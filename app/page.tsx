@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { content } from "@/content";
 
@@ -13,9 +12,44 @@ function getEmbeddedFormUrl(formUrl: string) {
   return `${formUrl}${hasQuery ? "&" : "?"}embedded=true`;
 }
 
+function HeroVideoBg() {
+  const v = (content as any).heroVideo;
+  if (!v?.enabled || !v?.youtubeId) return null;
+
+  const id = v.youtubeId as string;
+  const start = typeof v.start === "number" ? v.start : 0;
+  const params = new URLSearchParams({
+    autoplay: "1",
+    mute: "1",
+    controls: "0",
+    rel: "0",
+    modestbranding: "1",
+    playsinline: "1",
+    loop: "1",
+    playlist: id
+  });
+
+  if (start > 0) {
+    params.set("start", String(start));
+  }
+
+  return (
+    <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 bg-[#041411]/70" />
+      <iframe
+        className="h-full w-full scale-[1.15]"
+        src={`https://www.youtube.com/embed/${id}?${params.toString()}`}
+        title="Turnkeyhaus Hero Background"
+        allow="autoplay; encrypted-media"
+        allowFullScreen={false}
+        loading="lazy"
+      />
+    </div>
+  );
+}
+
 export default function Home() {
   const embeddedFormUrl = getEmbeddedFormUrl(content.contact.formUrl);
-  const heroLogo = content.site.assets.logoOnDark;
 
   return (
     <>
@@ -36,31 +70,36 @@ export default function Home() {
 
       <main id="main-content">
         <section id="hero" className="container-shell pb-16 pt-16 md:pb-24 md:pt-24">
-          <div className="panel hero-panel">
-            <div className="logo-shell" aria-hidden="true">
-              <Image
-                src={heroLogo}
-                alt=""
-                width={3158}
-                height={1384}
-                priority
-                className="logo-main"
-              />
-            </div>
-            <p className="eyebrow">{content.hero.label}</p>
-            <h1 className="hero-title">{content.hero.headline}</h1>
-            <p className="hero-subtitle">{content.hero.subheadline}</p>
-            <p className="hero-description">{content.hero.description}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              {content.hero.ctas.map((cta) => (
-                <Link
-                  key={cta.href}
-                  href={cta.href}
-                  className={cta.variant === "primary" ? "btn-primary" : "btn-secondary"}
-                >
-                  {cta.label}
-                </Link>
-              ))}
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#041411] p-10 md:p-16">
+            <HeroVideoBg />
+            <div className="relative z-10 max-w-4xl space-y-6">
+              <div className="inline-block rounded-full border border-[#21c1a2]/40 bg-[#21c1a2]/10 px-4 py-1 text-xs tracking-widest text-[#21c1a2]">
+                {content.hero.label}
+              </div>
+
+              <h1 className="text-4xl font-bold leading-tight md:text-5xl">
+                {content.hero.headline}
+              </h1>
+
+              <p className="text-lg text-white/80">{content.hero.subheadline}</p>
+
+              <p className="text-sm text-white/60">{content.hero.description}</p>
+
+              <div className="flex flex-wrap gap-4 pt-4">
+                {content.hero.ctas.map((cta) => (
+                  <Link
+                    key={cta.href}
+                    href={cta.href}
+                    className={
+                      cta.variant === "primary"
+                        ? "rounded-xl bg-[#21c1a2] px-6 py-3 font-semibold text-black"
+                        : "rounded-xl border border-white/20 px-6 py-3 text-white"
+                    }
+                  >
+                    {cta.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </section>

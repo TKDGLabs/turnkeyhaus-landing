@@ -33,6 +33,11 @@ export const content = {
       { label: "우리가 하는 일", href: "#about", variant: "secondary" as const }
     ]
   },
+  heroVideo: {
+    enabled: true,
+    youtubeId: "TIOJf08c88c",
+    start: 0
+  },
   problem: {
     title: "Problem",
     items: [

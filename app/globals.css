@@ -72,6 +72,10 @@ a {
     border-color: var(--line-strong);
   }
 
+  .hero-panel-video {
+    background: transparent;
+  }
+
   .logo-shell {
     @apply mb-6 inline-flex md:mb-8;
   }
