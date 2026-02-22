@@ -13,10 +13,10 @@ function getEmbeddedFormUrl(formUrl: string) {
 }
 
 function HeroVideoBg() {
-  const v = (content as any).heroVideo;
-  if (!v?.enabled || !v?.youtubeId) return null;
+  const v = content.heroVideo;
+  if (!v.enabled || !v.youtubeId) return null;
 
-  const id = v.youtubeId as string;
+  const id = v.youtubeId;
   const start = typeof v.start === "number" ? v.start : 0;
   const params = new URLSearchParams({
     autoplay: "1",
