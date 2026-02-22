@@ -1,0 +1,207 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #041411;
+  --accent: #21c1a2;
+  --text: #effffb;
+  --muted: #a8c1bb;
+  --line: rgba(239, 255, 251, 0.16);
+  --line-strong: rgba(239, 255, 251, 0.28);
+  --radius-system: 14px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-a2z), "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(33, 193, 162, 0.2);
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -3rem;
+  z-index: 100;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #03231c;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+@layer components {
+  .container-shell {
+    @apply mx-auto w-full max-w-6xl px-5 md:px-8;
+  }
+
+  .section-shell {
+    @apply container-shell py-16 md:py-24;
+    border-top: 1px solid var(--line);
+  }
+
+  .panel {
+    @apply rounded-system p-5 md:p-7;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(7, 26, 22, 0.92) 0%, rgba(5, 20, 17, 0.92) 100%);
+  }
+
+  .hero-panel {
+    @apply md:p-10;
+    border-color: var(--line-strong);
+  }
+
+  .logo-shell {
+    @apply mb-6 inline-flex md:mb-8;
+  }
+
+  .logo-main {
+    @apply h-auto w-full max-w-[280px] md:max-w-[440px];
+  }
+
+  .brand-mark {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-white md:text-sm;
+  }
+
+  .nav-link {
+    @apply rounded-system whitespace-nowrap px-3 py-2 text-xs text-[color:var(--muted)] transition hover:text-white;
+    border: 1px solid transparent;
+  }
+
+  .nav-link:hover {
+    border-color: var(--line);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .eyebrow {
+    @apply mb-4 inline-flex rounded-system px-3 py-1 text-[11px] uppercase tracking-[0.16em] md:text-xs;
+    color: var(--accent);
+    border: 1px solid rgba(33, 193, 162, 0.35);
+  }
+
+  .hero-title {
+    @apply text-3xl leading-tight md:text-5xl;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-subtitle {
+    @apply mt-5 text-lg leading-relaxed text-white md:text-xl;
+  }
+
+  .hero-description {
+    @apply mt-5 max-w-3xl text-sm leading-relaxed text-[color:var(--muted)] md:text-base;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-system px-5 py-3 text-sm font-medium md:text-base;
+    min-height: 46px;
+    transition: all 0.2s ease;
+    border: 1px solid var(--line);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #03231c;
+    border-color: rgba(33, 193, 162, 0.7);
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.05);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--line-strong);
+    background: rgba(239, 255, 251, 0.04);
+  }
+
+  .section-heading {
+    @apply mb-6 flex items-center gap-3 md:mb-8;
+  }
+
+  .section-heading h2 {
+    @apply text-2xl md:text-3xl;
+    letter-spacing: -0.01em;
+  }
+
+  .section-label {
+    @apply inline-flex min-w-12 items-center justify-center rounded-system px-3 py-1 text-xs font-semibold;
+    border: 1px solid var(--line);
+    color: var(--accent);
+  }
+
+  .card-item {
+    @apply flex min-h-[106px] items-center;
+  }
+
+  .card-title {
+    @apply mb-3 text-xl;
+    letter-spacing: -0.01em;
+  }
+
+  .card-text {
+    @apply text-sm leading-relaxed text-[color:var(--muted)] md:text-base;
+  }
+
+  .step-index {
+    @apply mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--accent)];
+  }
+
+  .key-line {
+    @apply mt-6 rounded-system px-4 py-4 text-base md:mt-8 md:text-lg;
+    border: 1px solid rgba(33, 193, 162, 0.35);
+    color: var(--accent);
+    background: rgba(33, 193, 162, 0.08);
+  }
+
+  .list-line {
+    @apply rounded-system px-4 py-3 text-sm md:text-base;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+
+  .form-shell {
+    @apply overflow-hidden rounded-system;
+    border: 1px solid var(--line);
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .footer-company {
+    @apply mb-4 text-sm font-semibold md:text-base;
+  }
+
+  .footer-grid {
+    @apply grid gap-2 text-sm text-[color:var(--muted)] md:grid-cols-2;
+  }
+
+  .footer-grid a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
