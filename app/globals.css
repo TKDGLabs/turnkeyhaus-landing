@@ -21,6 +21,7 @@ body {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
+  line-height: 1.85;
   font-family: var(--font-a2z), "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   text-rendering: optimizeLegibility;
 }
@@ -28,6 +29,11 @@ body {
 h1,
 h2 {
   text-wrap: balance;
+}
+
+p,
+li {
+  line-height: 1.85;
 }
 
 a {

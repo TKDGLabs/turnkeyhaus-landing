@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { content } from "../content";
 
 const clsCard =
@@ -10,7 +12,7 @@ const clsMedia =
 const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
 const sectionShell = "mx-auto max-w-6xl px-5 py-20 md:py-24";
 const sectionStack = "space-y-8 md:space-y-10";
-const bodyCopy = "whitespace-pre-line text-base leading-[1.85] text-black/72 md:text-lg";
+const bodyCopy = "max-w-[52ch] whitespace-pre-line text-base leading-[1.85] text-black/72 md:text-lg";
 const sectionLabelClass = "text-sm font-semibold tracking-[0.14em] text-black/45 md:text-base";
 
 function isExternalLink(href: string) {
@@ -61,12 +63,12 @@ function SectionHeader({
   lead?: string;
 }) {
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="max-w-[52ch] space-y-4">
       <SectionLabel>{label}</SectionLabel>
-      <h2 className="whitespace-pre-line text-3xl font-semibold leading-[1.2] tracking-tight text-[#0B0F0E] md:text-4xl">
+      <h2 className="max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.05] tracking-tight text-[#0B0F0E] md:text-4xl">
         {title}
       </h2>
-      {lead ? <p className={`${bodyCopy} max-w-2xl`}>{lead}</p> : null}
+      {lead ? <p className={bodyCopy}>{lead}</p> : null}
     </div>
   );
 }
@@ -97,11 +99,26 @@ function isGoogleFormEmbedUrl(url: string) {
 
 const ytThumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
+function resolveHeroImageSrc() {
+  const candidatePaths = ["/images/showreel-cover.jpg", "/images/showreel-cover.png"];
+  const publicDir = join(process.cwd(), "public");
+
+  for (const imagePath of candidatePaths) {
+    const absolutePath = join(publicDir, imagePath.replace(/^\//, ""));
+    if (existsSync(absolutePath)) {
+      return imagePath;
+    }
+  }
+
+  return "/images/studio-1.jpg";
+}
+
 export default function Page() {
   const formEmbedUrl = content.contact.googleFormEmbedUrl.trim();
   const formShareUrl = content.contact.googleFormShareUrl.trim();
   const hasFormEmbedUrl = isGoogleFormEmbedUrl(formEmbedUrl);
   const hasFormShareUrl = formShareUrl.startsWith("http://") || formShareUrl.startsWith("https://");
+  const heroImageSrc = resolveHeroImageSrc();
 
   return (
     <main className="min-h-screen bg-white text-[#0B0F0E]">
@@ -129,15 +146,15 @@ export default function Page() {
         id="top"
         className="bg-white"
       >
-        <div className="mx-auto max-w-6xl px-6 py-24 md:py-28">
+        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
           <div className="grid gap-6 md:grid-cols-2 items-start">
             <div className="space-y-10">
-              <h1 className="text-5xl md:text-6xl leading-[1.05] tracking-tight font-semibold text-black max-w-[15ch] whitespace-pre-line">
+              <h1 className="max-w-[16ch] whitespace-pre-line text-5xl font-semibold leading-[1.05] tracking-tight text-black md:text-6xl">
                 {`전문직 유튜브,
 제작이 아니라 전략입니다.`}
               </h1>
 
-              <p className="text-lg md:text-xl leading-[1.85] text-black/70 max-w-[44ch]">
+              <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] text-black/70 md:text-lg">
                 우리는 단순히 영상만 납품하지 않습니다.
                 전문분야 채널의 판단 구조를 설계합니다.
               </p>
@@ -159,12 +176,12 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-2xl border border-black/10">
+            <div className="overflow-hidden rounded-2xl">
               <Image
-                src="/images/your-image.jpg"
+                src={heroImageSrc}
                 alt="Turnkeyhaus studio"
                 width={1200}
-                height={800}
+                height={900}
                 className="h-auto w-full object-cover"
                 priority
               />
@@ -191,14 +208,14 @@ export default function Page() {
               </ul>
 
               <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-                <p className="max-w-2xl whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
+                <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
                   {content.problem.emphasis}
                 </p>
               </div>
             </div>
           ) : (
             <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-              <p className="max-w-2xl whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
+              <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
                 {content.problem.emphasis}
               </p>
             </div>
@@ -214,28 +231,15 @@ export default function Page() {
             lead={content.realityCheck.lead}
           />
 
-          <div className="grid gap-5 md:grid-cols-[1.2fr_0.8fr] md:items-stretch">
-            <div className="space-y-4">
-              <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-                <p className="max-w-2xl whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
-                  {content.realityCheck.emphasis}
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-black/10 bg-white p-6">
-                <p className={`${bodyCopy} max-w-2xl`}>{content.realityCheck.body}</p>
-              </div>
+          <div className="max-w-[52ch] space-y-6">
+            <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <p className={bodyCopy}>{content.realityCheck.body}</p>
             </div>
 
-            <div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-black/10 bg-[#fbfcfb] p-6">
-              <p className={`${bodyCopy} max-w-2xl`}>{content.realityCheck.ctaLead}</p>
-
-              <ActionLink
-                href={content.realityCheck.ctaHref}
-                className="inline-flex w-fit rounded-2xl border border-[#1aa98d] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-white"
-              >
-                {content.realityCheck.ctaLabel}
-              </ActionLink>
+            <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
+              <p className="whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
+                {content.realityCheck.emphasis}
+              </p>
             </div>
           </div>
         </div>
@@ -256,7 +260,7 @@ export default function Page() {
               </ul>
 
               <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-5">
-                <p className="max-w-2xl whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
+                <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
                   {content.approach.keyline}
                 </p>
               </div>
@@ -328,17 +332,15 @@ export default function Page() {
             </ul>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2 md:items-start">
             {content.studioProof.images.map((image) => (
-              <div
-                key={image.src}
-                className="relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-black/5"
-              >
+              <div key={image.src} className="overflow-hidden rounded-2xl border border-black/10 bg-black/5">
                 <Image
                   src={image.src}
                   alt={image.alt}
-                  fill
-                  className="object-contain"
+                  width={1600}
+                  height={1200}
+                  className="h-auto w-full object-cover"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
@@ -348,7 +350,7 @@ export default function Page() {
           <div className="space-y-6">
             <div className="space-y-3">
               <h3 className="text-xl font-semibold tracking-tight text-[#0B0F0E]">{content.studioProof.crewTitle}</h3>
-              <p className="max-w-3xl text-base leading-[1.85] text-black/72">
+              <p className="max-w-[52ch] text-base leading-[1.85] text-black/72">
                 {content.studioProof.crewLead}
               </p>
             </div>
@@ -389,9 +391,9 @@ export default function Page() {
 
       <section id="portfolio" className="border-t border-black/10">
         <div className={`${sectionShell} ${sectionStack}`}>
-          <div className="max-w-2xl space-y-4">
+          <div className="max-w-[52ch] space-y-4">
             <SectionLabel>{content.portfolio.h2}</SectionLabel>
-            <p className={`${bodyCopy} max-w-2xl`}>{content.portfolio.lead}</p>
+            <p className={bodyCopy}>{content.portfolio.lead}</p>
           </div>
 
           <div className="grid gap-5 md:grid-cols-3">
@@ -466,7 +468,7 @@ export default function Page() {
           </div>
 
           <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-            <p className="max-w-2xl whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
+            <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
               {content.pricing.emphasis}
             </p>
           </div>
@@ -475,12 +477,12 @@ export default function Page() {
 
       <section id="contact" className="border-t border-black/10">
         <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
-          <div className="mb-10 max-w-2xl space-y-6">
+          <div className="mb-10 max-w-[52ch] space-y-6">
             <SectionLabel>{content.contact.label}</SectionLabel>
-            <h2 className="whitespace-pre-line text-3xl font-semibold leading-[1.2] tracking-tight text-[#0B0F0E] md:text-4xl">
+            <h2 className="max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.05] tracking-tight text-[#0B0F0E] md:text-4xl">
               {content.contact.h2}
             </h2>
-            <p className={`${bodyCopy} max-w-2xl`}>{content.contact.lead}</p>
+            <p className={bodyCopy}>{content.contact.lead}</p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-start">

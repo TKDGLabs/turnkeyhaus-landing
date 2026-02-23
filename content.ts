@@ -296,7 +296,7 @@ export const content: Content = {
       }
     ],
     crewNote: "전국 촬영 대응.\n추가 출장비 없이 운영 범위에 포함됩니다.",
-    closing: "우리는 영상 제작자가 아니라\n구조를 이해하는 운영 파트너입니다.",
+    closing: "우리는 단순한 영상 제작자가 아닙니다. 브랜딩 구조를 이해하는 운영 파트너입니다",
     images: [images.studio1, images.studio2]
   },
   portfolio: {
