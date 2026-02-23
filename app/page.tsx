@@ -127,28 +127,22 @@ export default function Page() {
 
       <section
         id="top"
-        className="border-b border-black/10 bg-white"
+        className="bg-white"
       >
-        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-          <div className="grid gap-16 md:grid-cols-[1.2fr_0.8fr] md:items-stretch">
+        <div className="mx-auto max-w-6xl px-6 py-24 md:py-28">
+          <div className="grid gap-6 md:grid-cols-2 items-start">
             <div className="space-y-10">
-              <SectionLabel>[ PROFESSIONAL YOUTUBE STRUCTURE ]</SectionLabel>
-
-              <h1 className="max-w-[18ch] whitespace-pre-line text-5xl font-semibold leading-[1.05] tracking-tight text-black md:text-6xl">
-                전문직 유튜브,
-                {"\n"}
-                조회수 말고 구조로 만드십시오.
+              <h1 className="text-5xl md:text-6xl leading-[1.05] tracking-tight font-semibold text-black max-w-[15ch] whitespace-pre-line">
+                {`전문직 유튜브,
+제작이 아니라 전략입니다.`}
               </h1>
 
-              <p className="max-w-[48ch] whitespace-pre-line text-lg leading-[1.85] text-black/70 md:text-xl">
-                유튜브에 월 수백을 쓰고도
-                {"\n"}
-                상담이 늘지 않는 이유는
-                {"\n"}
-                콘텐츠가 아니라 구조입니다.
+              <p className="text-lg md:text-xl leading-[1.85] text-black/70 max-w-[44ch]">
+                우리는 단순히 영상만 납품하지 않습니다.
+                전문분야 채널의 판단 구조를 설계합니다.
               </p>
 
-              <div className="flex flex-wrap gap-4 pt-4">
+              <div className="flex flex-wrap gap-4 pt-2">
                 <a
                   href="#contact"
                   className="rounded-xl bg-[#21c1a2] px-8 py-4 font-semibold text-black"
@@ -165,25 +159,15 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="h-full space-y-6 rounded-2xl border border-black/10 bg-white p-6 md:p-8">
-              <SectionLabel>[ MEDIA EXECUTION ]</SectionLabel>
-
-              <div className="relative aspect-video overflow-hidden rounded-2xl border border-black/10">
-                <Image
-                  src="/images/showreel-cover.jpg"
-                  alt="Turnkeyhaus Media Execution"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 40vw"
-                  priority
-                />
-              </div>
-
-              <p className="whitespace-pre-line text-sm leading-[1.85] text-black/60">
-                컨설팅은 말로,
-                {"\n"}
-                실행은 시스템으로 증명합니다.
-              </p>
+            <div className="relative overflow-hidden rounded-2xl border border-black/10">
+              <Image
+                src="/images/your-image.jpg"
+                alt="Turnkeyhaus studio"
+                width={1200}
+                height={800}
+                className="h-auto w-full object-cover"
+                priority
+              />
             </div>
           </div>
         </div>
@@ -331,7 +315,18 @@ export default function Page() {
 
       <section id="proof" className="border-t border-black/10">
         <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader label={content.studioProof.label} title={content.studioProof.h2} lead={content.studioProof.lead} />
+          <SectionHeader label={content.studioProof.label} title={content.studioProof.h2} />
+
+          <div className="rounded-2xl border border-black/10 bg-white p-6 md:p-8">
+            <h3 className="text-lg font-semibold text-[#0B0F0E]">{content.studioProof.operationTitle}</h3>
+            <ul className="mt-4 space-y-2 text-sm leading-relaxed text-black/72 md:text-base">
+              {content.studioProof.operationSystem.map((item) => (
+                <li key={item} className="list-inside list-disc">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <div className="grid gap-5 md:grid-cols-2">
             {content.studioProof.images.map((image) => (
@@ -350,11 +345,45 @@ export default function Page() {
             ))}
           </div>
 
-          {content.studioProof.caption ? (
-            <div className="rounded-2xl border border-black/10 bg-[#fbfcfb] px-5 py-4">
-              <p className={`${bodyCopy} max-w-2xl`}>{content.studioProof.caption}</p>
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <h3 className="text-xl font-semibold tracking-tight text-[#0B0F0E]">{content.studioProof.crewTitle}</h3>
+              <p className="max-w-3xl text-base leading-[1.85] text-black/72">
+                {content.studioProof.crewLead}
+              </p>
             </div>
-          ) : null}
+
+            <div className="grid gap-5 md:grid-cols-2">
+              {content.studioProof.crewCards.map((member) => (
+                <article
+                  key={member.role}
+                  className="space-y-3 rounded-2xl border border-black/10 bg-white p-6 md:p-8"
+                >
+                  <div className="text-sm font-semibold tracking-[0.06em] text-black/50">{member.role}</div>
+                  <p className="text-base leading-[1.85] text-black/72">{member.headline}</p>
+                  <ul className="space-y-2 text-sm leading-[1.8] text-black/62">
+                    {member.bullets.map((line) => (
+                      <li key={line} className="list-inside list-disc">
+                        {line}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
+
+            <div className="rounded-2xl border border-black/10 bg-white p-6 md:p-8">
+              <p className="whitespace-pre-line text-base leading-[1.85] text-black/72">
+                {content.studioProof.crewNote}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
+              <p className="whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
+                {content.studioProof.closing}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

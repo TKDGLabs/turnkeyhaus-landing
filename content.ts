@@ -35,6 +35,12 @@ export type OperatingLevelCard = {
   target: string;
 };
 
+export type ProductionCrewCard = {
+  role: string;
+  headline: string;
+  bullets: string[];
+};
+
 export type FooterLine = {
   label: string;
   value: string;
@@ -90,9 +96,14 @@ export type Content = {
   studioProof: {
     label: string;
     h2: string;
-    lead: string;
+    operationTitle: string;
+    operationSystem: string[];
+    crewTitle: string;
+    crewLead: string;
+    crewCards: ProductionCrewCard[];
+    crewNote: string;
+    closing: string;
     images: ImageAsset[];
-    caption: string;
   };
   portfolio: {
     label: string;
@@ -235,10 +246,58 @@ export const content: Content = {
   },
   studioProof: {
     label: "[ 실행 증거 ]",
-    h2: "컨설팅은 말로,\n실행은 시스템으로.",
-    lead: "PD 2인 · 3CAM · 월 1~2회 촬영\n(촬영은 최소화, 운영은 지속)",
-    images: [images.studio1, images.studio2],
-    caption: ""
+    h2: "컨설팅은 말로,\n실행은 기준으로 증명합니다.",
+    operationTitle: "운영 시스템",
+    operationSystem: [
+      "전담 PD 배정",
+      "Sony FX 시네마 라인 장비 사용",
+      "월 1–2회 촬영 기반 운영",
+      "출장비 별도 없음 (전국 대응)"
+    ],
+    crewTitle: "제작진 역량",
+    crewLead:
+      "전문직 채널은 단순 촬영 인력으로 운영되지 않습니다. 전공과 실무 경험을 갖춘 팀이 전담 구조로 운영합니다.",
+    crewCards: [
+      {
+        role: "Account Lead",
+        headline: "전문직 브랜딩 설계 경험",
+        bullets: [
+          "법률·의료 채널 구조 설계",
+          "브랜드 포지셔닝 및 톤 전략",
+          "전환 중심 콘텐츠 구조 설계"
+        ]
+      },
+      {
+        role: "Marketing Producer",
+        headline: "SEO 기반 운영 설계",
+        bullets: [
+          "검색 키워드 구조 설계",
+          "성과 분석 및 리포트",
+          "콘텐츠 자산화 전략"
+        ]
+      },
+      {
+        role: "Video Director",
+        headline: "시네마 라인 촬영 시스템",
+        bullets: [
+          "Sony FX 시리즈 운용",
+          "3CAM 기반 촬영",
+          "고난도 인터뷰·브랜딩 영상 연출"
+        ]
+      },
+      {
+        role: "Creative Lead",
+        headline: "채널 성장 및 디자인 구조",
+        bullets: [
+          "채널 아이덴티티 설계",
+          "썸네일·브랜딩 시스템 구축",
+          "대형 채널 성장 경험"
+        ]
+      }
+    ],
+    crewNote: "전국 촬영 대응.\n추가 출장비 없이 운영 범위에 포함됩니다.",
+    closing: "우리는 영상 제작자가 아니라\n구조를 이해하는 운영 파트너입니다.",
+    images: [images.studio1, images.studio2]
   },
   portfolio: {
     label: "[ 포트폴리오 ]",
