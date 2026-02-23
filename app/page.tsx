@@ -10,7 +10,8 @@ const clsMedia =
 const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
 const sectionShell = "mx-auto max-w-6xl px-5 py-20 md:py-24";
 const sectionStack = "space-y-8 md:space-y-10";
-const bodyCopy = "whitespace-pre-line text-base leading-[1.8] text-black/72 md:text-lg";
+const bodyCopy = "whitespace-pre-line text-base leading-[1.85] text-black/72 md:text-lg";
+const sectionLabelClass = "text-sm font-semibold tracking-[0.14em] text-black/45 md:text-base";
 
 function isExternalLink(href: string) {
   return href.startsWith("http://") || href.startsWith("https://");
@@ -40,6 +41,16 @@ function ActionLink({
   );
 }
 
+function SectionLabel({
+  children,
+  className = ""
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={`${sectionLabelClass} ${className}`.trim()}>{children}</div>;
+}
+
 function SectionHeader({
   label,
   title,
@@ -51,7 +62,7 @@ function SectionHeader({
 }) {
   return (
     <div className="max-w-2xl space-y-4">
-      <div className="text-xs font-semibold tracking-[0.14em] text-black/55">{label}</div>
+      <SectionLabel>{label}</SectionLabel>
       <h2 className="whitespace-pre-line text-3xl font-semibold leading-[1.2] tracking-tight text-[#0B0F0E] md:text-4xl">
         {title}
       </h2>
@@ -118,20 +129,18 @@ export default function Page() {
         id="top"
         className="border-b border-black/10 bg-white"
       >
-        <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
-          <div className="grid gap-16 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+          <div className="grid gap-16 md:grid-cols-[1.2fr_0.8fr] md:items-stretch">
             <div className="space-y-10">
-              <div className="text-xs font-semibold tracking-[0.18em] text-black/50">
-                [ PROFESSIONAL YOUTUBE STRUCTURE ]
-              </div>
+              <SectionLabel>[ PROFESSIONAL YOUTUBE STRUCTURE ]</SectionLabel>
 
-              <h1 className="whitespace-pre-line text-5xl font-semibold leading-[1.05] tracking-tight text-black md:text-6xl">
+              <h1 className="max-w-[18ch] whitespace-pre-line text-5xl font-semibold leading-[1.05] tracking-tight text-black md:text-6xl">
                 전문직 유튜브,
                 {"\n"}
                 조회수 말고 구조로 만드십시오.
               </h1>
 
-              <p className="max-w-2xl whitespace-pre-line text-lg leading-[1.8] text-black/70 md:text-xl">
+              <p className="max-w-[48ch] whitespace-pre-line text-lg leading-[1.85] text-black/70 md:text-xl">
                 유튜브에 월 수백을 쓰고도
                 {"\n"}
                 상담이 늘지 않는 이유는
@@ -156,10 +165,8 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-black/10 bg-white p-6">
-              <div className="mb-4 text-xs font-semibold tracking-[0.18em] text-black/50">
-                [ MEDIA EXECUTION ]
-              </div>
+            <div className="h-full space-y-6 rounded-2xl border border-black/10 bg-white p-6 md:p-8">
+              <SectionLabel>[ MEDIA EXECUTION ]</SectionLabel>
 
               <div className="relative aspect-video overflow-hidden rounded-2xl border border-black/10">
                 <Image
@@ -172,7 +179,7 @@ export default function Page() {
                 />
               </div>
 
-              <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-black/60">
+              <p className="whitespace-pre-line text-sm leading-[1.85] text-black/60">
                 컨설팅은 말로,
                 {"\n"}
                 실행은 시스템으로 증명합니다.
@@ -200,14 +207,14 @@ export default function Page() {
               </ul>
 
               <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-                <p className="max-w-2xl whitespace-pre-line text-base leading-[1.8] font-semibold text-[#0B0F0E] md:text-lg">
+                <p className="max-w-2xl whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
                   {content.problem.emphasis}
                 </p>
               </div>
             </div>
           ) : (
             <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-              <p className="max-w-2xl whitespace-pre-line text-base leading-[1.8] font-semibold text-[#0B0F0E] md:text-lg">
+              <p className="max-w-2xl whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
                 {content.problem.emphasis}
               </p>
             </div>
@@ -226,7 +233,7 @@ export default function Page() {
           <div className="grid gap-5 md:grid-cols-[1.2fr_0.8fr] md:items-stretch">
             <div className="space-y-4">
               <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-                <p className="max-w-2xl whitespace-pre-line text-base font-semibold leading-[1.8] text-[#0B0F0E] md:text-lg">
+                <p className="max-w-2xl whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
                   {content.realityCheck.emphasis}
                 </p>
               </div>
@@ -265,7 +272,7 @@ export default function Page() {
               </ul>
 
               <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-5">
-                <p className="max-w-2xl whitespace-pre-line text-base leading-[1.8] font-semibold text-[#0B0F0E] md:text-lg">
+                <p className="max-w-2xl whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
                   {content.approach.keyline}
                 </p>
               </div>
@@ -302,7 +309,7 @@ export default function Page() {
                     </div>
                   ) : null}
 
-                  <p className="whitespace-pre-line text-base leading-[1.8] text-black/72 md:text-lg">{card.oneLiner}</p>
+                  <p className="whitespace-pre-line text-base leading-[1.85] text-black/72 md:text-lg">{card.oneLiner}</p>
 
                   <ul className="space-y-2 text-sm text-black/72">
                     {card.bullets.map((bullet) => (
@@ -328,7 +335,18 @@ export default function Page() {
 
           <div className="grid gap-5 md:grid-cols-2">
             {content.studioProof.images.map((image) => (
-              <MediaFrame key={image.src} image={image} overlayClass="bg-black/8" />
+              <div
+                key={image.src}
+                className="relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-black/5"
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
             ))}
           </div>
 
@@ -343,7 +361,7 @@ export default function Page() {
       <section id="portfolio" className="border-t border-black/10">
         <div className={`${sectionShell} ${sectionStack}`}>
           <div className="max-w-2xl space-y-4">
-            <div className="text-xs font-semibold tracking-[0.14em] text-black/55">{content.portfolio.h2}</div>
+            <SectionLabel>{content.portfolio.h2}</SectionLabel>
             <p className={`${bodyCopy} max-w-2xl`}>{content.portfolio.lead}</p>
           </div>
 
@@ -371,7 +389,7 @@ export default function Page() {
                     </span>
                   </div>
 
-                  <p className="whitespace-pre-line text-base leading-[1.8] text-black/72 md:text-lg">{item.oneLiner}</p>
+                  <p className="whitespace-pre-line text-base leading-[1.85] text-black/72 md:text-lg">{item.oneLiner}</p>
 
                   <div className="flex flex-wrap gap-2">
                     {item.tags.map((tag) => (
@@ -419,7 +437,7 @@ export default function Page() {
           </div>
 
           <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-            <p className="max-w-2xl whitespace-pre-line text-base font-semibold leading-[1.8] text-[#0B0F0E] md:text-lg">
+            <p className="max-w-2xl whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
               {content.pricing.emphasis}
             </p>
           </div>
@@ -428,8 +446,8 @@ export default function Page() {
 
       <section id="contact" className="border-t border-black/10">
         <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
-          <div className="mb-10 max-w-2xl space-y-4">
-            <div className="text-xs font-semibold tracking-[0.14em] text-black/55">{content.contact.label}</div>
+          <div className="mb-10 max-w-2xl space-y-6">
+            <SectionLabel>{content.contact.label}</SectionLabel>
             <h2 className="whitespace-pre-line text-3xl font-semibold leading-[1.2] tracking-tight text-[#0B0F0E] md:text-4xl">
               {content.contact.h2}
             </h2>
@@ -438,9 +456,9 @@ export default function Page() {
 
           <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-start">
             <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 md:p-8">
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <h3 className="text-2xl font-semibold tracking-tight text-[#0B0F0E]">채널 구조 진단</h3>
-                <p className="whitespace-pre-line text-base leading-[1.8] text-black/70">
+                <p className="whitespace-pre-line text-base leading-[1.85] text-black/70">
                   현재 상황과 목표를 남겨주시면
                   {"\n"}
                   채널 구조 관점으로 검토 후 회신드립니다.
@@ -468,7 +486,7 @@ export default function Page() {
                 </ul>
               </div>
 
-              <p className="text-xs leading-[1.8] text-black/50">
+              <p className="text-xs leading-[1.85] text-black/50">
                 제작 견적이 아니라 구조 진단이 먼저입니다.
               </p>
 

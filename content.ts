@@ -159,14 +159,14 @@ export const content: Content = {
     ]
   },
   nav: [
-    { label: "PROBLEM", href: "#problem" },
-    { label: "REALITY", href: "#reality-check" },
-    { label: "APPROACH", href: "#approach" },
-    { label: "PROFESSIONAL", href: "#professional" },
-    { label: "PROOF", href: "#proof" },
-    { label: "PORTFOLIO", href: "#portfolio" },
-    { label: "LEVEL", href: "#pricing" },
-    { label: "CONTACT", href: "#contact" }
+    { label: "문제", href: "#problem" },
+    { label: "현실 점검", href: "#reality-check" },
+    { label: "방식", href: "#approach" },
+    { label: "전문직 적용", href: "#professional" },
+    { label: "실행 증거", href: "#proof" },
+    { label: "포트폴리오", href: "#portfolio" },
+    { label: "운영 레벨", href: "#pricing" },
+    { label: "채널 진단", href: "#contact" }
   ],
   problem: {
     label: "[ 문제 ]",
