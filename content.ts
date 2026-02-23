@@ -30,8 +30,8 @@ export type PortfolioItem = {
   tags: string[];
   result: string;
   href: string;
-  image: ImageAsset;
-  ctaLabel: string;
+  youtubeId?: string;
+  imageSrc: string;
 };
 
 export type FooterLine = {
@@ -76,11 +76,12 @@ export type Content = {
     items: string[];
     emphasis: string;
   };
-  structure: {
+  approach: {
     label: string;
     h2: string;
     lead: string;
     bullets: string[];
+    keyline: string;
     image: ImageAsset;
   };
   professionalTargets: {
@@ -101,6 +102,12 @@ export type Content = {
     h2: string;
     lead: string;
     items: PortfolioItem[];
+  };
+  pricing: {
+    label: string;
+    h2: string;
+    lead?: string;
+    lines: string[];
   };
   contact: {
     label: string;
@@ -126,10 +133,7 @@ const images = {
   med: { src: "/images/pro-med.jpg", alt: "병원·의료 대표 이미지" },
   tax: { src: "/images/pro-tax.jpg", alt: "세무·회계·노무 대표 이미지" },
   structure: { src: "/images/concept-brand.jpg", alt: "브랜드 구조 설계 이미지" },
-  different: { src: "/images/concept-different.jpg", alt: "차별화 개념 이미지" },
-  portfolio365: { src: "/images/portfolio-365tube.png", alt: "365Tube 포트폴리오 썸네일" },
-  portfolioLaw: { src: "/images/portfolio-law.png", alt: "법 잘하는 변호사들 포트폴리오 썸네일" },
-  portfolioJuchia: { src: "/images/portfolio-juchia.png", alt: "주치아 앞선tube 포트폴리오 썸네일" }
+  different: { src: "/images/concept-different.jpg", alt: "차별화 개념 이미지" }
 } as const;
 
 export const content: Content = {
@@ -158,18 +162,19 @@ export const content: Content = {
   },
   nav: [
     { label: "PROBLEM", href: "#problem" },
-    { label: "STRUCTURE", href: "#structure" },
+    { label: "APPROACH", href: "#approach" },
     { label: "PROFESSIONAL", href: "#professional" },
     { label: "PROOF", href: "#proof" },
     { label: "PORTFOLIO", href: "#portfolio" },
+    { label: "PRICING", href: "#pricing" },
     { label: "CONTACT", href: "#contact" }
   ],
   hero: {
     label: "[ CONSULTING FIRM · MEDIA EXECUTION ]",
-    h1: "컨설팅 기준으로 설계하고\n미디어로 실행합니다.",
-    sub: "유튜브는 홍보물이 아니라 신뢰를 남기는 구조입니다.",
+    h1: "콘텐츠는 흐르고,\n구조는 남습니다.",
+    sub: "전문직 채널을\n운영 시스템으로 설계합니다.",
     body:
-      "Turnkeyhaus는 TKDG Labs의 미디어 기반 실행 조직입니다.\n제작물 단위가 아니라 채널 구조와 운영 체계를 먼저 설계합니다.",
+      "Turnkeyhaus는 TKDG Labs의\n미디어 기반 실행 조직입니다.\n촬영보다 먼저, 기준과 구조를 고정합니다.",
     ctas: [
       { label: "채널 구조 진단 요청", href: "#contact", variant: "primary" },
       { label: "포트폴리오 보기", href: "#portfolio", variant: "ghost" }
@@ -183,60 +188,53 @@ export const content: Content = {
     }
   },
   problem: {
-    label: "[ PROBLEM ]",
-    h2: "전문직 채널이 멈추는 지점",
-    lead: "대부분의 채널은 콘텐츠 제작부터 시작해 운영 구조를 놓칩니다.",
-    items: [
-      "전문성은 높지만 채널 정체성이 일관되지 않음",
-      "영상 수는 늘어나지만 신뢰 축적이 느림",
-      "조회수 대비 상담·문의 전환이 약함",
-      "제작 후 반복 가능한 운영 시스템이 남지 않음"
-    ],
-    emphasis: "문제는 콘텐츠가 아니라 구조의 부재입니다."
+    label: "[ 문제 ]",
+    h2: "대부분의 콘텐츠는\n비슷한 이야기를 합니다.",
+    lead: "조회수가 많다고,\n매출이 늘진 않습니다.",
+    items: [],
+    emphasis: "잠재 고객이 찾던 맥락에\n놓이지 못하면 남지 않습니다."
   },
-  structure: {
-    label: "[ STRUCTURE ]",
-    h2: "브랜드는 구조로 완성됩니다",
-    lead: "포지셔닝, 톤, 편성, 전환 동선을 하나의 운영 체계로 연결합니다.",
+  approach: {
+    label: "[ 방식 ]",
+    h2: "잠재 고객이 찾는 질문을\n구조로 바꿉니다.",
+    lead: "",
     bullets: [
-      "타겟과 포지셔닝을 먼저 정의합니다.",
-      "롱폼·숏폼 역할을 분리해 채널 체계를 만듭니다.",
-      "검색 유입과 문의 전환 동선을 함께 설계합니다."
+      "포지셔닝 · 톤 정의",
+      "롱폼/숏폼 역할 분리",
+      "검색(SEO) · 전환(CTA) 동시 설계",
+      "성과 분석 → 성공 포맷 축적"
     ],
+    keyline: "촬영은 재료 생산입니다.\n운영은 신뢰를 축적하는 과정입니다.",
     image: images.structure
   },
   professionalTargets: {
-    label: "[ PROFESSIONAL ]",
-    h2: "통합 전문직 적용",
-    lead: "분야는 다르지만 운영 원칙은 동일합니다.",
+    label: "[ 전문직 적용 ]",
+    h2: "전문직은 자극이 아니라\n신뢰의 기준이 필요합니다.",
+    lead: "",
     cards: [
       {
         title: "변호사 · 로펌",
-        oneLiner: "법률 서비스는 일관된 신뢰 톤이 경쟁력입니다.",
+        oneLiner: "채널의 말투와 구조를\n일관되게 유지합니다.",
         tags: ["법률", "로펌", "상담"],
-        bullets: ["채널 포지셔닝/톤 설계", "사례·이슈 기반 포맷 구조화", "상담 전환형 CTA 설계"],
+        bullets: ["질문 중심 포맷 설계", "사례/상황 기반 구조화", "문의 전환 동선 설계"],
         image: images.law,
         href: "#contact",
         ctaLabel: "구조 진단 요청"
       },
       {
         title: "병원 · 의료",
-        oneLiner: "의료 정보는 명확성과 신뢰의 반복이 핵심입니다.",
+        oneLiner: "채널의 말투와 구조를\n일관되게 유지합니다.",
         tags: ["병원", "의료", "브랜딩"],
-        bullets: ["원장 브랜딩 구조", "환자 관점 설명형 포맷", "롱폼→숏폼 자산화"],
+        bullets: ["질문 중심 포맷 설계", "사례/상황 기반 구조화", "문의 전환 동선 설계"],
         image: images.med,
         href: "#contact",
         ctaLabel: "구조 진단 요청"
       },
       {
         title: "세무 · 회계 · 노무",
-        oneLiner: "숫자와 규정은 ‘구조화된 설명’이 신뢰를 만듭니다.",
+        oneLiner: "채널의 말투와 구조를\n일관되게 유지합니다.",
         tags: ["세무", "회계", "노무"],
-        bullets: [
-          "키워드 기반 콘텐츠 설계(세무/회계/노무별)",
-          "사례·상황별 포맷 구조화",
-          "문의 전환 동선(CTA) 설계"
-        ],
+        bullets: ["질문 중심 포맷 설계", "사례/상황 기반 구조화", "문의 전환 동선 설계"],
         image: images.tax,
         href: "#contact",
         ctaLabel: "구조 진단 요청"
@@ -244,56 +242,64 @@ export const content: Content = {
     ]
   },
   studioProof: {
-    label: "[ PROOF ]",
-    h2: "실행 인프라",
-    lead: "실행은 단발 제작이 아니라 반복 가능한 시스템으로 운영합니다.",
+    label: "[ 실행 증거 ]",
+    h2: "컨설팅은 말로,\n실행은 시스템으로.",
+    lead: "PD 2인 · 3CAM · 월 1~2회 촬영\n(촬영은 최소화, 운영은 지속)",
     images: [images.studio1, images.studio2],
-    caption: "PD 2인 / 3CAM / 월 1~2회 촬영 기반 운영"
+    caption: ""
   },
   portfolio: {
-    label: "[ PORTFOLIO ]",
-    h2: "운영 결과",
-    lead: "성과는 결과 숫자와 운영 지속성으로 확인합니다.",
+    label: "[ 포트폴리오 ]",
+    h2: "[ 포트폴리오 ]",
+    lead: "썸네일을 클릭하면 해당 영상으로 이동합니다.",
     items: [
       {
-        title: "365Tube",
-        oneLiner: "치과 네트워크 채널 설계 · 편성/아이덴티티 구축",
-        tags: ["치과", "채널 설계", "운영"],
-        result: "44 → 500",
-        href: "https://youtube.com/",
-        image: images.portfolio365,
-        ctaLabel: "채널 보기"
-      },
-      {
-        title: "법 잘하는 변호사들",
-        oneLiner: "채널 리빌딩 · SEO/운영 설계 · 상담 전환 구조",
-        tags: ["로펌", "리빌딩", "브랜딩"],
-        result: "500 → 5.7K",
-        href: "https://youtube.com/",
-        image: images.portfolioLaw,
-        ctaLabel: "채널 보기"
-      },
-      {
         title: "주치아 앞선tube",
-        oneLiner: "신규 런칭 · 원장 브랜딩 · 경쟁 리스크 최소화 설계",
-        tags: ["치과", "런칭", "브랜드 미디어"],
-        result: "0 → 517",
-        href: "https://youtube.com/",
-        image: images.portfolioJuchia,
-        ctaLabel: "채널 보기"
+        oneLiner: "신규 런칭 · 원장 브랜딩 · 운영 설계",
+        tags: ["치과", "런칭", "운영"],
+        result: "구독자 0 → 517명",
+        href: "https://youtu.be/ajOQC_X-5bE",
+        youtubeId: "ajOQC_X-5bE",
+        imageSrc: "/images/studio-1.jpg"
+      },
+      {
+        title: "법 잘하는 변호사들 · 로맨즈",
+        oneLiner: "채널 리빌딩 · SEO/운영 설계 · 전환 구조",
+        tags: ["로펌", "리빌딩", "브랜딩"],
+        result: "구독자 500 → 5.7천명",
+        href: "https://youtu.be/mozP07dCcuk",
+        youtubeId: "mozP07dCcuk",
+        imageSrc: "/images/pro-law.jpg"
+      },
+      {
+        title: "유안티비",
+        oneLiner: "채널 운영 설계 · 포맷 구조화 · 장기 자산화",
+        tags: ["채널 운영", "구조화", "자산화"],
+        result: "구독자 2.2천 → 11.7만",
+        href: "https://youtu.be/Fii93LBGjSY",
+        youtubeId: "Fii93LBGjSY",
+        imageSrc: "/images/studio-2.jpg"
       }
     ]
   },
+  pricing: {
+    label: "[ 운영 구조 ]",
+    h2: "채널 운영은 월 단위입니다.",
+    lines: [
+      "촬영은 매월 1~2회 진행됩니다.",
+      "상세 견적은 진단 후 안내드립니다."
+    ]
+  },
   contact: {
-    label: "[ CONTACT ]",
-    h2: "채널 구조 진단",
-    lead: "필요한 팀과만 협업합니다. 과장 없이 구조로 설득합니다.",
+    label: "[ 채널 구조 진단 ]",
+    h2: "지금 필요한 건\n더 많은 제작이 아니라\n더 나은 구조입니다.",
+    lead: "현재 상황과 목표를 남겨주시면\n채널 구조 관점으로 빠르게 검토 후 회신드립니다.",
     panelTitle: "상담 예약하기",
-    panelBody: "폼을 작성해주시면 채널 구조 관점에서 빠르게 검토 후 회신드립니다.",
+    panelBody: "현재 상황과 목표를 남겨주시면\n채널 구조 관점으로 빠르게 검토 후 회신드립니다.",
     panelHint: "Google Form은 임베드 URL만 사용합니다. (forms.gle 공유 링크 직접 사용 금지)",
     googleFormEmbedUrl:
       "https://docs.google.com/forms/d/e/1FAIpQLScnyuTnc051RnX8yaGNlPW6TSOe9INyaV-Gp8lc8xqUSL6kQg/viewform?embedded=true",
-    primaryCtaLabel: "상담 폼 열기",
+    primaryCtaLabel: "상담 예약하기",
     iframeTitle: "Turnkeyhaus 상담 폼"
   },
   footer: {
