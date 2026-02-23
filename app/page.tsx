@@ -1,5 +1,3 @@
-import { existsSync } from "node:fs";
-import path from "node:path";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -13,9 +11,6 @@ const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 
 const sectionShell = "mx-auto max-w-6xl px-5 py-20 md:py-24";
 const sectionStack = "space-y-8 md:space-y-10";
 const bodyCopy = "whitespace-pre-line text-base leading-[1.8] text-black/72 md:text-lg";
-
-const showreelMp4Path = content.hero.showreel.mp4Src.replace(/^\//, "");
-const hasShowreelVideo = existsSync(path.join(process.cwd(), "public", showreelMp4Path));
 
 function isExternalLink(href: string) {
   return href.startsWith("http://") || href.startsWith("https://");
@@ -82,42 +77,6 @@ function MediaFrame({
   );
 }
 
-function ShowreelCard() {
-  const showreel = content.hero.showreel;
-  if (!showreel.enabled) {
-    return null;
-  }
-
-  return (
-    <aside className="rounded-2xl border border-black/10 bg-white p-5">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold tracking-[0.12em] text-black/60">[ SHOWREEL ]</span>
-        <span className="text-xs text-black/45">{showreel.label}</span>
-      </div>
-
-      <div className="relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-[#f6f8f7]">
-        <Image
-          src={showreel.fallback.src}
-          alt={showreel.fallback.alt}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 35vw"
-        />
-
-        {hasShowreelVideo ? (
-          <video className="absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline preload="metadata">
-            <source src={showreel.mp4Src} type="video/mp4" />
-          </video>
-        ) : null}
-
-        <div className="absolute inset-0 bg-black/15" />
-      </div>
-
-      <p className="mt-3 whitespace-pre-line text-sm leading-[1.8] text-black/55">{showreel.note}</p>
-    </aside>
-  );
-}
-
 function isGoogleFormEmbedUrl(url: string) {
   return (
     url.startsWith("https://docs.google.com/forms/d/e/") &&
@@ -129,10 +88,12 @@ const ytThumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
 export default function Page() {
   const formEmbedUrl = content.contact.googleFormEmbedUrl.trim();
+  const formShareUrl = content.contact.googleFormShareUrl.trim();
   const hasFormEmbedUrl = isGoogleFormEmbedUrl(formEmbedUrl);
+  const hasFormShareUrl = formShareUrl.startsWith("http://") || formShareUrl.startsWith("https://");
 
   return (
-    <main id="top" className="min-h-screen bg-white text-[#0B0F0E]">
+    <main className="min-h-screen bg-white text-[#0B0F0E]">
       <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <Link href="#top" className="flex items-center">
@@ -153,41 +114,71 @@ export default function Page() {
         </div>
       </header>
 
-      <section className={sectionShell}>
-        <div className="grid gap-8 md:grid-cols-[1.25fr_0.75fr] md:items-start">
-          <div className="rounded-2xl border border-black/10 bg-white p-8 md:p-12">
-            <div className={`max-w-2xl ${sectionStack}`}>
-              <div className="text-xs font-semibold tracking-[0.14em] text-black/55">{content.hero.label}</div>
+      <section
+        id="top"
+        className="border-b border-black/10 bg-white"
+      >
+        <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
+          <div className="grid gap-16 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+            <div className="space-y-10">
+              <div className="text-xs font-semibold tracking-[0.18em] text-black/50">
+                [ PROFESSIONAL YOUTUBE STRUCTURE ]
+              </div>
 
-              <h1 className="whitespace-pre-line text-5xl font-semibold leading-[1.05] tracking-tight text-[#0B0F0E] md:text-6xl">
-                {content.hero.h1}
+              <h1 className="whitespace-pre-line text-5xl font-semibold leading-[1.05] tracking-tight text-black md:text-6xl">
+                전문직 유튜브,
+                {"\n"}
+                조회수 말고 구조로 만드십시오.
               </h1>
 
-              <p className="max-w-2xl whitespace-pre-line text-base leading-[1.8] text-[#0B0F0E] md:text-lg">
-                {content.hero.sub}
+              <p className="max-w-2xl whitespace-pre-line text-lg leading-[1.8] text-black/70 md:text-xl">
+                유튜브에 월 수백을 쓰고도
+                {"\n"}
+                상담이 늘지 않는 이유는
+                {"\n"}
+                콘텐츠가 아니라 구조입니다.
               </p>
 
-              <p className={`${bodyCopy} max-w-2xl`}>{content.hero.body}</p>
+              <div className="flex flex-wrap gap-4 pt-4">
+                <a
+                  href="#contact"
+                  className="rounded-xl bg-[#21c1a2] px-8 py-4 font-semibold text-black"
+                >
+                  채널 구조 진단 요청
+                </a>
 
-              <div className="flex flex-wrap gap-3">
-                {content.hero.ctas.map((cta) => (
-                  <ActionLink
-                    key={`${cta.href}-${cta.label}`}
-                    href={cta.href}
-                    className={
-                      cta.variant === "primary"
-                        ? "rounded-2xl border border-[#1aa98d] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-white"
-                        : "rounded-2xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-[#0B0F0E]"
-                    }
-                  >
-                    {cta.label}
-                  </ActionLink>
-                ))}
+                <a
+                  href="#portfolio"
+                  className="rounded-xl border border-black/20 px-8 py-4 font-semibold text-black"
+                >
+                  포트폴리오 보기
+                </a>
               </div>
             </div>
-          </div>
 
-          <ShowreelCard />
+            <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <div className="mb-4 text-xs font-semibold tracking-[0.18em] text-black/50">
+                [ MEDIA EXECUTION ]
+              </div>
+
+              <div className="relative aspect-video overflow-hidden rounded-2xl border border-black/10">
+                <Image
+                  src="/images/showreel-cover.jpg"
+                  alt="Turnkeyhaus Media Execution"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  priority
+                />
+              </div>
+
+              <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-black/60">
+                컨설팅은 말로,
+                {"\n"}
+                실행은 시스템으로 증명합니다.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -221,6 +212,41 @@ export default function Page() {
               </p>
             </div>
           )}
+        </div>
+      </section>
+
+      <section id="reality-check" className="border-t border-black/10">
+        <div className={`${sectionShell} ${sectionStack}`}>
+          <SectionHeader
+            label={content.realityCheck.label}
+            title={content.realityCheck.h2}
+            lead={content.realityCheck.lead}
+          />
+
+          <div className="grid gap-5 md:grid-cols-[1.2fr_0.8fr] md:items-stretch">
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
+                <p className="max-w-2xl whitespace-pre-line text-base font-semibold leading-[1.8] text-[#0B0F0E] md:text-lg">
+                  {content.realityCheck.emphasis}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-black/10 bg-white p-6">
+                <p className={`${bodyCopy} max-w-2xl`}>{content.realityCheck.body}</p>
+              </div>
+            </div>
+
+            <div className="flex h-full flex-col justify-between gap-6 rounded-2xl border border-black/10 bg-[#fbfcfb] p-6">
+              <p className={`${bodyCopy} max-w-2xl`}>{content.realityCheck.ctaLead}</p>
+
+              <ActionLink
+                href={content.realityCheck.ctaHref}
+                className="inline-flex w-fit rounded-2xl border border-[#1aa98d] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-white"
+              >
+                {content.realityCheck.ctaLabel}
+              </ActionLink>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -367,55 +393,120 @@ export default function Page() {
 
       <section id="pricing" className="border-t border-black/10">
         <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader label={content.pricing.label} title={content.pricing.h2} lead={content.pricing.lead} />
+          <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
 
           <div className="grid gap-4 md:grid-cols-3">
-            {content.pricing.lines.map((line) => (
-              <div key={line} className="rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm text-black/72">
-                {line}
-              </div>
+            {content.pricing.levels.map((level) => (
+              <article key={level.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+                <div className="mb-4 space-y-1">
+                  <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E]">{level.title}</h3>
+                  <p className="text-sm font-medium text-black/65">{level.priceBand}</p>
+                </div>
+
+                <ul className="space-y-2 text-sm leading-relaxed text-black/72">
+                  {level.bullets.map((bullet) => (
+                    <li key={bullet} className="list-inside list-disc">
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="mt-5 border-t border-black/10 pt-4 text-xs leading-relaxed text-black/55">
+                  {level.target}
+                </p>
+              </article>
             ))}
+          </div>
+
+          <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
+            <p className="max-w-2xl whitespace-pre-line text-base font-semibold leading-[1.8] text-[#0B0F0E] md:text-lg">
+              {content.pricing.emphasis}
+            </p>
           </div>
         </div>
       </section>
 
       <section id="contact" className="border-t border-black/10">
-        <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader label={content.contact.label} title={content.contact.h2} lead={content.contact.lead} />
+        <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
+          <div className="mb-10 max-w-2xl space-y-4">
+            <div className="text-xs font-semibold tracking-[0.14em] text-black/55">{content.contact.label}</div>
+            <h2 className="whitespace-pre-line text-3xl font-semibold leading-[1.2] tracking-tight text-[#0B0F0E] md:text-4xl">
+              {content.contact.h2}
+            </h2>
+            <p className={`${bodyCopy} max-w-2xl`}>{content.contact.lead}</p>
+          </div>
 
-          <div className="grid gap-5 md:grid-cols-[1fr_460px] md:items-start">
-            <div className="space-y-4 rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/72">
-              <h3 className="text-lg font-semibold text-[#0B0F0E]">{content.contact.panelTitle}</h3>
-              <p className={`${bodyCopy} text-black/72`}>{content.contact.panelBody}</p>
-              <div className="rounded-2xl border border-black/10 bg-[#fbfcfb] p-4 text-xs text-black/55">
-                {content.contact.panelHint}
+          <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-start">
+            <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 md:p-8">
+              <div className="space-y-4">
+                <h3 className="text-2xl font-semibold tracking-tight text-[#0B0F0E]">채널 구조 진단</h3>
+                <p className="whitespace-pre-line text-base leading-[1.8] text-black/70">
+                  현재 상황과 목표를 남겨주시면
+                  {"\n"}
+                  채널 구조 관점으로 검토 후 회신드립니다.
+                </p>
               </div>
 
-              {hasFormEmbedUrl ? (
-                <ActionLink
-                  href={formEmbedUrl}
-                  className="inline-flex rounded-2xl border border-[#1aa98d] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-white"
-                >
-                  {content.contact.primaryCtaLabel}
-                </ActionLink>
-              ) : (
-                <div className="inline-flex rounded-2xl border border-black/10 bg-[#f2f4f3] px-5 py-3 text-sm font-semibold text-black/45">
-                  임베드 URL 등록 필요
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-black/70">소요시간: 약 5–10분</div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs font-medium text-black/65">
+                    신규 유입
+                  </span>
+                  <span className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs font-medium text-black/65">
+                    리빌딩
+                  </span>
                 </div>
-              )}
+              </div>
+
+              <div className="space-y-3 rounded-2xl border border-black/10 bg-[#fbfcfb] p-5">
+                <div className="text-sm font-semibold text-[#0B0F0E]">진단 산출물</div>
+                <ul className="space-y-2 text-sm leading-relaxed text-black/72">
+                  <li className="list-inside list-disc">채널 포지셔닝/톤 점검</li>
+                  <li className="list-inside list-disc">콘텐츠 역할(롱폼·숏폼) 재정의</li>
+                  <li className="list-inside list-disc">전환 동선(CTA) 개선 포인트</li>
+                </ul>
+              </div>
+
+              <p className="text-xs leading-[1.8] text-black/50">
+                제작 견적이 아니라 구조 진단이 먼저입니다.
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href="#contact-form"
+                  className="inline-flex rounded-xl border border-[#1aa98d] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black"
+                >
+                  설문 작성하기
+                </a>
+
+                {hasFormShareUrl ? (
+                  <a
+                    href={formShareUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
+                  >
+                    새 창으로 열기
+                  </a>
+                ) : null}
+              </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-black/10 bg-white">
+            <div
+              id="contact-form"
+              className="overflow-hidden rounded-2xl border border-black/10 bg-white"
+            >
               {hasFormEmbedUrl ? (
                 <iframe
                   src={formEmbedUrl}
-                  className="h-[760px] w-full"
+                  className="h-[860px] w-full md:h-[920px]"
                   loading="lazy"
                   title={content.contact.iframeTitle}
                   referrerPolicy="strict-origin-when-cross-origin"
                 />
               ) : (
-                <div className="grid h-[360px] place-items-center p-6 text-center text-sm leading-relaxed text-black/60">
+                <div className="grid h-[860px] place-items-center p-6 text-center text-sm leading-relaxed text-black/60 md:h-[920px]">
                   Google Form 임베드 URL이 아직 설정되지 않았습니다.
                   <br />
                   README 안내대로 임베드 URL을 복사해

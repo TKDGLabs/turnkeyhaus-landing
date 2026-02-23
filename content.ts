@@ -1,9 +1,3 @@
-export type Cta = {
-  label: string;
-  href: string;
-  variant: "primary" | "ghost";
-};
-
 export type NavItem = {
   label: string;
   href: string;
@@ -34,6 +28,13 @@ export type PortfolioItem = {
   imageSrc: string;
 };
 
+export type OperatingLevelCard = {
+  title: string;
+  priceBand: string;
+  bullets: string[];
+  target: string;
+};
+
 export type FooterLine = {
   label: string;
   value: string;
@@ -55,26 +56,22 @@ export type Content = {
     keywords: string[];
   };
   nav: NavItem[];
-  hero: {
-    label: string;
-    h1: string;
-    sub: string;
-    body: string;
-    ctas: Cta[];
-    showreel: {
-      enabled: boolean;
-      label: string;
-      mp4Src: string;
-      fallback: ImageAsset;
-      note: string;
-    };
-  };
   problem: {
     label: string;
     h2: string;
     lead: string;
     items: string[];
     emphasis: string;
+  };
+  realityCheck: {
+    label: string;
+    h2: string;
+    lead: string;
+    emphasis: string;
+    body: string;
+    ctaLead: string;
+    ctaLabel: string;
+    ctaHref: string;
   };
   approach: {
     label: string;
@@ -106,8 +103,8 @@ export type Content = {
   pricing: {
     label: string;
     h2: string;
-    lead?: string;
-    lines: string[];
+    levels: OperatingLevelCard[];
+    emphasis: string;
   };
   contact: {
     label: string;
@@ -117,6 +114,7 @@ export type Content = {
     panelBody: string;
     panelHint: string;
     googleFormEmbedUrl: string;
+    googleFormShareUrl: string;
     primaryCtaLabel: string;
     iframeTitle: string;
   };
@@ -162,37 +160,31 @@ export const content: Content = {
   },
   nav: [
     { label: "PROBLEM", href: "#problem" },
+    { label: "REALITY", href: "#reality-check" },
     { label: "APPROACH", href: "#approach" },
     { label: "PROFESSIONAL", href: "#professional" },
     { label: "PROOF", href: "#proof" },
     { label: "PORTFOLIO", href: "#portfolio" },
-    { label: "PRICING", href: "#pricing" },
+    { label: "LEVEL", href: "#pricing" },
     { label: "CONTACT", href: "#contact" }
   ],
-  hero: {
-    label: "[ CONSULTING FIRM · MEDIA EXECUTION ]",
-    h1: "콘텐츠는 흐르고,\n구조는 남습니다.",
-    sub: "전문직 채널을\n운영 시스템으로 설계합니다.",
-    body:
-      "Turnkeyhaus는 TKDG Labs의\n미디어 기반 실행 조직입니다.\n촬영보다 먼저, 기준과 구조를 고정합니다.",
-    ctas: [
-      { label: "채널 구조 진단 요청", href: "#contact", variant: "primary" },
-      { label: "포트폴리오 보기", href: "#portfolio", variant: "ghost" }
-    ],
-    showreel: {
-      enabled: true,
-      label: "Showreel (Muted Loop)",
-      mp4Src: "/videos/showreel.mp4",
-      fallback: images.studio1,
-      note: "짧은 무음 루프로 실행 역량만 간결하게 보여줍니다."
-    }
-  },
   problem: {
     label: "[ 문제 ]",
     h2: "대부분의 콘텐츠는\n비슷한 이야기를 합니다.",
     lead: "조회수가 많다고,\n매출이 늘진 않습니다.",
     items: [],
     emphasis: "잠재 고객이 찾던 맥락에\n놓이지 못하면 남지 않습니다."
+  },
+  realityCheck: {
+    label: "[ 현실 점검 ]",
+    h2: "월 수백만 원을 쓰고도\n채널이 남지 않는 경우가 있습니다.",
+    lead: "영상은 늘어나는데,\n자산은 쌓이지 않습니다.",
+    emphasis: "문제는 비용이 아니라 구조입니다.",
+    body:
+      "유튜브는 단기 캠페인이 아닙니다.\n초반 1–2개월의 조회수는 방향을 증명하지 않습니다.\n채널은 최소 6–12개월의 설계와 축적을 전제로 합니다.",
+    ctaLead: "지금 구조를 점검하지 않으면,\n1년 뒤에도 같은 질문을 하게 됩니다.",
+    ctaLabel: "채널 구조 진단 요청",
+    ctaHref: "#contact"
   },
   approach: {
     label: "[ 방식 ]",
@@ -210,31 +202,31 @@ export const content: Content = {
   professionalTargets: {
     label: "[ 전문직 적용 ]",
     h2: "전문직은 자극이 아니라\n신뢰의 기준이 필요합니다.",
-    lead: "",
+    lead: "말투·구조·운영을 규칙으로 고정",
     cards: [
       {
         title: "변호사 · 로펌",
-        oneLiner: "채널의 말투와 구조를\n일관되게 유지합니다.",
+        oneLiner: "사건이 아니라 ‘판단의 프레임’을 설계합니다.",
         tags: ["법률", "로펌", "상담"],
-        bullets: ["질문 중심 포맷 설계", "사례/상황 기반 구조화", "문의 전환 동선 설계"],
+        bullets: ["의뢰 전 질문 시리즈 구조", "사건/유형 키워드 맵", "상담 전환 동선"],
         image: images.law,
         href: "#contact",
         ctaLabel: "구조 진단 요청"
       },
       {
         title: "병원 · 의료",
-        oneLiner: "채널의 말투와 구조를\n일관되게 유지합니다.",
+        oneLiner: "불안을 줄이는 설명은, 구조에서 시작됩니다.",
         tags: ["병원", "의료", "브랜딩"],
-        bullets: ["질문 중심 포맷 설계", "사례/상황 기반 구조화", "문의 전환 동선 설계"],
+        bullets: ["환자 질문 포맷 표준화", "비교·오해·주의 구조", "신뢰 축적 루틴"],
         image: images.med,
         href: "#contact",
         ctaLabel: "구조 진단 요청"
       },
       {
         title: "세무 · 회계 · 노무",
-        oneLiner: "채널의 말투와 구조를\n일관되게 유지합니다.",
+        oneLiner: "규정은 어렵고, 사례는 남습니다.",
         tags: ["세무", "회계", "노무"],
-        bullets: ["질문 중심 포맷 설계", "사례/상황 기반 구조화", "문의 전환 동선 설계"],
+        bullets: ["시즌/이슈 캘린더 편성", "상황별 템플릿", "판단 기준 기반 문의 설계"],
         image: images.tax,
         href: "#contact",
         ctaLabel: "구조 진단 요청"
@@ -283,12 +275,44 @@ export const content: Content = {
     ]
   },
   pricing: {
-    label: "[ 운영 구조 ]",
-    h2: "채널 운영은 월 단위입니다.",
-    lines: [
-      "촬영은 매월 1~2회 진행됩니다.",
-      "상세 견적은 진단 후 안내드립니다."
-    ]
+    label: "[ 운영 레벨 ]",
+    h2: "유튜브는 건별 제작이 아니라\n운영 단위로 설계됩니다.",
+    levels: [
+      {
+        title: "Structure Foundation",
+        priceBand: "월 300만원대",
+        bullets: [
+          "월 1회 촬영",
+          "채널 포지셔닝 설계",
+          "롱폼/숏폼 구조화",
+          "기본 전환 동선 설계"
+        ],
+        target: "대상: 신규 채널 또는 운영 체계가 없는 경우"
+      },
+      {
+        title: "Structure Growth",
+        priceBand: "월 400만원대",
+        bullets: [
+          "월 1–2회 촬영",
+          "SEO 기반 콘텐츠 설계",
+          "숏폼 자산화 시스템",
+          "월간 운영 분석 리포트"
+        ],
+        target: "대상: 이미 채널이 있으나 구조가 정리되지 않은 경우"
+      },
+      {
+        title: "Structure Intensive",
+        priceBand: "월 500–600만원대",
+        bullets: [
+          "고난도 브랜딩 재설계",
+          "전담 운영 구조",
+          "팀 단위 채널 관리",
+          "장기 성장 설계"
+        ],
+        target: "대상: 브랜드 단위 채널을 운영하는 전문직"
+      }
+    ],
+    emphasis: "상세 제안은 채널 구조 진단 이후에만 가능합니다."
   },
   contact: {
     label: "[ 채널 구조 진단 ]",
@@ -299,6 +323,7 @@ export const content: Content = {
     panelHint: "Google Form은 임베드 URL만 사용합니다. (forms.gle 공유 링크 직접 사용 금지)",
     googleFormEmbedUrl:
       "https://docs.google.com/forms/d/e/1FAIpQLScnyuTnc051RnX8yaGNlPW6TSOe9INyaV-Gp8lc8xqUSL6kQg/viewform?embedded=true",
+    googleFormShareUrl: "https://forms.gle/L58BK4pc3gEq81iM9",
     primaryCtaLabel: "상담 예약하기",
     iframeTitle: "Turnkeyhaus 상담 폼"
   },
