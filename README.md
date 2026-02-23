@@ -16,3 +16,8 @@ Next.js(App Router) 기반 단일 랜딩 페이지입니다.
 ## No-code Style Operation
 텍스트/CTA/섹션 데이터/이미지 경로/링크는 `content.ts`에서만 수정하면 됩니다.
 레이아웃은 `app/page.tsx`가 담당하며, 이미지 표시는 `next/image`를 사용합니다.
+
+## Google Form Embed URL
+Google Form에서 `보내기` 버튼을 누른 뒤 `< >`(임베드) 탭으로 이동합니다.
+표시된 `iframe src`의 URL(`https://docs.google.com/forms/d/e/.../viewform?embedded=true`)을 복사합니다.
+복사한 URL을 `content.ts`의 `content.contact.googleFormEmbedUrl`에 넣습니다. (`forms.gle` 공유 링크는 iframe에 사용하지 않음)

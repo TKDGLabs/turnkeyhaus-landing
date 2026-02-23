@@ -4,8 +4,6 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import { content } from "../content";
 
-const siteUrl = content.seo.siteUrl;
-
 const a2z = localFont({
   src: [
     { path: "../public/fonts/a2z-100-thin.woff2", weight: "100", style: "normal" },
@@ -23,7 +21,7 @@ const a2z = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(content.seo.siteUrl),
   title: content.seo.title,
   description: content.seo.description,
   keywords: content.seo.keywords,
@@ -32,7 +30,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: siteUrl,
+    url: content.seo.siteUrl,
     siteName: content.brand.name,
     title: content.seo.title,
     description: content.seo.description,
@@ -47,7 +45,10 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true }
+    googleBot: {
+      index: true,
+      follow: true
+    }
   },
   icons: {
     icon: [{ url: "/favicon.ico" }],
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko" className={a2z.variable}>
-      <body>{children}</body>
+      <body className="bg-white text-[#0B0F0E] antialiased">{children}</body>
     </html>
   );
 }
