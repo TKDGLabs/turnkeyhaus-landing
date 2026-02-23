@@ -149,9 +149,9 @@ export default function Page() {
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
           <div className="grid gap-6 md:grid-cols-2 items-start">
             <div className="space-y-10">
-              <h1 className="max-w-[16ch] whitespace-pre-line text-5xl font-semibold leading-[1.05] tracking-tight text-black md:text-6xl">
-                {`전문직 유튜브,
-제작이 아니라 전략입니다.`}
+              <h1 className="text-5xl md:text-6xl leading-[1.05] tracking-tight font-semibold text-black max-w-[15ch] text-balance">
+                전문직 유튜브,
+                제작이 아니라 전략입니다.
               </h1>
 
               <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] text-black/70 md:text-lg">
