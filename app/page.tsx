@@ -1,424 +1,368 @@
-import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { content } from "@/content";
+import { content } from "../content";
 
-function getEmbeddedFormUrl(formUrl: string) {
-  const hasQuery = formUrl.includes("?");
-  const hasEmbedParam = formUrl.includes("embedded=true");
+const clsCard =
+  "group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-colors hover:border-white/20";
+const clsMedia =
+  "relative aspect-video overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-white/20";
+const clsOverlay = "absolute inset-0 bg-[#041411]/60";
 
-  if (hasEmbedParam) {
-    return formUrl;
-  }
-
-  return `${formUrl}${hasQuery ? "&" : "?"}embedded=true`;
-}
-
-function isExternalLink(href: string) {
-  return href.startsWith("http://") || href.startsWith("https://");
-}
-
-type ActionLinkProps = {
-  href: string;
-  className: string;
-  children: ReactNode;
-  ariaLabel?: string;
-};
-
-function ActionLink({ href, className, children, ariaLabel }: ActionLinkProps) {
-  if (isExternalLink(href)) {
-    return (
-      <a href={href} target="_blank" rel="noreferrer" className={className} aria-label={ariaLabel}>
-        {children}
-      </a>
-    );
-  }
-
+function SectionHeader({ h2, lead }: { h2: string; lead?: string }) {
   return (
-    <Link href={href} className={className} aria-label={ariaLabel}>
-      {children}
-    </Link>
-  );
-}
-
-function HeroVideoBg() {
-  const video = content.heroVideo;
-  if (!video.enabled || !video.youtubeId) {
-    return null;
-  }
-
-  const params = new URLSearchParams({
-    autoplay: "1",
-    mute: "1",
-    controls: "0",
-    rel: "0",
-    modestbranding: "1",
-    playsinline: "1",
-    loop: "1",
-    playlist: video.youtubeId
-  });
-
-  if (video.start > 0) {
-    params.set("start", String(video.start));
-  }
-
-  return (
-    <div className="absolute inset-0 -z-10" aria-hidden>
-      <div className="absolute inset-0 bg-[#041411]/70" />
-      <iframe
-        className="h-full w-full scale-[1.15]"
-        src={`https://www.youtube.com/embed/${video.youtubeId}?${params.toString()}`}
-        title={content.ui.heroVideoTitle}
-        allow="autoplay; encrypted-media; picture-in-picture"
-        allowFullScreen={false}
-        loading="lazy"
-      />
+    <div className="mb-6 grid gap-2">
+      <div className="text-xs font-semibold tracking-[0.14em] text-white/60">{h2}</div>
+      {lead ? <div className="text-sm leading-relaxed text-white/70">{lead}</div> : null}
     </div>
   );
 }
 
-type SectionHeadingProps = {
-  index: string;
-  title: string;
-  subtitle: string;
-};
-
-function SectionHeading({ index, title, subtitle }: SectionHeadingProps) {
+function MediaFrame({
+  src,
+  alt,
+  overlay = true,
+  sizes = "(max-width: 768px) 100vw, 50vw",
+  scaleClass = "group-hover:scale-[1.02]"
+}: {
+  src: string;
+  alt: string;
+  overlay?: boolean;
+  sizes?: string;
+  scaleClass?: string;
+}) {
   return (
-    <div className="section-heading">
-      <span className="section-label">{index}</span>
-      <div className="space-y-1">
-        <h2>{title}</h2>
-        <p className="text-sm text-[color:var(--muted)] md:text-base">{subtitle}</p>
+    <div className={clsMedia}>
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        className={`object-cover transition-transform duration-300 ${scaleClass}`}
+        sizes={sizes}
+      />
+      {overlay ? <div className={clsOverlay} /> : null}
+    </div>
+  );
+}
+
+function Showreel() {
+  const sr = content.hero.showreel;
+  if (!sr.enabled) return null;
+
+  // mp4가 없을 경우를 대비해 fallback 이미지 제공
+  // (mp4 파일이 실제로 존재하면 video가 정상 재생됨)
+  return (
+    <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-xs font-semibold tracking-[0.14em] text-white/60">[ MEDIA ]</div>
+        <div className="text-xs text-white/50">{sr.label}</div>
+      </div>
+
+      <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/10">
+        <div className="absolute inset-0 bg-[#041411]/55" />
+
+        {/* video는 파일이 없으면 404이지만, 페이지는 깨지지 않음.
+            실제 운영에서는 public/videos/showreel.mp4 를 넣는 것을 권장 */}
+        <video
+          className="absolute inset-0 h-full w-full object-cover opacity-80"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          src={sr.mp4Src}
+        />
+
+        {/* fallback image: 영상이 없어도 분위기 유지 */}
+        <Image
+          src={sr.fallbackImageSrc}
+          alt="showreel fallback"
+          fill
+          className="object-cover opacity-60"
+          sizes="(max-width: 768px) 100vw, 40vw"
+          priority={false}
+        />
+
+        <div className="absolute inset-x-0 bottom-0 p-3">
+          <div className="text-xs text-white/70">{sr.note}</div>
+        </div>
       </div>
     </div>
   );
 }
 
-export default function Home() {
-  const embeddedFormUrl = getEmbeddedFormUrl(content.sections.contact.formUrl);
-
+export default function Page() {
   return (
-    <>
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[rgba(4,20,17,0.92)] backdrop-blur">
-        <div className="container-shell flex h-16 items-center justify-between gap-4">
-          <Link
-            href="#hero"
-            className="brand-mark"
-            aria-label={`${content.site.name} ${content.ui.scrollToTopAriaLabel}`}
-          >
-            {content.site.name}
-          </Link>
-          <nav
-            aria-label={content.ui.navigationAriaLabel}
-            className="flex max-w-[70%] items-center gap-1 overflow-x-auto py-1 md:max-w-none md:gap-2"
-          >
-            {content.navigation.map((item) => (
-              <Link key={item.href} href={item.href} className="nav-link">
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
+    <main className="min-h-screen bg-[#041411] text-white">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+        <Link href="#top" className="flex items-baseline gap-2">
+          <span className="text-sm font-semibold tracking-[0.06em]">{content.brand.name}</span>
+          <span className="text-xs text-white/60">{content.brand.sub}</span>
+        </Link>
+
+        <nav className="hidden items-center gap-2 md:flex">
+          {content.nav.map((n) => (
+            <a
+              key={n.href}
+              href={n.href}
+              className="rounded-xl px-3 py-2 text-xs text-white/60 transition hover:bg-white/[0.05] hover:text-white"
+            >
+              {n.label}
+            </a>
+          ))}
+        </nav>
       </header>
 
-      <main id="main-content">
-        <section id="hero" className="container-shell pb-16 pt-14 md:pb-24 md:pt-20">
-          <article className="panel hero-panel hero-panel-video relative overflow-hidden rounded-2xl border border-white/10 bg-[#041411] p-8 md:p-16">
-            <HeroVideoBg />
-            <div className="relative z-10 max-w-4xl">
-              <p className="eyebrow">{content.hero.label}</p>
-              <h1 className="hero-title">{content.hero.headline}</h1>
-              <p className="hero-subtitle">{content.hero.subheadline}</p>
-              <p className="hero-description">{content.hero.description}</p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                {content.hero.ctas.map((cta) => (
-                  <ActionLink
-                    key={`${cta.href}-${cta.label}`}
-                    href={cta.href}
-                    className={cta.variant === "primary" ? "btn-primary" : "btn-secondary"}
+      <section id="top" className="mx-auto max-w-6xl px-5 pb-12 pt-6">
+        <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-start">
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-7 md:p-10">
+            {content.hero.backgroundGridEnabled ? (
+              <div className="pointer-events-none absolute inset-0 opacity-30">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(33,193,162,0.18),transparent_55%),radial-gradient(circle_at_100%_10%,rgba(33,193,162,0.12),transparent_50%)]" />
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:40px_40px]" />
+              </div>
+            ) : null}
+
+            <div className="relative z-10 grid gap-5">
+              <div className="text-xs font-semibold tracking-[0.14em] text-white/60">
+                {content.hero.eyebrow}
+              </div>
+
+              <h1 className="whitespace-pre-line text-4xl font-semibold leading-[1.06] tracking-[-0.02em] md:text-5xl">
+                {content.hero.h1}
+              </h1>
+
+              <p className="text-base leading-relaxed text-white/80 md:text-lg">{content.hero.sub}</p>
+
+              <p className="whitespace-pre-line text-sm leading-relaxed text-white/60">{content.hero.body}</p>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                {content.hero.ctas.map((c) => (
+                  <a
+                    key={c.href}
+                    href={c.href}
+                    className={
+                      c.variant === "primary"
+                        ? "rounded-xl bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black"
+                        : "rounded-xl border border-white/20 bg-transparent px-5 py-3 text-sm font-semibold text-white"
+                    }
                   >
-                    {cta.label}
-                  </ActionLink>
+                    {c.label}
+                  </a>
                 ))}
               </div>
             </div>
-          </article>
-        </section>
-
-        <section id={content.sections.problem.id} className="section-shell">
-          <SectionHeading
-            index={content.sections.problem.index}
-            title={content.sections.problem.title}
-            subtitle={content.sections.problem.subtitle}
-          />
-          <div className="grid gap-4 md:grid-cols-2">
-            {content.sections.problem.items.map((item) => (
-              <article key={item} className="panel card-item">
-                <p>{item}</p>
-              </article>
-            ))}
           </div>
-          <p className="key-line">{content.sections.problem.emphasis}</p>
-        </section>
 
-        <section id={content.sections.process.id} className="section-shell">
-          <SectionHeading
-            index={content.sections.process.index}
-            title={content.sections.process.title}
-            subtitle={content.sections.process.subtitle}
-          />
-          <div className="grid gap-4 md:grid-cols-3">
-            {content.sections.process.steps.map((step) => (
-              <article key={step.step} className="panel">
-                <p className="step-index">{step.step}</p>
-                <h3 className="card-title">{step.title}</h3>
-                <p className="card-text">{step.description}</p>
-              </article>
-            ))}
-          </div>
-          <p className="key-line">{content.sections.process.emphasis}</p>
-        </section>
+          <Showreel />
+        </div>
+      </section>
 
-        <section id={content.sections.brandStructure.id} className="section-shell">
-          <SectionHeading
-            index={content.sections.brandStructure.index}
-            title={content.sections.brandStructure.title}
-            subtitle={content.sections.brandStructure.subtitle}
-          />
-          <div className="grid items-stretch gap-5 md:grid-cols-2">
-            <article className="panel flex flex-col justify-between">
-              <div className="space-y-4">
-                {content.sections.brandStructure.paragraphs.map((paragraph) => (
-                  <p key={paragraph} className="card-text">
-                    {paragraph}
-                  </p>
-                ))}
+      <section id="problem" className="border-t border-white/10">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <SectionHeader h2={content.problem.h2} lead={content.problem.lead} />
+          <div className="grid gap-5 md:grid-cols-2">
+            <ul className="grid gap-3">
+              {content.problem.items.map((it) => (
+                <li
+                  key={it}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/70"
+                >
+                  {it}
+                </li>
+              ))}
+            </ul>
+            <div className="rounded-2xl border border-[#21c1a2]/25 bg-[#21c1a2]/10 p-6">
+              <div className="text-sm leading-relaxed text-white">
+                <b>{content.problem.emphasis}</b>
               </div>
-              <p className="key-line mt-6">{content.sections.brandStructure.emphasis}</p>
-            </article>
-            <figure className="group">
-              <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-white/20">
-                <Image
-                  src={content.sections.brandStructure.image.src}
-                  alt={content.sections.brandStructure.image.alt}
-                  fill
-                  sizes="(min-width: 768px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                />
-                <div className="absolute inset-0 bg-[#041411]/60" />
+              <div className="mt-3 text-xs leading-relaxed text-white/70">
+                컨설팅 관점에서 설계하고, 미디어 조직으로 실행합니다.
               </div>
-            </figure>
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id={content.sections.professionalTargets.id} className="section-shell">
-          <SectionHeading
-            index={content.sections.professionalTargets.index}
-            title={content.sections.professionalTargets.title}
-            subtitle={content.sections.professionalTargets.subtitle}
-          />
-          <div className="grid gap-5 md:grid-cols-3">
-            {content.sections.professionalTargets.cards.map((card) => (
-              <article
-                key={card.title}
-                className="panel group overflow-hidden border border-white/10 p-0 transition-colors hover:border-white/20"
-              >
-                <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-white/20">
-                  <Image
-                    src={card.image.src}
-                    alt={card.image.alt}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 100vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                  />
-                  <div className="absolute inset-0 bg-[#041411]/60" />
+      <section id="structure" className="border-t border-white/10">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <SectionHeader h2={content.brandStructure.h2} lead={content.brandStructure.lead} />
+
+          <div className="grid gap-6 md:grid-cols-2 md:items-center">
+            <div className="grid gap-3">
+              {content.brandStructure.bullets.map((b) => (
+                <div
+                  key={b}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/70"
+                >
+                  {b}
                 </div>
-                <div className="space-y-4 p-5 md:p-6">
-                  <h3 className="card-title mb-0">{card.title}</h3>
-                  <p className="card-text">{card.oneLiner}</p>
-                  <ul className="space-y-2 text-sm text-[color:var(--muted)]">
-                    {card.bullets.map((bullet) => (
-                      <li key={bullet} className="list-line py-2 text-sm">
-                        {bullet}
+              ))}
+            </div>
+
+            <MediaFrame src={content.brandStructure.imageSrc} alt="brand structure concept" />
+          </div>
+        </div>
+      </section>
+
+      <section id="professional" className="border-t border-white/10">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <SectionHeader h2={content.professionalTargets.h2} lead={content.professionalTargets.lead} />
+
+          <div className="grid gap-5 md:grid-cols-3">
+            {content.professionalTargets.cards.map((c) => (
+              <a key={c.title} href={c.href} className={clsCard}>
+                <MediaFrame src={c.imageSrc} alt={c.title} sizes="(max-width: 768px) 100vw, 33vw" />
+                <div className="grid gap-3 p-5">
+                  <div className="text-base font-semibold">{c.title}</div>
+                  <div className="text-sm leading-relaxed text-white/70">{c.oneLiner}</div>
+                  <ul className="grid gap-2 text-sm text-white/70">
+                    {c.bullets.map((b) => (
+                      <li key={b} className="list-inside list-disc">
+                        {b}
                       </li>
                     ))}
                   </ul>
-                  <ActionLink href={card.href} className="btn-secondary w-full">
-                    {card.hrefLabel}
-                  </ActionLink>
+                  <div className="text-xs font-semibold text-[#21c1a2]">구조 진단 요청 →</div>
                 </div>
-              </article>
+              </a>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id={content.sections.studioProof.id} className="section-shell">
-          <SectionHeading
-            index={content.sections.studioProof.index}
-            title={content.sections.studioProof.title}
-            subtitle={content.sections.studioProof.subtitle}
-          />
-          <p className="card-text mb-6">{content.sections.studioProof.description}</p>
+      <section id="proof" className="border-t border-white/10">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <SectionHeader h2={content.studioProof.h2} lead={content.studioProof.lead} />
+
           <div className="grid gap-5 md:grid-cols-2">
-            {content.sections.studioProof.items.map((item) => (
-              <figure
-                key={item.image.src}
-                className="group overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-white/20"
-              >
-                <div className="relative aspect-video overflow-hidden">
-                  <Image
-                    src={item.image.src}
-                    alt={item.image.alt}
-                    fill
-                    sizes="(min-width: 768px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                  />
-                  <div className="absolute inset-0 bg-[#041411]/60" />
-                </div>
-                <figcaption className="space-y-1 border-t border-white/10 bg-[#041411] p-4">
-                  <p className="text-sm text-white">{item.captionTop}</p>
-                  <p className="text-xs text-[color:var(--muted)]">{item.captionBottom}</p>
-                </figcaption>
-              </figure>
+            {content.studioProof.images.map((im) => (
+              <MediaFrame key={im.src} src={im.src} alt={im.alt} />
             ))}
           </div>
-        </section>
 
-        <section id={content.sections.differentiation.id} className="section-shell">
-          <SectionHeading
-            index={content.sections.differentiation.index}
-            title={content.sections.differentiation.title}
-            subtitle={content.sections.differentiation.subtitle}
-          />
-          <div className="grid items-start gap-5 md:grid-cols-[1.2fr_0.8fr]">
-            <article className="panel">
-              <h3 className="card-title">{content.sections.differentiation.headline}</h3>
-              <div className="space-y-4">
-                {content.sections.differentiation.paragraphs.map((paragraph) => (
-                  <p key={paragraph} className="card-text">
-                    {paragraph}
-                  </p>
+          <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/70">
+            {content.studioProof.caption}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <SectionHeader h2={content.differentiation.h2} />
+          <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-center">
+            <div className="grid gap-4">
+              <div className="text-2xl font-semibold">{content.differentiation.title}</div>
+              <div className="whitespace-pre-line text-sm leading-relaxed text-white/70">
+                {content.differentiation.body}
+              </div>
+              <ul className="grid gap-2 text-sm text-white/70">
+                {content.differentiation.bullets.map((b) => (
+                  <li key={b} className="list-inside list-disc">
+                    {b}
+                  </li>
                 ))}
-              </div>
-              <p className="key-line mt-6">{content.sections.differentiation.emphasis}</p>
-            </article>
-            <figure className="group mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-white/20">
-              <div className="relative aspect-video overflow-hidden">
-                <Image
-                  src={content.sections.differentiation.image.src}
-                  alt={content.sections.differentiation.image.alt}
-                  fill
-                  sizes="(min-width: 768px) 30vw, 100vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                />
-                <div className="absolute inset-0 bg-[#041411]/60" />
-              </div>
-            </figure>
-          </div>
-        </section>
+              </ul>
+            </div>
 
-        <section id={content.sections.portfolio.id} className="section-shell">
-          <SectionHeading
-            index={content.sections.portfolio.index}
-            title={content.sections.portfolio.title}
-            subtitle={content.sections.portfolio.subtitle}
-          />
+            <MediaFrame
+              src={content.differentiation.imageSrc}
+              alt="differentiation concept"
+              sizes="(max-width: 768px) 100vw, 40vw"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="portfolio" className="border-t border-white/10">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <SectionHeader h2={content.portfolio.h2} lead={content.portfolio.lead} />
+
           <div className="grid gap-5 md:grid-cols-3">
-            {content.sections.portfolio.items.map((item) => (
-              <article
-                key={`${item.title}-${item.href}`}
-                className="panel group overflow-hidden border border-white/10 p-0 transition-colors hover:border-white/20"
-              >
-                <div className="relative aspect-video overflow-hidden border-b border-white/10">
-                  <Image
-                    src={item.image.src}
-                    alt={item.image.alt}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 100vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#041411]/70 to-transparent" />
+            {content.portfolio.items.map((it) => (
+              <a key={it.title} href={it.href} target="_blank" rel="noreferrer" className={clsCard}>
+                <MediaFrame
+                  src={it.imageSrc}
+                  alt={`${it.title} 썸네일`}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  scaleClass="group-hover:scale-[1.03]"
+                />
+                <div className="grid gap-3 p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="text-base font-semibold">{it.title}</div>
+                    <div className="shrink-0 rounded-full bg-[#21c1a2]/20 px-2 py-1 text-xs font-semibold text-[#21c1a2]">
+                      {it.result}
+                    </div>
+                  </div>
+                  <div className="text-sm text-white/70">{it.oneLiner}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {it.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="rounded-full border border-white/10 bg-black/20 px-2 py-1 text-xs text-white/60"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="text-xs font-semibold text-white/60">채널 보기 →</div>
                 </div>
-                <div className="space-y-4 p-5 md:p-6">
-                  <h3 className="card-title mb-0">{item.title}</h3>
-                  <p className="card-text">{item.oneLiner}</p>
-                  <p className="list-line text-sm">{item.metric}</p>
-                  <ActionLink href={item.href} className="btn-secondary w-full">
-                    {item.linkLabel}
-                  </ActionLink>
-                </div>
-              </article>
+              </a>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id={content.sections.about.id} className="section-shell">
-          <SectionHeading
-            index={content.sections.about.index}
-            title={content.sections.about.title}
-            subtitle={content.sections.about.subtitle}
-          />
-          <div className="grid gap-4 md:grid-cols-2">
-            {content.sections.about.relation.map((item) => (
-              <article key={item.org} className="panel">
-                <p className="step-index">{item.org}</p>
-                <h3 className="card-title">{item.role}</h3>
-                <p className="card-text">{item.description}</p>
-              </article>
+      <section className="border-t border-white/10">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <SectionHeader h2={content.pricing.h2} />
+          <div className="grid gap-3 md:grid-cols-3">
+            {content.pricing.lines.map((l) => (
+              <div key={l} className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/70">
+                {l}
+              </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id={content.sections.contact.id} className="section-shell">
-          <SectionHeading
-            index={content.sections.contact.index}
-            title={content.sections.contact.title}
-            subtitle={content.sections.contact.subtitle}
-          />
-          <article className="panel space-y-5">
-            <p className="hero-subtitle">{content.sections.contact.body}</p>
-            <div className="form-shell">
+      <section id="contact" className="border-t border-white/10">
+        <div className="mx-auto max-w-6xl px-5 py-12">
+          <SectionHeader h2={content.contact.h2} lead={content.contact.lead} />
+
+          <div className="grid gap-5 md:grid-cols-[1fr_420px] md:items-start">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-sm text-white/70">
+              <div className="text-base font-semibold text-white">{content.contact.primaryCtaLabel}</div>
+              <div className="mt-2 leading-relaxed">
+                아래 폼을 작성해주시면, 채널 구조 관점에서 빠르게 확인 후 회신드립니다.
+              </div>
+              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 text-xs text-white/60">
+                * Google Form 임베드 URL은 content.ts에서 교체 가능합니다.
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
               <iframe
-                src={embeddedFormUrl}
-                title={content.sections.contact.subtitle}
+                src={content.contact.googleFormEmbedUrl}
+                className="h-[780px] w-full"
                 loading="lazy"
-                referrerPolicy="strict-origin-when-cross-origin"
-                className="h-[600px] w-full"
+                title="Turnkeyhaus 상담 폼"
               />
             </div>
-            <ActionLink href={content.sections.contact.formUrl} className="btn-primary inline-flex">
-              {content.sections.contact.buttonLabel}
-            </ActionLink>
-          </article>
-        </section>
-      </main>
+          </div>
 
-      <footer className="container-shell border-t border-white/10 py-10">
-        <p className="footer-company">{content.footer.company}</p>
-        <div className="footer-grid">
-          <p>
-            {content.ui.footerLabels.ceo}: {content.footer.ceo}
-          </p>
-          <p>
-            {content.ui.footerLabels.businessNumber}: {content.footer.businessNumber}
-          </p>
-          <p>
-            {content.ui.footerLabels.corporateNumber}: {content.footer.corporateNumber}
-          </p>
-          <p>
-            {content.ui.footerLabels.address}: {content.footer.address}
-          </p>
-          <p>
-            {content.ui.footerLabels.email}:{" "}
-            <a href={`mailto:${content.footer.email}`}>{content.footer.email}</a>
-          </p>
-          <p>
-            {content.ui.footerLabels.tel}:{" "}
-            <a href={`tel:${content.footer.tel.replaceAll("-", "")}`}>{content.footer.tel}</a>
-          </p>
+          <footer className="mt-10 border-t border-white/10 pt-6 text-xs text-white/60">
+            <div className="grid gap-1">
+              <div className="text-white/80">{content.footer.companyName}</div>
+              <div>대표자: {content.footer.ceo}</div>
+              <div>사업자등록번호: {content.footer.bizNo}</div>
+              <div>법인등록번호: {content.footer.corpNo}</div>
+              <div>주소: {content.footer.address}</div>
+              <div>Email: {content.footer.email}</div>
+              <div>Tel: {content.footer.tel}</div>
+            </div>
+          </footer>
         </div>
-      </footer>
-    </>
+      </section>
+    </main>
   );
 }
