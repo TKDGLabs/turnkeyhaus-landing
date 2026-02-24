@@ -1,13 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import dynamic from "next/dynamic";
 import { content } from "../content";
-
-const SplineHero = dynamic(
-  () => import("../components/SplineHero"),
-  { ssr: false }
-);
 
 const clsCard =
   "group overflow-hidden rounded-2xl border border-black/10 bg-white transition-colors hover:border-black/20";
@@ -131,8 +125,65 @@ export default function Page() {
         </div>
       </header>
 
-      <section id="top" className="bg-white border-b border-black/10">
-        <SplineHero />
+      <section
+        id="top"
+        className="min-h-[720px] border-b border-black/10 bg-white lg:min-h-[820px] flex items-center"
+      >
+        <div className="mx-auto w-full max-w-6xl px-6 py-20 md:py-24">
+          <div className="grid w-full items-center gap-8 md:grid-cols-[1fr_1.35fr_0.9fr]">
+            <div className="space-y-8">
+              <h1 className="max-w-[18ch] text-balance text-[36px] font-semibold leading-[1.12] tracking-tight text-black md:text-[60px]">
+                전문직 브랜딩,
+                유튜브로 실행합니다.
+              </h1>
+
+              <p className="max-w-[48ch] text-base leading-[1.9] text-black/70 md:text-lg">
+                영상이 아니라,
+                전문직 채널의 성장 구조를 설계합니다.
+              </p>
+
+              <div className="pt-4">
+                <a
+                  href="#contact"
+                  className="inline-block rounded-xl bg-[#21c1a2] px-8 py-4 font-semibold text-black"
+                >
+                  채널 구조 진단 요청
+                </a>
+              </div>
+            </div>
+
+            <div className="relative h-[420px] w-full lg:h-[520px]">
+              <Image
+                src="/images/showreel-cover.jpg"
+                alt="Turnkeyhaus 블록 그래픽"
+                width={1200}
+                height={900}
+                className="h-full w-full object-contain"
+                priority
+              />
+            </div>
+
+            <div className="rounded-2xl border border-black/10 bg-white p-6 md:p-8">
+              <div className="space-y-5">
+                <div>
+                  <h3 className="text-sm font-semibold tracking-[0.08em] text-black/50">상담 구조</h3>
+                  <p className="mt-2 text-sm leading-[1.85] text-black/70">
+                    유입 키워드와 상담 질문이 연결되도록
+                    구조를 먼저 설계합니다.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-semibold tracking-[0.08em] text-black/50">판단 구조</h3>
+                  <p className="mt-2 text-sm leading-[1.85] text-black/70">
+                    채널의 메시지 기준을 고정해
+                    반복 가능한 신뢰 자산으로 축적합니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="strategy-frame" className="border-t border-black/10">
