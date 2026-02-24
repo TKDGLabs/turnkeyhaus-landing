@@ -125,67 +125,61 @@ export default function Page() {
         </div>
       </header>
 
-      <section
-        id="top"
-        className="bg-white"
-      >
-        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <div className="grid gap-16 md:grid-cols-[1.1fr_0.9fr] items-center">
-            <div className="space-y-10">
+      <section id="top" className="bg-white border-b border-black/10">
+        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+          <div className="grid gap-14 md:grid-cols-[1.1fr_0.9fr] items-center">
+            {/* LEFT */}
+            <div className="space-y-8">
               <h1
                 className="
-                  text-[40px] leading-[1.12]
-                  md:text-[64px] md:leading-[1.08]
-                  tracking-tight font-semibold text-black
-                  max-w-[22ch] md:max-w-[18ch]
+                  text-[36px]
+                  md:text-[60px]
+                  leading-[1.12]
+                  tracking-tight
+                  font-semibold
+                  text-black
+                  max-w-[18ch]
                   text-balance
                 "
               >
-                전문직 유튜브, 제작이 아닌 전략.
+                전문직 브랜딩,
+                유튜브로 실행합니다.
               </h1>
 
               <p
                 className="
-                  mt-6
                   text-base
                   md:text-lg
                   leading-[1.9]
                   text-black/70
-                  max-w-[46ch]
+                  max-w-[48ch]
                 "
               >
-                우리는 단순히 영상을 납품하지 않습니다.
-                전문분야 채널의 판단 구조를 설계합니다.
+                영상이 아니라,
+                전문직 채널의 성장 구조를 설계합니다.
               </p>
 
-              <div className="mt-10 flex flex-col gap-4 md:flex-row md:gap-6">
+              <div className="pt-4">
                 <a
                   href="#contact"
-                  className="rounded-xl bg-[#21c1a2] px-8 py-4 font-semibold text-black"
+                  className="inline-block px-8 py-4 rounded-xl bg-[#21c1a2] text-black font-semibold"
                 >
                   채널 구조 진단 요청
-                </a>
-
-                <a
-                  href="#portfolio"
-                  className="rounded-xl border border-black/20 px-8 py-4 font-semibold text-black"
-                >
-                  포트폴리오 보기
                 </a>
               </div>
             </div>
 
+            {/* RIGHT – 이미지 (장식 제거) */}
             <div className="w-full md:max-w-[520px] md:ml-auto">
-              <div className="relative overflow-hidden rounded-2xl bg-black/5">
+              <div className="overflow-hidden rounded-2xl border border-black/10">
                 <Image
                   src="/images/showreel-cover.jpg"
-                  alt="Turnkeyhaus 사례 썸네일"
+                  alt="Turnkeyhaus 사례"
                   width={1200}
                   height={900}
                   className="w-full h-auto object-cover"
                   priority
                 />
-                <div className="absolute inset-0 bg-white/10" />
               </div>
             </div>
           </div>
