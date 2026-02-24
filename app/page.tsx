@@ -1,8 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
 import { content } from "../content";
 
 const clsCard =
@@ -10,8 +8,8 @@ const clsCard =
 const clsMedia =
   "relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-[#f8faf9] transition-colors hover:border-black/20";
 const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
-const sectionShell = "mx-auto max-w-6xl px-5 py-20 md:py-24";
-const sectionStack = "space-y-8 md:space-y-10";
+const sectionShell = "mx-auto max-w-6xl px-5 py-16 md:py-20";
+const sectionStack = "space-y-6 md:space-y-8";
 const bodyCopy = "max-w-[52ch] whitespace-pre-line text-base leading-[1.85] text-black/72 md:text-lg";
 const sectionLabelClass = "text-sm font-semibold tracking-[0.14em] text-black/45 md:text-base";
 
@@ -99,26 +97,11 @@ function isGoogleFormEmbedUrl(url: string) {
 
 const ytThumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
-function resolveHeroImageSrc() {
-  const candidatePaths = ["/images/showreel-cover.jpg", "/images/showreel-cover.png"];
-  const publicDir = join(process.cwd(), "public");
-
-  for (const imagePath of candidatePaths) {
-    const absolutePath = join(publicDir, imagePath.replace(/^\//, ""));
-    if (existsSync(absolutePath)) {
-      return imagePath;
-    }
-  }
-
-  return "/images/studio-1.jpg";
-}
-
 export default function Page() {
   const formEmbedUrl = content.contact.googleFormEmbedUrl.trim();
   const formShareUrl = content.contact.googleFormShareUrl.trim();
   const hasFormEmbedUrl = isGoogleFormEmbedUrl(formEmbedUrl);
   const hasFormShareUrl = formShareUrl.startsWith("http://") || formShareUrl.startsWith("https://");
-  const heroImageSrc = resolveHeroImageSrc();
 
   return (
     <main className="min-h-screen bg-white text-[#0B0F0E]">
@@ -146,20 +129,16 @@ export default function Page() {
         id="top"
         className="bg-white"
       >
-        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <div className="grid gap-16 md:grid-cols-[1.1fr_0.9fr] items-center">
             <div className="space-y-10">
               <h1
                 className="
-                  text-3xl
-                  md:text-5xl
-                  leading-[1.25]
-                  md:leading-[1.15]
-                  tracking-tight
-                  font-semibold
-                  text-black
-                  max-w-[20ch]
-                  md:max-w-[18ch]
+                  text-[40px] leading-[1.12]
+                  md:text-[64px] md:leading-[1.08]
+                  tracking-tight font-semibold text-black
+                  max-w-[22ch] md:max-w-[18ch]
+                  text-balance
                 "
               >
                 전문직 유튜브, 제작이 아닌 전략.
@@ -196,16 +175,35 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="w-full max-w-[520px] ml-auto">
-              <Image
-                src={heroImageSrc}
-                alt="Turnkeyhaus studio"
-                width={1200}
-                height={900}
-                className="h-auto w-full object-cover"
-                priority
-              />
+            <div className="w-full md:max-w-[520px] md:ml-auto">
+              <div className="relative overflow-hidden rounded-2xl bg-black/5">
+                <Image
+                  src="/images/showreel-cover.jpg"
+                  alt="Turnkeyhaus 사례 썸네일"
+                  width={1200}
+                  height={900}
+                  className="w-full h-auto object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-white/10" />
+              </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="strategy-frame" className="border-t border-black/10">
+        <div className={`${sectionShell} ${sectionStack}`}>
+          <SectionHeader label={content.strategyFrame.label} title={content.strategyFrame.h2} />
+
+          <div className="grid gap-4 md:grid-cols-4">
+            {content.strategyFrame.steps.map((step, index) => (
+              <article key={step.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+                <div className="text-sm font-semibold tracking-[0.08em] text-black/45">{`0${index + 1}`}</div>
+                <h3 className="mt-3 text-lg font-semibold text-[#0B0F0E]">{step.title}</h3>
+                <p className="mt-2 text-sm leading-[1.85] text-black/70">{step.detail}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -215,7 +213,7 @@ export default function Page() {
           <SectionHeader label={content.problem.label} title={content.problem.h2} lead={content.problem.lead} />
 
           {content.problem.items.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="max-w-[52ch] space-y-4">
               <ul className="space-y-3">
                 {content.problem.items.map((item) => (
                   <li
@@ -227,15 +225,15 @@ export default function Page() {
                 ))}
               </ul>
 
-              <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-                <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
+              <div className="rounded-2xl border border-black/10 bg-white p-6">
+                <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-black/80 md:text-lg">
                   {content.problem.emphasis}
                 </p>
               </div>
             </div>
           ) : (
-            <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-              <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
+            <div className="max-w-[52ch] rounded-2xl border border-black/10 bg-white p-6">
+              <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-black/80 md:text-lg">
                 {content.problem.emphasis}
               </p>
             </div>
@@ -269,25 +267,18 @@ export default function Page() {
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.approach.label} title={content.approach.h2} lead={content.approach.lead} />
 
-          <div className="grid gap-6 md:grid-cols-2 md:items-center">
-            <div className="space-y-4">
-              <ul className="space-y-3">
-                {content.approach.bullets.map((bullet) => (
-                  <li key={bullet} className="rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm text-black/72">
-                    {bullet}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-5">
-                <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-[#0B0F0E] md:text-lg">
-                  {content.approach.keyline}
-                </p>
-              </div>
-            </div>
-
-            <MediaFrame image={content.approach.image} overlayClass="bg-black/8" />
+          <div className="grid gap-4 md:grid-cols-2">
+            {content.approach.steps.map((step) => (
+              <article key={step.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+                <h3 className="text-lg font-semibold text-[#0B0F0E]">{step.title}</h3>
+                <p className="mt-2 text-sm leading-[1.85] text-black/72">{step.detail}</p>
+              </article>
+            ))}
           </div>
+
+          <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.85] text-black/80 md:text-lg">
+            {content.approach.keyline}
+          </p>
         </div>
       </section>
 
@@ -327,7 +318,7 @@ export default function Page() {
                     ))}
                   </ul>
 
-                  <ActionLink href={card.href} className="text-xs font-semibold text-[#189b82]">
+                  <ActionLink href={card.href} className="text-xs font-semibold text-[#21c1a2]">
                     {card.ctaLabel} →
                   </ActionLink>
                 </div>
@@ -338,73 +329,35 @@ export default function Page() {
       </section>
 
       <section id="proof" className="border-t border-black/10">
-        <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader label={content.studioProof.label} title={content.studioProof.h2} />
+        <div className="mx-auto max-w-6xl space-y-8 px-5 py-20 md:grid md:grid-cols-[1fr_0.9fr] md:items-start md:gap-10 md:space-y-0 md:py-24">
+          <div className="space-y-6">
+            <SectionLabel>{content.studioProof.label}</SectionLabel>
+            <h2 className="max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.05] tracking-tight text-[#0B0F0E] md:text-4xl">
+              {content.studioProof.h2}
+            </h2>
+            <p className={bodyCopy}>{content.studioProof.crewLead}</p>
 
-          <div className="rounded-2xl border border-black/10 bg-white p-6 md:p-8">
-            <h3 className="text-lg font-semibold text-[#0B0F0E]">{content.studioProof.operationTitle}</h3>
-            <ul className="mt-4 space-y-2 text-sm leading-relaxed text-black/72 md:text-base">
+            <ul className="space-y-3">
               {content.studioProof.operationSystem.map((item) => (
-                <li key={item} className="list-inside list-disc">
+                <li key={item} className="rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm leading-[1.85] text-black/75">
                   {item}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2 md:items-start">
+          <div className="space-y-4">
             {content.studioProof.images.map((image) => (
-              <div key={image.src} className="overflow-hidden rounded-2xl border border-black/10 bg-black/5">
+              <div key={image.src} className="overflow-hidden rounded-2xl border border-black/10 bg-white">
                 <Image
                   src={image.src}
                   alt={image.alt}
                   width={1600}
                   height={1200}
-                  className="h-auto w-full object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="w-full h-auto object-cover"
                 />
               </div>
             ))}
-          </div>
-
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <h3 className="text-xl font-semibold tracking-tight text-[#0B0F0E]">{content.studioProof.crewTitle}</h3>
-              <p className="max-w-[52ch] text-base leading-[1.85] text-black/72">
-                {content.studioProof.crewLead}
-              </p>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-2">
-              {content.studioProof.crewCards.map((member) => (
-                <article
-                  key={member.role}
-                  className="space-y-3 rounded-2xl border border-black/10 bg-white p-6 md:p-8"
-                >
-                  <div className="text-sm font-semibold tracking-[0.06em] text-black/50">{member.role}</div>
-                  <p className="text-base leading-[1.85] text-black/72">{member.headline}</p>
-                  <ul className="space-y-2 text-sm leading-[1.8] text-black/62">
-                    {member.bullets.map((line) => (
-                      <li key={line} className="list-inside list-disc">
-                        {line}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
-
-            <div className="rounded-2xl border border-black/10 bg-white p-6 md:p-8">
-              <p className="whitespace-pre-line text-base leading-[1.85] text-black/72">
-                {content.studioProof.crewNote}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-              <p className="whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
-                {content.studioProof.closing}
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -435,7 +388,7 @@ export default function Page() {
                 <div className="space-y-4 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="text-base font-semibold text-[#0B0F0E]">{item.title}</h3>
-                    <span className="shrink-0 rounded-full border border-[#21c1a2]/35 bg-[#21c1a2]/15 px-2.5 py-1 text-xs font-semibold text-[#127763]">
+                    <span className="shrink-0 rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs font-semibold text-black/70">
                       {item.result}
                     </span>
                   </div>
@@ -487,8 +440,8 @@ export default function Page() {
             ))}
           </div>
 
-          <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-            <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
+          <div className="rounded-2xl border border-black/10 bg-white p-6">
+            <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.85] text-black/80 md:text-lg">
               {content.pricing.emphasis}
             </p>
           </div>
@@ -544,7 +497,7 @@ export default function Page() {
               <div className="flex flex-wrap gap-3">
                 <a
                   href="#contact-form"
-                  className="inline-flex rounded-xl border border-[#1aa98d] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black"
+                  className="inline-flex rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black"
                 >
                   설문 작성하기
                 </a>

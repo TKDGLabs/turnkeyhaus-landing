@@ -46,6 +46,11 @@ export type FooterLine = {
   value: string;
 };
 
+export type StrategyStep = {
+  title: string;
+  detail: string;
+};
+
 export type Content = {
   brand: {
     name: string;
@@ -79,13 +84,17 @@ export type Content = {
     ctaLabel: string;
     ctaHref: string;
   };
+  strategyFrame: {
+    label: string;
+    h2: string;
+    steps: StrategyStep[];
+  };
   approach: {
     label: string;
     h2: string;
     lead: string;
-    bullets: string[];
+    steps: StrategyStep[];
     keyline: string;
-    image: ImageAsset;
   };
   professionalTargets: {
     label: string;
@@ -197,18 +206,51 @@ export const content: Content = {
     ctaLabel: "채널 구조 진단 요청",
     ctaHref: "#contact"
   },
+  strategyFrame: {
+    label: "[ 전략 설계 프레임 ]",
+    h2: "전략은 감각이 아니라\n단계로 설계됩니다.",
+    steps: [
+      {
+        title: "진단",
+        detail: "타겟 질문·검색 맥락·현재 채널 상태를 먼저 정리합니다."
+      },
+      {
+        title: "포지셔닝",
+        detail: "채널의 말투·톤·판단 기준을 고정해 일관성을 만듭니다."
+      },
+      {
+        title: "편성",
+        detail: "롱폼·숏폼의 역할을 분리해 축적 가능한 편성 구조를 만듭니다."
+      },
+      {
+        title: "운영",
+        detail: "SEO·CTA·성과 분석을 결합해 전환 흐름을 안정화합니다."
+      }
+    ]
+  },
   approach: {
     label: "[ 방식 ]",
-    h2: "잠재 고객이 찾는 질문을\n구조로 바꿉니다.",
-    lead: "",
-    bullets: [
-      "포지셔닝 · 톤 정의",
-      "롱폼/숏폼 역할 분리",
-      "검색(SEO) · 전환(CTA) 동시 설계",
-      "성과 분석 → 성공 포맷 축적"
+    h2: "우리는 제작 공정이 아니라\n운영 프레임을 설계합니다.",
+    lead: "각 단계는 독립이 아니라, 다음 단계의 품질을 결정하는 연결 구조입니다.",
+    steps: [
+      {
+        title: "① 포지셔닝 · 톤 정의",
+        detail: "전문직 채널에서 어떤 관점으로 말할지 기준을 먼저 확정합니다."
+      },
+      {
+        title: "② 롱폼/숏폼 역할 분리",
+        detail: "확신을 만드는 콘텐츠와 도달을 만드는 콘텐츠를 분리해 설계합니다."
+      },
+      {
+        title: "③ 검색(SEO) · 전환(CTA) 동시 설계",
+        detail: "유입 키워드와 상담 동선을 같은 화면에서 작동하도록 맞춥니다."
+      },
+      {
+        title: "④ 성과 분석 · 포맷 축적",
+        detail: "반응 데이터를 바탕으로 성공 포맷을 재사용 가능한 자산으로 고정합니다."
+      }
     ],
-    keyline: "촬영은 재료 생산입니다.\n운영은 신뢰를 축적하는 과정입니다.",
-    image: images.structure
+    keyline: "촬영은 재료 생산입니다.\n운영은 신뢰를 축적하는 과정입니다."
   },
   professionalTargets: {
     label: "[ 전문직 적용 ]",
@@ -245,59 +287,62 @@ export const content: Content = {
     ]
   },
   studioProof: {
-    label: "[ 실행 증거 ]",
-    h2: "컨설팅은 말로,\n실행은 기준으로 증명합니다.",
+    label: "[ 전략 실행 기반 ]",
+    h2: "컨설팅은 말이 아니라,\n운영 시스템으로 증명합니다.",
     operationTitle: "운영 시스템",
     operationSystem: [
-      "전담 PD 배정",
-      "Sony FX 시네마 라인 장비 사용",
-      "월 1–2회 촬영 기반 운영",
-      "출장비 별도 없음 (전국 대응)"
+      "전담 PD 2인 운영 구조",
+      "Sony FX 시네마 라인 운용",
+      "3CAM 기반 인터뷰 설계",
+      "전국 촬영 대응 (출장비 별도 없음)"
     ],
-    crewTitle: "제작진 역량",
+    crewTitle: "전담 구조",
     crewLead:
-      "전문직 채널은 단순 촬영 인력으로 운영되지 않습니다. 전공과 실무 경험을 갖춘 팀이 전담 구조로 운영합니다.",
+      "전문직 채널은 전담 구조로 운영됩니다.\n촬영은 일부이고, 기준과 설계가 중심입니다.",
     crewCards: [
       {
         role: "Account Lead",
-        headline: "전문직 브랜딩 설계 경험",
+        headline: "전문직 브랜딩 설계",
         bullets: [
-          "법률·의료 채널 구조 설계",
-          "브랜드 포지셔닝 및 톤 전략",
-          "전환 중심 콘텐츠 구조 설계"
+          "업종별 포지셔닝 기준 수립",
+          "메시지 톤 및 채널 판단 기준 고정",
+          "상담 전환 구조 설계"
         ]
       },
       {
         role: "Marketing Producer",
         headline: "SEO 기반 운영 설계",
         bullets: [
-          "검색 키워드 구조 설계",
-          "성과 분석 및 리포트",
-          "콘텐츠 자산화 전략"
+          "검색 키워드 맵 설계",
+          "월간 성과 리포트 운영",
+          "콘텐츠 자산화 전략 수립"
         ]
       },
       {
         role: "Video Director",
-        headline: "시네마 라인 촬영 시스템",
+        headline: "촬영 표준 운영",
         bullets: [
-          "Sony FX 시리즈 운용",
-          "3CAM 기반 촬영",
-          "고난도 인터뷰·브랜딩 영상 연출"
+          "촬영 품질 표준 가이드 적용",
+          "인터뷰/브랜딩 포맷 연출",
+          "운영 계획 기반 촬영 실행"
         ]
       },
       {
         role: "Creative Lead",
-        headline: "채널 성장 및 디자인 구조",
+        headline: "채널 디자인 구조",
         bullets: [
-          "채널 아이덴티티 설계",
-          "썸네일·브랜딩 시스템 구축",
-          "대형 채널 성장 경험"
+          "썸네일/브랜딩 시스템 고정",
+          "포맷별 시각 규칙 관리",
+          "장기 운영 관점 개선"
         ]
       }
     ],
-    crewNote: "전국 촬영 대응.\n추가 출장비 없이 운영 범위에 포함됩니다.",
-    closing: "우리는 단순한 영상 제작자가 아닙니다. 브랜딩 구조를 이해하는 운영 파트너입니다",
-    images: [images.studio1, images.studio2]
+    crewNote: "",
+    closing: "",
+    images: [
+      { src: "/images/equipment-storage.jpg", alt: "장비 보관 및 운영 준비 현장" },
+      { src: "/images/equipment-travel.jpg", alt: "전국 출장 촬영 세팅 현장" }
+    ]
   },
   portfolio: {
     label: "[ 포트폴리오 ]",
