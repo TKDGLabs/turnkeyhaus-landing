@@ -149,16 +149,37 @@ export default function Page() {
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
           <div className="grid gap-16 md:grid-cols-[1.1fr_0.9fr] items-center">
             <div className="space-y-10">
-              <h1 className="text-4xl md:text-5xl leading-[1.15] tracking-tight font-semibold text-black max-w-[18ch]">
-                전문직 유튜브, 제작이 아니라 전략입니다.
+              <h1
+                className="
+                  text-3xl
+                  md:text-5xl
+                  leading-[1.25]
+                  md:leading-[1.15]
+                  tracking-tight
+                  font-semibold
+                  text-black
+                  max-w-[20ch]
+                  md:max-w-[18ch]
+                "
+              >
+                전문직 유튜브, 제작이 아닌 전략.
               </h1>
 
-              <p className="text-lg leading-[1.9] text-black/70 max-w-[50ch]">
-                우리는 단순한 영상 제작자가 아닙니다.
-                전문직 채널의 판단 구조를 설계합니다.
+              <p
+                className="
+                  mt-6
+                  text-base
+                  md:text-lg
+                  leading-[1.9]
+                  text-black/70
+                  max-w-[46ch]
+                "
+              >
+                우리는 단순히 영상을 납품하지 않습니다.
+                전문분야 채널의 판단 구조를 설계합니다.
               </p>
 
-              <div className="flex flex-wrap gap-4 pt-2">
+              <div className="mt-10 flex flex-col gap-4 md:flex-row md:gap-6">
                 <a
                   href="#contact"
                   className="rounded-xl bg-[#21c1a2] px-8 py-4 font-semibold text-black"
