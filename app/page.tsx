@@ -105,6 +105,7 @@ export default function Page() {
   const formShareUrl = content.contact.googleFormShareUrl.trim();
   const hasFormEmbedUrl = isGoogleFormEmbedUrl(formEmbedUrl);
   const hasFormShareUrl = formShareUrl.startsWith("http://") || formShareUrl.startsWith("https://");
+  const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
 
   return (
     <main className="min-h-screen bg-white text-[#0B0F0E]">
@@ -143,29 +144,6 @@ export default function Page() {
             priority
           />
         </div>
-
-        <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-20 md:py-24">
-          <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-[40px] font-semibold leading-[1.12] tracking-tight text-black md:text-[64px] md:leading-[1.08]">
-              전문직 브랜딩,
-              <br />
-              유튜브로 실행.
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-[52ch] text-base leading-[1.85] text-black/75 md:text-lg">
-              영상이 아니라, 전문직 채널의 성장 구조를 설계합니다.
-            </p>
-
-            <div className="mt-10">
-              <a
-                href="#contact"
-                className="inline-block rounded-xl bg-[#21c1a2] px-8 py-4 font-semibold text-black"
-              >
-                채널 구조 진단 요청
-              </a>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section id="strategy-frame" className="border-t border-black/10">
@@ -185,13 +163,40 @@ export default function Page() {
       </section>
 
       <section id="problem" className="border-t border-black/10">
-        <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader label={content.problem.label} title={content.problem.h2} lead={content.problem.lead} />
+        <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
+          <div className="space-y-10">
+            <div className="grid gap-10 md:grid-cols-[1.2fr_0.8fr] md:items-center md:gap-12">
+              <div className="space-y-8">
+                <SectionLabel>{content.problem.label}</SectionLabel>
+                <h2 className="max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.05] tracking-tight text-[#0B0F0E] md:text-4xl">
+                  {content.problem.h2}
+                </h2>
 
-          <div className="max-w-[52ch] rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-            <p className="whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
-              {content.problem.emphasis}
-            </p>
+                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[1.9] text-black/75 md:text-lg">
+                  {problemSupport}
+                </p>
+
+                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[1.9] text-black/75 md:text-lg">
+                  {problemDetail}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-black/10 bg-black/5 p-4 md:p-6">
+                <Image
+                  src="/images/reality-illustration.png"
+                  alt="문제와 현실 점검 일러스트"
+                  width={1200}
+                  height={1200}
+                  className="w-full h-auto max-h-56 object-contain md:max-h-[420px]"
+                />
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 p-6">
+              <p className="text-base font-semibold leading-[1.85] text-black md:text-lg">
+                {content.problem.emphasis}
+              </p>
+            </div>
           </div>
         </div>
       </section>
