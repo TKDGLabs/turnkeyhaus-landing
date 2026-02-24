@@ -212,53 +212,10 @@ export default function Page() {
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.problem.label} title={content.problem.h2} lead={content.problem.lead} />
 
-          {content.problem.items.length > 0 ? (
-            <div className="max-w-[52ch] space-y-4">
-              <ul className="space-y-3">
-                {content.problem.items.map((item) => (
-                  <li
-                    key={item}
-                    className="whitespace-pre-line rounded-2xl border border-black/10 bg-[#fbfcfb] px-5 py-4 text-sm text-black/70"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="rounded-2xl border border-black/10 bg-white p-6">
-                <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-black/80 md:text-lg">
-                  {content.problem.emphasis}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="max-w-[52ch] rounded-2xl border border-black/10 bg-white p-6">
-              <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] font-semibold text-black/80 md:text-lg">
-                {content.problem.emphasis}
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      <section id="reality-check" className="border-t border-black/10">
-        <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader
-            label={content.realityCheck.label}
-            title={content.realityCheck.h2}
-            lead={content.realityCheck.lead}
-          />
-
-          <div className="max-w-[52ch] space-y-6">
-            <div className="rounded-2xl border border-black/10 bg-white p-6">
-              <p className={bodyCopy}>{content.realityCheck.body}</p>
-            </div>
-
-            <div className="rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
-              <p className="whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
-                {content.realityCheck.emphasis}
-              </p>
-            </div>
+          <div className="max-w-[52ch] rounded-2xl border border-[#21c1a2]/40 bg-[#21c1a2]/10 p-6">
+            <p className="whitespace-pre-line text-base font-semibold leading-[1.85] text-[#0B0F0E] md:text-lg">
+              {content.problem.emphasis}
+            </p>
           </div>
         </div>
       </section>

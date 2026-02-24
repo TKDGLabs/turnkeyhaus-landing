@@ -74,16 +74,6 @@ export type Content = {
     items: string[];
     emphasis: string;
   };
-  realityCheck: {
-    label: string;
-    h2: string;
-    lead: string;
-    emphasis: string;
-    body: string;
-    ctaLead: string;
-    ctaLabel: string;
-    ctaHref: string;
-  };
   strategyFrame: {
     label: string;
     h2: string;
@@ -180,7 +170,6 @@ export const content: Content = {
   },
   nav: [
     { label: "문제", href: "#problem" },
-    { label: "현실 점검", href: "#reality-check" },
     { label: "방식", href: "#approach" },
     { label: "전문직 적용", href: "#professional" },
     { label: "실행 증거", href: "#proof" },
@@ -189,22 +178,12 @@ export const content: Content = {
     { label: "채널 진단", href: "#contact" }
   ],
   problem: {
-    label: "[ 문제 ]",
-    h2: "대부분의 콘텐츠는\n비슷한 이야기를 합니다.",
-    lead: "조회수가 많다고,\n매출이 늘진 않습니다.",
+    label: "[ 문제 · 현실 점검 ]",
+    h2: "대부분의 콘텐츠는 비슷한 이야기를 합니다.\n그래서 수백만원을 써도 채널이 남지 않습니다.",
+    lead:
+      "영상은 늘어나지만,\n자산은 쌓이지 않습니다.\n\n유튜브는 캠페인이 아니라 구조입니다.\n조회수는 순간이고,\n구조는 축적입니다.",
     items: [],
-    emphasis: "잠재 고객이 찾던 맥락에\n놓이지 못하면 남지 않습니다."
-  },
-  realityCheck: {
-    label: "[ 현실 점검 ]",
-    h2: "월 수백만 원을 쓰고도\n채널이 남지 않는 경우가 있습니다.",
-    lead: "영상은 늘어나는데,\n자산은 쌓이지 않습니다.",
-    emphasis: "문제는 비용이 아니라 구조입니다.",
-    body:
-      "유튜브는 단기 캠페인이 아닙니다.\n초반 1–2개월의 조회수는 방향을 증명하지 않습니다.\n채널은 최소 6–12개월의 설계와 축적을 전제로 합니다.",
-    ctaLead: "지금 구조를 점검하지 않으면,\n1년 뒤에도 같은 질문을 하게 됩니다.",
-    ctaLabel: "채널 구조 진단 요청",
-    ctaHref: "#contact"
+    emphasis: "문제는 비용이 아니라 구조입니다."
   },
   strategyFrame: {
     label: "[ 전략 설계 프레임 ]",
