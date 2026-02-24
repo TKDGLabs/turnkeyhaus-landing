@@ -147,16 +147,15 @@ export default function Page() {
         className="bg-white"
       >
         <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
-          <div className="grid gap-6 md:grid-cols-2 items-start">
+          <div className="grid gap-16 md:grid-cols-[1.1fr_0.9fr] items-center">
             <div className="space-y-10">
-              <h1 className="text-5xl md:text-6xl leading-[1.05] tracking-tight font-semibold text-black max-w-[15ch] text-balance">
-                전문직 유튜브,
-                제작이 아니라 전략입니다.
+              <h1 className="text-4xl md:text-5xl leading-[1.15] tracking-tight font-semibold text-black max-w-[18ch]">
+                전문직 유튜브, 제작이 아니라 전략입니다.
               </h1>
 
-              <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.85] text-black/70 md:text-lg">
-                우리는 단순히 영상만 납품하지 않습니다.
-                전문분야 채널의 판단 구조를 설계합니다.
+              <p className="text-lg leading-[1.9] text-black/70 max-w-[50ch]">
+                우리는 단순한 영상 제작자가 아닙니다.
+                전문직 채널의 판단 구조를 설계합니다.
               </p>
 
               <div className="flex flex-wrap gap-4 pt-2">
@@ -176,7 +175,7 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl">
+            <div className="w-full max-w-[520px] ml-auto">
               <Image
                 src={heroImageSrc}
                 alt="Turnkeyhaus studio"
