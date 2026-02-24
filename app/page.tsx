@@ -131,67 +131,8 @@ export default function Page() {
         </div>
       </header>
 
-      <section id="top" className="relative bg-white">
+      <section id="top" className="bg-white border-b border-black/10">
         <SplineHero />
-
-        <div className="relative z-10 mx-auto max-w-6xl px-6 py-20 md:py-24">
-          <div className="grid gap-14 md:grid-cols-[1.1fr_0.9fr] items-center">
-            {/* LEFT */}
-            <div className="space-y-8">
-              <h1
-                className="
-                  text-[36px]
-                  md:text-[60px]
-                  leading-[1.12]
-                  tracking-tight
-                  font-semibold
-                  text-black
-                  max-w-[18ch]
-                  text-balance
-                "
-              >
-                전문직 브랜딩,
-                유튜브로 실행합니다.
-              </h1>
-
-              <p
-                className="
-                  text-base
-                  md:text-lg
-                  leading-[1.9]
-                  text-black/70
-                  max-w-[48ch]
-                "
-              >
-                영상이 아니라,
-                전문직 채널의 성장 구조를 설계합니다.
-              </p>
-
-              <div className="pt-4">
-                <a
-                  href="#contact"
-                  className="inline-block px-8 py-4 rounded-xl bg-[#21c1a2] text-black font-semibold"
-                >
-                  채널 구조 진단 요청
-                </a>
-              </div>
-            </div>
-
-            {/* RIGHT – 이미지 (장식 제거) */}
-            <div className="w-full md:max-w-[520px] md:ml-auto">
-              <div className="overflow-hidden rounded-2xl border border-black/10">
-                <Image
-                  src="/images/showreel-cover.jpg"
-                  alt="Turnkeyhaus 사례"
-                  width={1200}
-                  height={900}
-                  className="w-full h-auto object-cover"
-                  priority
-                />
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section id="strategy-frame" className="border-t border-black/10">
