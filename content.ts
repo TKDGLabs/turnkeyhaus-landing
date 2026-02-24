@@ -319,8 +319,7 @@ export const content: Content = {
     crewNote: "",
     closing: "",
     images: [
-      { src: "/images/equipment-storage.jpg", alt: "장비 보관 및 운영 준비 현장" },
-      { src: "/images/equipment-travel.jpg", alt: "전국 출장 촬영 세팅 현장" }
+      { src: "/images/showreel-cover.jpg", alt: "Turnkeyhaus 실행 기반 대표 이미지" }
     ]
   },
   portfolio: {

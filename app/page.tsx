@@ -106,6 +106,10 @@ export default function Page() {
   const hasFormEmbedUrl = isGoogleFormEmbedUrl(formEmbedUrl);
   const hasFormShareUrl = formShareUrl.startsWith("http://") || formShareUrl.startsWith("https://");
   const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
+  const proofImage = content.studioProof.images[0] ?? {
+    src: "/images/showreel-cover.jpg",
+    alt: "Turnkeyhaus 실행 기반 대표 이미지"
+  };
 
   return (
     <main className="min-h-screen bg-white text-[#0B0F0E]">
@@ -284,18 +288,16 @@ export default function Page() {
             </ul>
           </div>
 
-          <div className="space-y-4">
-            {content.studioProof.images.map((image) => (
-              <div key={image.src} className="overflow-hidden rounded-2xl border border-black/10 bg-white">
-                <Image
-                  src={image.src}
-                  alt={image.alt}
-                  width={1600}
-                  height={1200}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            ))}
+          <div className="md:pt-2">
+            <div className="overflow-hidden rounded-2xl border border-black/10 bg-black/5 p-3 md:p-4">
+              <Image
+                src={proofImage.src}
+                alt={proofImage.alt}
+                width={1600}
+                height={1067}
+                className="w-full h-auto object-contain"
+              />
+            </div>
           </div>
         </div>
       </section>
