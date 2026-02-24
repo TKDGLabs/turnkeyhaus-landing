@@ -114,17 +114,24 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-white text-[#0B0F0E]">
       <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <Link href="#top" className="flex items-center">
-            <Image src="/logo.png" alt="Turnkeyhaus" width={150} height={40} priority />
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+          <Link href="#top" className="flex h-11 shrink-0 items-center">
+            <Image
+              src="/logo.png"
+              alt="Turnkeyhaus"
+              width={164}
+              height={44}
+              className="h-11 w-auto object-contain"
+              priority
+            />
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center gap-1.5 md:flex">
             {content.nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-xl px-3 py-2 text-xs font-medium tracking-[0.08em] text-black/65 transition-colors hover:text-black"
+                className="inline-flex h-10 items-center whitespace-nowrap rounded-xl px-3.5 text-sm font-semibold tracking-[0.02em] text-black/72 transition-colors hover:bg-black/[0.03] hover:text-black"
               >
                 {item.label}
               </Link>

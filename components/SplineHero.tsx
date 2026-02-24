@@ -13,9 +13,10 @@ export default function SplineHero() {
       className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden md:block"
       aria-hidden="true"
     >
-      <div className="absolute inset-y-0 left-1/2 w-full max-w-[1440px] -translate-x-1/2 px-12 lg:px-24">
+      {/* Keep Spline centered in a fixed frame so it doesn't feel left-biased on wide screens */}
+      <div className="absolute inset-y-0 left-1/2 w-full max-w-[1240px] -translate-x-1/2 px-10 lg:px-16">
         <div className="relative h-full w-full overflow-hidden">
-          <div className="absolute inset-0 translate-x-[10%] scale-[1.08]">
+          <div className="absolute inset-0 scale-[1.28] origin-center">
             <Spline
               scene="https://prod.spline.design/zb9htpW08g2kO3Lk/scene.splinecode"
               style={{ width: "100%", height: "100%" }}
