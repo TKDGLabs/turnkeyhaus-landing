@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import dynamic from "next/dynamic";
 import { content } from "../content";
+
+const SplineHero = dynamic(() => import("../components/SplineHero"), { ssr: false });
 
 const clsCard =
   "group overflow-hidden rounded-2xl border border-black/10 bg-white transition-colors hover:border-black/20";
@@ -125,8 +128,11 @@ export default function Page() {
         </div>
       </header>
 
-      <section id="top" className="bg-white border-b border-black/10">
-        <div className="mx-auto max-w-6xl px-6 py-20 md:py-24">
+      <section id="top" className="relative overflow-hidden bg-white border-b border-black/10">
+        <SplineHero />
+        <div className="pointer-events-none absolute inset-0 z-0 hidden bg-white/70 md:block" />
+
+        <div className="relative z-10 mx-auto max-w-6xl px-6 py-20 md:py-24">
           <div className="grid gap-14 md:grid-cols-[1.1fr_0.9fr] items-center">
             {/* LEFT */}
             <div className="space-y-8">
