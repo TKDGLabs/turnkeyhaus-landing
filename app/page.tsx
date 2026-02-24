@@ -296,13 +296,13 @@ export default function Page() {
           </div>
 
           <div className="md:pt-2">
-            <div className="overflow-hidden rounded-2xl border border-black/10 bg-black/5 p-3 md:p-4">
+            <div className="mx-auto w-full max-w-[640px] overflow-hidden rounded-2xl border border-black/10 bg-black/5 p-3 md:ml-auto md:p-4">
               <Image
                 src={proofImage.src}
                 alt={proofImage.alt}
                 width={1600}
                 height={1067}
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-cover"
               />
             </div>
           </div>

@@ -6,12 +6,13 @@ export default function SplineHero() {
       className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden md:block"
       aria-hidden="true"
     >
-      <div className="absolute inset-y-0 left-1/2 w-full max-w-[1240px] -translate-x-1/2 px-10 lg:px-16">
-        <div className="relative h-full w-full overflow-hidden">
+      {/* centered frame with gutters to avoid oversized/cropped look */}
+      <div className="absolute inset-0 flex items-center justify-center px-8 py-8 lg:px-14 lg:py-10">
+        <div className="relative h-full w-full max-h-[700px] max-w-[1180px] overflow-hidden">
           <iframe
             src="https://my.spline.design/statisticscolumns-gzsp5KbIvLR1IJUmAZZ0SEpP/"
             title="Turnkeyhaus hero spline background"
-            className="h-full w-full border-0"
+            className="h-full w-full origin-center scale-[0.94] border-0"
             loading="eager"
           />
         </div>
