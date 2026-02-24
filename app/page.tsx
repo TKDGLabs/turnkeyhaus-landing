@@ -133,7 +133,7 @@ export default function Page() {
         className="relative flex min-h-[720px] items-center justify-center overflow-hidden border-b border-black/10 bg-white lg:min-h-[820px]"
       >
         <SplineHero />
-        <div className="absolute inset-0 -z-10 md:hidden">
+        <div className="pointer-events-none absolute inset-0 z-0 md:hidden">
           <Image
             src="/images/showreel-cover.jpg"
             alt="Turnkeyhaus hero background"
