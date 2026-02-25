@@ -140,20 +140,19 @@ export default function Page() {
         </div>
       </header>
 
-      <section
-        id="top"
-        className="relative flex min-h-[720px] items-center justify-center overflow-hidden border-b border-black/10 bg-white lg:min-h-[820px]"
-      >
-        <SplineHero />
-        <div className="pointer-events-none absolute inset-0 z-0 md:hidden">
-          <Image
-            src="/images/showreel-cover.jpg"
-            alt="Turnkeyhaus hero background"
-            fill
-            className="object-cover"
-            sizes="100vw"
-            priority
-          />
+      <section id="top" className="relative overflow-hidden border-b border-black/10 bg-white">
+        <div className="relative mx-auto w-full max-w-[1920px] aspect-[16/9]">
+          <SplineHero />
+          <div className="pointer-events-none absolute inset-0 z-0 md:hidden">
+            <Image
+              src="/images/showreel-cover.jpg"
+              alt="Turnkeyhaus hero background"
+              fill
+              className="object-cover"
+              sizes="100vw"
+              priority
+            />
+          </div>
         </div>
       </section>
 
