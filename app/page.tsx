@@ -143,16 +143,14 @@ export default function Page() {
       </header>
 
       <section id="top" className="relative overflow-hidden border-b border-black/10 bg-white">
-        <div className="relative mx-auto w-full max-w-[1920px] aspect-[4/5] md:aspect-[16/9]">
+        <div className="relative mx-auto w-full max-w-[1920px] aspect-square md:aspect-[16/9]">
           <SplineHero />
           <div className="pointer-events-none absolute inset-0 z-0 md:hidden">
-            <Image
-              src="/images/showreel-cover.jpg"
-              alt="Turnkeyhaus hero background"
-              fill
-              className="object-contain bg-black/[0.04]"
-              sizes="100vw"
-              priority
+            <div
+              className="h-full w-full bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: "url('/images/mobile-hero-cover.jpg')",
+              }}
             />
           </div>
         </div>
