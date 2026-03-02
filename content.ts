@@ -210,8 +210,8 @@ export const content: Content = {
     { label: "채널 진단", href: "#contact" }
   ],
   heroValue: {
-    headline: "전문직 유튜브 채널,\n전략 없이 시작하면 6개월 뒤 멈춥니다.",
-    body: "세무사·변호사·의사를 위한\n전환 중심 유튜브 브랜딩 시스템",
+    headline: "전문분야 브랜딩은\n턴키로 한 번에 맡기세요.",
+    body: "고객 입장에서 설계하는\n전환 중심 브랜딩 시스템",
     primaryCta: { label: "무료 전략 점검 받기", href: "#contact" },
     secondaryCta: { label: "실제 성장 사례 보기", href: "#portfolio" }
   },
@@ -436,7 +436,7 @@ export const content: Content = {
   },
   faq: {
     label: "[ FAQ ]",
-    h2: "도입 전에 가장 많이 묻는 질문입니다.",
+    h2: "턴키 방식 적용 전\n자주 묻는 질문입니다.",
     items: [
       {
         q: "성과는 언제부터 확인할 수 있나요?",
@@ -464,7 +464,7 @@ export const content: Content = {
   },
   contact: {
     label: "[ 채널 구조 진단 ]",
-    h2: "\"유튜브를 할지 말지\"가 아니라\n\"제대로 할지 말지\"의 문제입니다.",
+    h2: "단 한 번의 컨설팅으로\n브랜드의 성장을 예측하세요.",
     lead: "현재 상황과 목표를 남겨주시면\n채널 구조 관점으로 빠르게 검토 후 회신드립니다.",
     panelTitle: "상담 예약하기",
     panelBody: "현재 상황과 목표를 남겨주시면\n채널 구조 관점으로 빠르게 검토 후 회신드립니다.",
