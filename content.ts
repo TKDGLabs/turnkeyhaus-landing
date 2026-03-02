@@ -46,9 +46,38 @@ export type FooterLine = {
   value: string;
 };
 
+export type CtaLink = {
+  label: string;
+  href: string;
+};
+
 export type StrategyStep = {
   title: string;
   detail: string;
+};
+
+export type FaqItem = {
+  q: string;
+  a: string;
+};
+
+export type BlogSection = {
+  heading: string;
+  paragraphs: string[];
+  bullets?: string[];
+};
+
+export type BlogPost = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  publishedAt: string;
+  readTime: string;
+  seoTitle: string;
+  seoDescription: string;
+  keywords: string[];
+  sections: BlogSection[];
 };
 
 export type Content = {
@@ -65,8 +94,17 @@ export type Content = {
     title: string;
     description: string;
     keywords: string[];
+    openGraphTitle: string;
+    openGraphDescription: string;
+    locale: string;
   };
   nav: NavItem[];
+  heroValue: {
+    headline: string;
+    body: string;
+    primaryCta: CtaLink;
+    secondaryCta: CtaLink;
+  };
   problem: {
     label: string;
     h2: string;
@@ -116,6 +154,18 @@ export type Content = {
     levels: OperatingLevelCard[];
     emphasis: string;
   };
+  faq: {
+    label: string;
+    h2: string;
+    items: FaqItem[];
+  };
+  blog: {
+    label: string;
+    h2: string;
+    lead: string;
+    ctaLabel: string;
+    posts: BlogPost[];
+  };
   contact: {
     label: string;
     h2: string;
@@ -152,21 +202,22 @@ export const content: Content = {
     logoPngPath: "/logo.png"
   },
   seo: {
-    siteUrl: "https://turnkey.haus",
-    canonical: "https://turnkey.haus",
+    siteUrl: "https://www.turnkey.haus",
+    canonical: "https://www.turnkey.haus",
     ogImagePath: "/og.png",
-    title: "전문직 유튜브 브랜딩 | Turnkeyhaus (세무사·변호사·병원 채널 설계)",
+    title: "전문직 유튜브 브랜딩 대행 | Turnkeyhaus",
     description:
-      "Turnkeyhaus는 세무사·변호사·병원 등 전문직 유튜브 브랜딩을 설계하는 미디어 실행 조직입니다. 단순 유튜브 제작사가 아닌 채널 구조와 운영 시스템을 통해 신뢰 자산을 구축합니다.",
+      "세무사, 변호사, 의사 등 전문직을 위한 유튜브 채널 기획·제작·운영 대행. 전략 중심 브랜딩 시스템.",
     keywords: [
-      "전문직 유튜브",
-      "유튜브 브랜딩",
-      "유튜브 컨설팅",
-      "유튜브 제작사",
-      "세무사 유튜브",
-      "변호사 유튜브",
-      "병원 유튜브"
-    ]
+      "전문직 유튜브 대행",
+      "세무사 유튜브 제작",
+      "변호사 유튜브 제작",
+      "의사 유튜브 마케팅",
+      "유튜브 브랜딩 대행"
+    ],
+    openGraphTitle: "전문직 유튜브 브랜딩 시스템",
+    openGraphDescription: "전문직만을 위한 유튜브 전략 설계 및 운영",
+    locale: "ko_KR"
   },
   nav: [
     { label: "문제", href: "#problem" },
@@ -174,9 +225,16 @@ export const content: Content = {
     { label: "전문직 적용", href: "#professional" },
     { label: "실행 증거", href: "#proof" },
     { label: "포트폴리오", href: "#portfolio" },
+    { label: "인사이트", href: "/blog" },
     { label: "운영 레벨", href: "#pricing" },
     { label: "채널 진단", href: "#contact" }
   ],
+  heroValue: {
+    headline: "전문직을 위한 유튜브 브랜딩 대행 시스템",
+    body: "문제 정의 → 구조 설계 → 실행 → 측정을\n한 흐름으로 운영합니다.",
+    primaryCta: { label: "채널 구조 진단 요청", href: "#contact" },
+    secondaryCta: { label: "포트폴리오 보기", href: "#portfolio" }
+  },
   problem: {
     label: "[ 문제 · 현실 점검 ]",
     h2: "대부분의 채널은\n성장이 쉽지 않습니다.",
@@ -395,6 +453,192 @@ export const content: Content = {
       }
     ],
     emphasis: "상세 제안은 채널 구조 진단 이후에만 가능합니다."
+  },
+  faq: {
+    label: "[ FAQ ]",
+    h2: "도입 전에 가장 많이 묻는 질문입니다.",
+    items: [
+      {
+        q: "성과는 언제부터 확인할 수 있나요?",
+        a: "초기 반응은 1~2개월 내 확인할 수 있지만, 유의미한 상담 전환은 보통 6~12개월 운영 축적이 필요합니다."
+      },
+      {
+        q: "촬영만 맡길 수도 있나요?",
+        a: "가능하지만 권장하지 않습니다. 촬영 단독보다 채널 기준·편성·전환 동선을 함께 설계할 때 성과가 안정적입니다."
+      },
+      {
+        q: "운영 범위는 어떻게 정해지나요?",
+        a: "월 운영 레벨(촬영 횟수, 포맷 복잡도, 분석 범위)에 따라 제안 범위가 달라지며 구조 진단 이후 확정됩니다."
+      },
+      {
+        q: "지역 제한이 있나요?",
+        a: "전국 대응합니다. 현재 운영 범위 내에서는 추가 출장비 없이 진행됩니다."
+      }
+    ]
+  },
+  blog: {
+    label: "[ 인사이트 ]",
+    h2: "유입을 만드는 검색형 콘텐츠 아카이브",
+    lead: "홈페이지는 전환을 담당하고, 블로그는 검색 유입을 담당합니다.",
+    ctaLabel: "인사이트 전체 보기",
+    posts: [
+      {
+        slug: "why-tax-accountant-youtube",
+        title: "세무사 유튜브를 해야 하는 이유",
+        excerpt:
+          "세무 서비스는 신뢰가 선행되어야 상담으로 이어집니다. 검색형 영상 아카이브를 구축하면 잠재 고객의 질문을 먼저 선점할 수 있습니다.",
+        category: "세무사 유튜브",
+        publishedAt: "2026-03-03",
+        readTime: "5분",
+        seoTitle: "세무사 유튜브를 해야 하는 이유 | Turnkeyhaus",
+        seoDescription:
+          "세무사 유튜브 제작이 필요한 이유와 검색 기반 콘텐츠 구조, 상담 전환 동선 설계 방법을 정리합니다.",
+        keywords: ["세무사 유튜브 제작", "세무사 유튜브", "전문직 유튜브 대행"],
+        sections: [
+          {
+            heading: "세무사는 왜 유튜브가 필요한가",
+            paragraphs: [
+              "세무 상담은 서비스 구매 전 정보 탐색 구간이 길고, 고객은 반복적으로 같은 질문을 검색합니다.",
+              "이때 텍스트만으로는 전달되지 않는 판단 기준을 영상으로 정리하면 신뢰 형성 속도가 달라집니다."
+            ]
+          },
+          {
+            heading: "조회수보다 중요한 설계 기준",
+            paragraphs: [
+              "세무 채널은 바이럴보다 검색형 누적 구조가 유리합니다. 시즌성 이슈를 기준으로 아카이브를 설계해야 합니다."
+            ],
+            bullets: [
+              "신고 시즌/이슈 캘린더 기반 편성",
+              "상황별 질문 템플릿 표준화",
+              "영상 말미 상담 전환 CTA 일관화"
+            ]
+          },
+          {
+            heading: "운영 관점 결론",
+            paragraphs: [
+              "세무사 유튜브는 채널 성장 자체보다 상담 품질과 리드 신뢰도를 높이는 운영 시스템으로 봐야 성과가 안정됩니다."
+            ]
+          }
+        ]
+      },
+      {
+        slug: "lawyer-youtube-success-case",
+        title: "변호사 유튜브 성공 사례 분석",
+        excerpt:
+          "법률 채널은 사건 홍보보다 판단 프레임을 반복적으로 보여주는 구조가 핵심입니다. 성공 사례의 공통 패턴을 구조 관점에서 분석합니다.",
+        category: "변호사 유튜브",
+        publishedAt: "2026-03-03",
+        readTime: "6분",
+        seoTitle: "변호사 유튜브 성공 사례 분석 | Turnkeyhaus",
+        seoDescription:
+          "변호사 유튜브 제작과 운영에서 성공한 채널의 공통 전략을 포지셔닝, 포맷, CTA 구조로 분석합니다.",
+        keywords: ["변호사 유튜브 제작", "변호사 유튜브", "유튜브 브랜딩 대행"],
+        sections: [
+          {
+            heading: "성공 채널의 공통점",
+            paragraphs: [
+              "성공한 법률 채널은 개별 사건보다 의뢰 전 판단 기준을 체계적으로 설명합니다.",
+              "시청자는 사건 자체보다 '내 상황에도 적용 가능한 기준'을 얻을 때 상담으로 이동합니다."
+            ]
+          },
+          {
+            heading: "운영 구조로 보면",
+            paragraphs: [
+              "단발성 이슈 대응이 아니라, 핵심 질문군을 포맷으로 고정해 누적하는 설계가 필요합니다."
+            ],
+            bullets: [
+              "의뢰 전 질문 시리즈 고정 편성",
+              "사건 유형 키워드 맵 구축",
+              "상담 유도 CTA 문구 통일"
+            ]
+          },
+          {
+            heading: "실행 팁",
+            paragraphs: [
+              "변호사 유튜브는 전문성을 과시하는 채널이 아니라, 고객의 의사결정을 돕는 채널일 때 전환 효율이 올라갑니다."
+            ]
+          }
+        ]
+      },
+      {
+        slug: "why-youtube-matters-for-professional-marketing",
+        title: "전문직 마케팅에서 유튜브가 중요한 이유",
+        excerpt:
+          "전문직 마케팅은 신뢰를 축적하는 채널이 필요합니다. 유튜브는 검색, 설득, 전환을 하나의 흐름으로 연결할 수 있는 매체입니다.",
+        category: "전문직 유튜브",
+        publishedAt: "2026-03-03",
+        readTime: "5분",
+        seoTitle: "전문직 마케팅에서 유튜브가 중요한 이유 | Turnkeyhaus",
+        seoDescription:
+          "전문직 유튜브 대행 관점에서 검색 유입과 상담 전환을 동시에 설계해야 하는 이유를 설명합니다.",
+        keywords: ["전문직 유튜브 대행", "전문직 유튜브", "유튜브 컨설팅"],
+        sections: [
+          {
+            heading: "전문직 마케팅의 본질",
+            paragraphs: [
+              "전문직 서비스는 가격보다 판단 신뢰가 먼저 작동합니다.",
+              "따라서 단기 노출형 광고보다 기준을 반복적으로 설명하는 채널이 필요합니다."
+            ]
+          },
+          {
+            heading: "유튜브가 갖는 구조적 장점",
+            paragraphs: [
+              "유튜브는 검색 유입을 받으면서 동시에 영상으로 설명 밀도를 높일 수 있어 전문직에 적합합니다."
+            ],
+            bullets: [
+              "검색형 유입: 문제 인지 단계 선점",
+              "영상 설명: 신뢰 형성 가속",
+              "전환 동선: 상담 요청 연결"
+            ]
+          },
+          {
+            heading: "홈페이지와의 역할 분리",
+            paragraphs: [
+              "홈페이지는 전환, 블로그/유튜브는 유입에 집중해야 운영 효율이 올라갑니다. 채널 간 역할 충돌을 줄이는 것이 핵심입니다."
+            ]
+          }
+        ]
+      },
+      {
+        slug: "hospital-youtube-branding-strategy",
+        title: "병원 유튜브 브랜딩 전략",
+        excerpt:
+          "병원 채널은 정보 전달만으로 차별화되지 않습니다. 환자 불안을 줄이는 설명 구조와 내원 전환 동선을 함께 설계해야 합니다.",
+        category: "병원 유튜브",
+        publishedAt: "2026-03-03",
+        readTime: "6분",
+        seoTitle: "병원 유튜브 브랜딩 전략 | Turnkeyhaus",
+        seoDescription:
+          "병원 유튜브 브랜딩 전략과 환자 질문 포맷, 내원 전환 구조를 운영 관점에서 정리합니다.",
+        keywords: ["병원 유튜브 브랜딩", "의사 유튜브 마케팅", "유튜브 브랜딩 대행"],
+        sections: [
+          {
+            heading: "병원 채널이 어려운 이유",
+            paragraphs: [
+              "의학 정보 채널은 유사 콘텐츠가 많아 전달 방식만으로는 구분되지 않습니다.",
+              "환자 입장에서 이해하기 쉬운 설명 순서와 톤을 고정해야 신뢰가 쌓입니다."
+            ]
+          },
+          {
+            heading: "내원 전환까지 고려한 구조",
+            paragraphs: [
+              "의료 콘텐츠는 정확성뿐 아니라 오해 가능성 관리가 중요합니다."
+            ],
+            bullets: [
+              "환자 질문 포맷 표준화",
+              "비교·오해·주의 구조 분리",
+              "내원 전 행동 유도 CTA 설계"
+            ]
+          },
+          {
+            heading: "운영 기준",
+            paragraphs: [
+              "병원 유튜브는 단기 조회수보다 장기 신뢰 자산 구축을 목표로 두어야 광고 효율과 채널 효율을 동시에 높일 수 있습니다."
+            ]
+          }
+        ]
+      }
+    ]
   },
   contact: {
     label: "[ 채널 구조 진단 ]",

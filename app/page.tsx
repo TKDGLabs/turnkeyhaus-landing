@@ -3,6 +3,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { content } from "../content";
+import StatsBar from "../components/StatsBar";
+import BeforeAfterRomance from "../components/BeforeAfterRomance";
+import ProofBadges from "../components/ProofBadges";
 
 const SplineHero = dynamic(() => import("../components/SplineHero"), { ssr: false });
 
@@ -114,7 +117,7 @@ export default function Page() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-[#0B0F0E]">
+    <main className="min-h-screen bg-white pb-24 text-[#0B0F0E] md:pb-0">
       <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
           <Link href="#top" className="flex h-11 shrink-0 items-center">
@@ -166,6 +169,41 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      <section className="border-t border-black/10">
+        <div className="mx-auto max-w-6xl px-5 py-10 md:py-12">
+          <div className="rounded-2xl border border-black/10 bg-white p-6 md:p-8">
+            <div className="grid gap-6 md:grid-cols-[1.2fr_auto] md:items-end">
+              <div className="space-y-4">
+                <h1 className="max-w-[22ch] whitespace-pre-line text-2xl font-semibold leading-[1.3] tracking-tight text-[#0B0F0E] md:text-3xl">
+                  {content.heroValue.headline}
+                </h1>
+                <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg">
+                  {content.heroValue.body}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <ActionLink
+                  href={content.heroValue.primaryCta.href}
+                  className="inline-flex rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black"
+                >
+                  {content.heroValue.primaryCta.label}
+                </ActionLink>
+                <ActionLink
+                  href={content.heroValue.secondaryCta.href}
+                  className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
+                >
+                  {content.heroValue.secondaryCta.label}
+                </ActionLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <StatsBar />
+      <ProofBadges />
 
       <section id="strategy-frame" className="border-t border-black/10">
         <div className={`${sectionShell} ${sectionStack}`}>
@@ -370,6 +408,46 @@ export default function Page() {
         </div>
       </section>
 
+      <BeforeAfterRomance />
+
+      <section id="blog" className="border-t border-black/10">
+        <div className={`${sectionShell} ${sectionStack}`}>
+          <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {content.blog.posts.map((post) => (
+              <article key={post.slug} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <span className="rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs font-medium text-black/65">
+                    {post.category}
+                  </span>
+                  <span className="text-xs text-black/50">{post.readTime}</span>
+                </div>
+
+                <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E] md:text-xl">{post.title}</h3>
+                <p className="mt-3 text-sm leading-[1.95] text-black/72 md:text-base">{post.excerpt}</p>
+
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="mt-4 inline-flex text-sm font-semibold text-[#21c1a2]"
+                >
+                  글 읽기 →
+                </Link>
+              </article>
+            ))}
+          </div>
+
+          <div>
+            <Link
+              href="/blog"
+              className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
+            >
+              {content.blog.ctaLabel}
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section id="pricing" className="border-t border-black/10">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
@@ -407,6 +485,21 @@ export default function Page() {
             <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.95] text-black/80 md:text-lg">
               {content.pricing.emphasis}
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" className="border-t border-black/10">
+        <div className={`${sectionShell} ${sectionStack}`}>
+          <SectionHeader label={content.faq.label} title={content.faq.h2} />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {content.faq.items.map((item) => (
+              <article key={item.q} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+                <h3 className="text-base font-semibold text-[#0B0F0E] md:text-lg">{item.q}</h3>
+                <p className="mt-3 text-sm leading-[1.95] text-black/72 md:text-base">{item.a}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -506,6 +599,15 @@ export default function Page() {
           </div>
         </div>
       </section>
+
+      <div className="fixed inset-x-4 bottom-4 z-40 md:hidden">
+        <ActionLink
+          href={content.heroValue.primaryCta.href}
+          className="flex h-12 w-full items-center justify-center rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-4 text-sm font-semibold text-black shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
+        >
+          {content.heroValue.primaryCta.label}
+        </ActionLink>
+      </div>
 
       <footer className="border-t border-black/10 bg-white">
         <div className="mx-auto max-w-6xl px-5 py-10 text-xs text-black/65">

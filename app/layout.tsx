@@ -32,14 +32,15 @@ export const metadata: Metadata = {
     type: "website",
     url: content.seo.siteUrl,
     siteName: content.brand.name,
-    title: content.seo.title,
-    description: content.seo.description,
+    locale: content.seo.locale,
+    title: content.seo.openGraphTitle,
+    description: content.seo.openGraphDescription,
     images: [{ url: content.seo.ogImagePath, width: 1200, height: 630, alt: content.seo.title }]
   },
   twitter: {
     card: "summary_large_image",
-    title: content.seo.title,
-    description: content.seo.description,
+    title: content.seo.openGraphTitle,
+    description: content.seo.openGraphDescription,
     images: [content.seo.ogImagePath]
   },
   robots: {
@@ -56,10 +57,61 @@ export const metadata: Metadata = {
   }
 };
 
+const footerValue = (label: string) =>
+  content.footer.lines.find((line) => line.label === label)?.value ?? "";
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Turnkeyhaus",
+    legalName: content.footer.companyName,
+    alternateName: "TKDG Labs",
+    url: "https://www.turnkey.haus",
+    description: "전문직을 위한 유튜브 브랜딩 및 채널 운영 대행",
+    logo: `${content.seo.siteUrl}/logo.png`,
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: footerValue("Email"),
+      telephone: "+82-507-1463-3664"
+    },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: footerValue("주소"),
+      addressCountry: "KR"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: content.brand.name,
+    url: content.seo.siteUrl,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${content.seo.siteUrl}/?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: content.brand.name,
+    url: content.seo.siteUrl,
+    description: content.seo.description
+  }
+];
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko" className={a2z.variable}>
-      <body className="bg-white text-[#0B0F0E] antialiased">{children}</body>
+      <body className="bg-white text-[#0B0F0E] antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
