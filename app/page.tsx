@@ -13,7 +13,7 @@ const clsMedia =
 const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
 const sectionShell = "mx-auto max-w-6xl px-5 py-16 md:py-20";
 const sectionStack = "space-y-6 md:space-y-8";
-const bodyCopy = "max-w-[52ch] whitespace-pre-line text-base leading-[1.85] text-black/72 md:text-lg";
+const bodyCopy = "max-w-[52ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg";
 const sectionLabelClass = "text-sm font-semibold tracking-[0.14em] text-black/45 md:text-base";
 
 function isExternalLink(href: string) {
@@ -165,7 +165,7 @@ export default function Page() {
               <article key={step.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
                 <div className="text-sm font-semibold tracking-[0.08em] text-black/45">{`0${index + 1}`}</div>
                 <h3 className="mt-3 text-lg font-semibold text-[#0B0F0E]">{step.title}</h3>
-                <p className="mt-2 text-sm leading-[1.85] text-black/70">{step.detail}</p>
+                <p className="mt-2 text-sm leading-[1.95] text-black/70">{step.detail}</p>
               </article>
             ))}
           </div>
@@ -182,11 +182,11 @@ export default function Page() {
                   {content.problem.h2}
                 </h2>
 
-                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[1.9] text-black/75 md:text-lg">
+                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[2] text-black/75 md:text-lg">
                   {problemSupport}
                 </p>
 
-                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[1.9] text-black/75 md:text-lg">
+                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[2] text-black/75 md:text-lg">
                   {problemDetail}
                 </p>
               </div>
@@ -203,7 +203,7 @@ export default function Page() {
             </div>
 
             <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 p-6">
-              <p className="text-base font-semibold leading-[1.85] text-black md:text-lg">
+              <p className="text-base font-semibold leading-[1.95] text-black md:text-lg">
                 {content.problem.emphasis}
               </p>
             </div>
@@ -219,12 +219,12 @@ export default function Page() {
             {content.approach.steps.map((step) => (
               <article key={step.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
                 <h3 className="text-lg font-semibold text-[#0B0F0E]">{step.title}</h3>
-                <p className="mt-2 text-sm leading-[1.85] text-black/72">{step.detail}</p>
+                <p className="mt-2 text-sm leading-[1.95] text-black/72">{step.detail}</p>
               </article>
             ))}
           </div>
 
-          <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.85] text-black/80 md:text-lg">
+          <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.95] text-black/80 md:text-lg">
             {content.approach.keyline}
           </p>
         </div>
@@ -256,7 +256,7 @@ export default function Page() {
                     </div>
                   ) : null}
 
-                  <p className="whitespace-pre-line text-base leading-[1.85] text-black/72 md:text-lg">{card.oneLiner}</p>
+                  <p className="whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg">{card.oneLiner}</p>
 
                   <ul className="space-y-2 text-sm text-black/72">
                     {card.bullets.map((bullet) => (
@@ -287,7 +287,7 @@ export default function Page() {
 
             <ul className="space-y-3">
               {content.studioProof.operationSystem.map((item) => (
-                <li key={item} className="rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm leading-[1.85] text-black/75">
+                <li key={item} className="rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm leading-[1.95] text-black/75">
                   {item}
                 </li>
               ))}
@@ -339,7 +339,7 @@ export default function Page() {
                     </span>
                   </div>
 
-                  <p className="whitespace-pre-line text-base leading-[1.85] text-black/72 md:text-lg">{item.oneLiner}</p>
+                  <p className="whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg">{item.oneLiner}</p>
 
                   <div className="flex flex-wrap gap-2">
                     {item.tags.map((tag) => (
@@ -387,7 +387,7 @@ export default function Page() {
           </div>
 
           <div className="rounded-2xl border border-black/10 bg-white p-6">
-            <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.85] text-black/80 md:text-lg">
+            <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.95] text-black/80 md:text-lg">
               {content.pricing.emphasis}
             </p>
           </div>
@@ -408,7 +408,7 @@ export default function Page() {
             <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 md:p-8">
               <div className="space-y-6">
                 <h3 className="text-2xl font-semibold tracking-tight text-[#0B0F0E]">채널 구조 진단</h3>
-                <p className="whitespace-pre-line text-base leading-[1.85] text-black/70">
+                <p className="whitespace-pre-line text-base leading-[1.95] text-black/70">
                   현재 상황과 목표를 남겨주시면
                   {"\n"}
                   채널 구조 관점으로 검토 후 회신드립니다.
@@ -436,7 +436,7 @@ export default function Page() {
                 </ul>
               </div>
 
-              <p className="text-xs leading-[1.85] text-black/50">
+              <p className="text-xs leading-[1.95] text-black/50">
                 제작 견적이 아니라 구조 진단이 먼저입니다.
               </p>
 
