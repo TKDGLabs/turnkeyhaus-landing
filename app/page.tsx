@@ -15,6 +15,8 @@ const sectionShell = "mx-auto max-w-6xl px-5 py-16 md:py-20";
 const sectionStack = "space-y-6 md:space-y-8";
 const bodyCopy = "max-w-[52ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg";
 const sectionLabelClass = "text-sm font-semibold tracking-[0.14em] text-black/45 md:text-base";
+const sectionTitleClass =
+  "max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.18] tracking-tight text-[#0B0F0E] md:text-4xl md:leading-[1.2]";
 
 function isExternalLink(href: string) {
   return href.startsWith("http://") || href.startsWith("https://");
@@ -66,7 +68,7 @@ function SectionHeader({
   return (
     <div className="max-w-[52ch] space-y-4">
       <SectionLabel>{label}</SectionLabel>
-      <h2 className="max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.05] tracking-tight text-[#0B0F0E] md:text-4xl">
+      <h2 className={sectionTitleClass}>
         {title}
       </h2>
       {lead ? <p className={bodyCopy}>{lead}</p> : null}
@@ -178,7 +180,7 @@ export default function Page() {
             <div className="grid gap-10 md:grid-cols-[1.2fr_0.8fr] md:items-center md:gap-12">
               <div className="space-y-8">
                 <SectionLabel>{content.problem.label}</SectionLabel>
-                <h2 className="max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.05] tracking-tight text-[#0B0F0E] md:text-4xl">
+                <h2 className={sectionTitleClass}>
                   {content.problem.h2}
                 </h2>
 
@@ -280,7 +282,7 @@ export default function Page() {
         <div className="mx-auto max-w-6xl space-y-8 px-5 py-20 md:grid md:grid-cols-[1fr_0.9fr] md:items-start md:gap-10 md:space-y-0 md:py-24">
           <div className="space-y-6">
             <SectionLabel>{content.studioProof.label}</SectionLabel>
-            <h2 className="max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.05] tracking-tight text-[#0B0F0E] md:text-4xl">
+            <h2 className={sectionTitleClass}>
               {content.studioProof.h2}
             </h2>
             <p className={bodyCopy}>{content.studioProof.crewLead}</p>
@@ -398,7 +400,7 @@ export default function Page() {
         <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
           <div className="mb-10 max-w-[52ch] space-y-6">
             <SectionLabel>{content.contact.label}</SectionLabel>
-            <h2 className="max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.05] tracking-tight text-[#0B0F0E] md:text-4xl">
+            <h2 className={sectionTitleClass}>
               {content.contact.h2}
             </h2>
             <p className={bodyCopy}>{content.contact.lead}</p>
