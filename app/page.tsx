@@ -16,7 +16,7 @@ const sectionStack = "space-y-6 md:space-y-8";
 const bodyCopy = "max-w-[52ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg";
 const sectionLabelClass = "text-sm font-semibold tracking-[0.14em] text-black/45 md:text-base";
 const sectionTitleClass =
-  "max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.18] tracking-tight text-[#0B0F0E] md:text-4xl md:leading-[1.2]";
+  "max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.28] tracking-tight text-[#0B0F0E] md:text-4xl md:leading-[1.26]";
 
 function isExternalLink(href: string) {
   return href.startsWith("http://") || href.startsWith("https://");
@@ -295,13 +295,13 @@ export default function Page() {
           </div>
 
           <div className="md:pt-2">
-            <div className="mx-auto w-full max-w-[640px] overflow-hidden rounded-2xl border border-black/10 bg-black/5 p-3 md:ml-auto md:p-4">
+            <div className="mx-auto w-full max-w-[640px] overflow-hidden rounded-[20px] border border-black/10 md:ml-auto">
               <Image
                 src={proofImage.src}
                 alt={proofImage.alt}
                 width={1600}
                 height={1067}
-                className="w-full h-auto object-cover"
+                className="block w-full h-auto object-cover"
               />
             </div>
           </div>
@@ -379,7 +379,7 @@ export default function Page() {
                   ))}
                 </ul>
 
-                <p className="mt-5 border-t border-black/10 pt-4 text-xs leading-relaxed text-black/55">
+                <p className="mt-5 border-t border-black/10 pt-4 text-sm leading-[1.9] text-black/65 md:text-base">
                   {level.target}
                 </p>
               </article>
@@ -436,7 +436,7 @@ export default function Page() {
                 </ul>
               </div>
 
-              <p className="text-xs leading-[1.95] text-black/50">
+              <p className="text-sm leading-[1.95] text-black/60 md:text-base">
                 제작 견적이 아니라 구조 진단이 먼저입니다.
               </p>
 

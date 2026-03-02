@@ -238,7 +238,7 @@ export const content: Content = {
     cards: [
       {
         title: "변호사 · 로펌",
-        oneLiner: "사건이 아니라 ‘판단의 프레임’을 설계합니다.",
+        oneLiner: "시청이 아닌 '상담을 유도하는 콘텐츠'로",
         tags: ["법률", "로펌", "상담"],
         bullets: ["의뢰 전 질문 시리즈 구조", "사건/유형 키워드 맵", "상담 전환 동선"],
         image: images.law,
@@ -247,7 +247,7 @@ export const content: Content = {
       },
       {
         title: "병원 · 의료",
-        oneLiner: "불안을 줄이는 설명은, 구조에서 시작됩니다.",
+        oneLiner: "잠재 고객의 '내원을 이끄는 콘텐츠'로",
         tags: ["병원", "의료", "브랜딩"],
         bullets: ["환자 질문 포맷 표준화", "비교·오해·주의 구조", "신뢰 축적 루틴"],
         image: images.med,
@@ -256,7 +256,7 @@ export const content: Content = {
       },
       {
         title: "세무 · 회계 · 노무",
-        oneLiner: "규정은 어렵고, 사례는 남습니다.",
+        oneLiner: "규정과 사례를 '납득시키는 콘텐츠'로",
         tags: ["세무", "회계", "노무"],
         bullets: ["시즌/이슈 캘린더 편성", "상황별 템플릿", "판단 기준 기반 문의 설계"],
         image: images.tax,
