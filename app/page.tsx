@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { content } from "../content";
 import StatsBar from "../components/StatsBar";
-import BeforeAfterRomance from "../components/BeforeAfterRomance";
 import ProofBadges from "../components/ProofBadges";
+import { getSortedInsights } from "../content/insights";
 
 const SplineHero = dynamic(() => import("../components/SplineHero"), { ssr: false });
 
@@ -106,6 +106,7 @@ function isGoogleFormEmbedUrl(url: string) {
 const ytThumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
 export default function Page() {
+  const insightPosts = getSortedInsights().slice(0, 4);
   const formEmbedUrl = content.contact.googleFormEmbedUrl.trim();
   const formShareUrl = content.contact.googleFormShareUrl.trim();
   const hasFormEmbedUrl = isGoogleFormEmbedUrl(formEmbedUrl);
@@ -408,38 +409,44 @@ export default function Page() {
         </div>
       </section>
 
-      <BeforeAfterRomance />
-
       <section id="blog" className="border-t border-black/10">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {content.blog.posts.map((post) => (
-              <article key={post.slug} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <span className="rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs font-medium text-black/65">
-                    {post.category}
-                  </span>
-                  <span className="text-xs text-black/50">{post.readTime}</span>
-                </div>
+          {insightPosts.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              {insightPosts.map((post) => (
+                <article key={post.slug} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <span className="rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs font-medium text-black/65">
+                      {post.keywords[0] ?? "인사이트"}
+                    </span>
+                    <span className="text-xs text-black/50">{post.publishedAt}</span>
+                  </div>
 
-                <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E] md:text-xl">{post.title}</h3>
-                <p className="mt-3 text-sm leading-[1.95] text-black/72 md:text-base">{post.excerpt}</p>
+                  <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E] md:text-xl">{post.title}</h3>
+                  <p className="mt-3 text-sm leading-[1.95] text-black/72 md:text-base">{post.description}</p>
 
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="mt-4 inline-flex text-sm font-semibold text-[#21c1a2]"
-                >
-                  글 읽기 →
-                </Link>
-              </article>
-            ))}
-          </div>
+                  <Link
+                    href={`/insights/${post.slug}`}
+                    className="mt-4 inline-flex text-sm font-semibold text-[#21c1a2]"
+                  >
+                    글 읽기 →
+                  </Link>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-black/10 bg-white p-6 text-sm leading-[1.9] text-black/60 md:text-base">
+              인사이트 글이 아직 없습니다.{" "}
+              <code className="rounded bg-black/[0.04] px-2 py-1 text-xs">content/insights.ts</code>에 글을
+              추가하면 자동으로 반영됩니다.
+            </div>
+          )}
 
           <div>
             <Link
-              href="/blog"
+              href="/insights"
               className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
             >
               {content.blog.ctaLabel}
@@ -555,7 +562,7 @@ export default function Page() {
                   href="#contact-form"
                   className="inline-flex rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black"
                 >
-                  설문 작성하기
+                  내 채널 구조 점검 받기
                 </a>
 
                 {hasFormShareUrl ? (
@@ -565,7 +572,7 @@ export default function Page() {
                     rel="noreferrer"
                     className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
                   >
-                    새 창으로 열기
+                    1:1 전략 상담 예약
                   </a>
                 ) : null}
               </div>

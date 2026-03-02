@@ -17,6 +17,12 @@ Next.js(App Router) 기반 단일 랜딩 페이지입니다.
 텍스트/CTA/섹션 데이터/이미지 경로/링크는 `content.ts`에서만 수정하면 됩니다.
 레이아웃은 `app/page.tsx`가 담당하며, 이미지 표시는 `next/image`를 사용합니다.
 
+## Insights Writing (언제든 글 추가)
+인사이트 글은 `content/insights.ts`의 `insights` 배열에 추가하면 `/insights`와 상세 페이지에 자동 반영됩니다.
+글 데이터 타입은 `Insight` / `InsightBlock`이며, 한 글당 `slug`, `title`, `description`, `publishedAt`, `keywords`, `body`를 채우면 됩니다.
+본문은 `body`에서 `p`, `h2`, `ul` 블록으로 구성할 수 있습니다.
+문장 중 `**강조**` 표기는 상세 페이지에서 굵게 렌더됩니다.
+
 ## Google Form Embed URL
 Google Form에서 `보내기` 버튼을 누른 뒤 `< >`(임베드) 탭으로 이동합니다.
 표시된 `iframe src`의 URL(`https://docs.google.com/forms/d/e/.../viewform?embedded=true`)을 복사합니다.

@@ -2,24 +2,28 @@
 
 import CountUp from './CountUp';
 
-const comma = (n: number) => Math.round(n).toLocaleString();
+const toMan = (n: number, fractionDigits = 0) => {
+  const v = n / 10000;
+  if (fractionDigits === 0) return String(Math.round(v));
+  return v.toFixed(fractionDigits).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
+};
 
 export default function StatsBar() {
   return (
-    <section className="w-full border-y border-black/5 bg-white">
-      <div className="mx-auto max-w-6xl px-6 py-5">
+    <section className="w-full bg-white">
+      <div className="mx-auto max-w-6xl px-6 pb-2 pt-5">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <StatItem
             value={20200000}
             label="누적 조회수 돌파"
-            suffix="+"
-            format={comma}
+            suffix="만+"
+            format={(n) => toMan(n, 0)}
           />
           <StatItem
             value={177000}
             label="누적 관리 구독자"
-            suffix="+"
-            format={comma}
+            suffix="만+"
+            format={(n) => toMan(n, 1)}
           />
           <StatItem
             value={7.1}
@@ -29,12 +33,15 @@ export default function StatsBar() {
             format={(n) => n.toFixed(1)}
           />
           <StatItem
-            value={3}
-            label="동시 운영 채널 수 제한"
-            suffix="개"
-            format={(n) => String(Math.round(n))}
+            value={2250000}
+            label="단일 영상 최대 조회수"
+            suffix="만+"
+            format={(n) => toMan(n, 0)}
           />
         </div>
+        <p className="mt-4 text-sm font-medium text-black/75 md:text-base">
+          우리는 많이 받지 않습니다. 대신, 맡은 채널은 끝까지 설계합니다.
+        </p>
         <p className="mt-3 text-xs text-black/45">*internal aggregated data 기준</p>
       </div>
     </section>

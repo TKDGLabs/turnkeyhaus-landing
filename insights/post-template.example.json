@@ -1,0 +1,26 @@
+{
+  "slug": "new-insight-slug",
+  "title": "새 인사이트 제목",
+  "excerpt": "목록에서 보여줄 요약 문장",
+  "category": "전문직 유튜브",
+  "publishedAt": "2026-03-03",
+  "readTime": "5분",
+  "seoTitle": "새 인사이트 제목 | Turnkeyhaus",
+  "seoDescription": "검색 노출용 설명 문장",
+  "keywords": ["전문직 유튜브", "유튜브 브랜딩 대행"],
+  "sourceUrl": "https://www.threads.net/...",
+  "sections": [
+    {
+      "heading": "섹션 제목",
+      "paragraphs": [
+        "첫 번째 문단",
+        "두 번째 문단"
+      ],
+      "bullets": [
+        "핵심 포인트 1",
+        "핵심 포인트 2",
+        "핵심 포인트 3"
+      ]
+    }
+  ]
+}
