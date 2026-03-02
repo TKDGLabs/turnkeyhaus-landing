@@ -364,26 +364,32 @@ export default function Page() {
           <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
 
           <div className="grid gap-4 md:grid-cols-3">
-            {content.pricing.levels.map((level) => (
-              <article key={level.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
-                <div className="mb-4 space-y-1">
-                  <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E]">{level.title}</h3>
-                  <p className="text-sm font-medium text-black/65">{level.priceBand}</p>
-                </div>
+            {content.pricing.levels.map((level) => {
+              const targetText = level.target.replace(/^대상:\s*/, "");
 
-                <ul className="space-y-2 text-sm leading-relaxed text-black/72">
-                  {level.bullets.map((bullet) => (
-                    <li key={bullet} className="list-inside list-disc">
-                      {bullet}
-                    </li>
-                  ))}
-                </ul>
+              return (
+                <article key={level.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+                  <div className="mb-4 space-y-1">
+                    <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E]">{level.title}</h3>
+                    <p className="text-sm font-medium text-black/65">{level.priceBand}</p>
+                  </div>
 
-                <p className="mt-5 border-t border-black/10 pt-4 text-sm leading-[1.9] text-black/65 md:text-base">
-                  {level.target}
-                </p>
-              </article>
-            ))}
+                  <ul className="space-y-2 text-sm leading-relaxed text-black/72">
+                    {level.bullets.map((bullet) => (
+                      <li key={bullet} className="list-inside list-disc">
+                        {bullet}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="mt-5 border-t border-black/10 pt-4 text-sm leading-[1.9] text-black/65 md:text-base">
+                    <span className="font-medium text-black/72">대상:</span>
+                    <br />
+                    <span>{targetText}</span>
+                  </p>
+                </article>
+              );
+            })}
           </div>
 
           <div className="rounded-2xl border border-black/10 bg-white p-6">
