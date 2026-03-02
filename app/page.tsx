@@ -128,17 +128,28 @@ export default function Page() {
             />
           </Link>
 
-          <nav className="hidden items-center gap-1.5 md:flex">
-            {content.nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="inline-flex h-10 items-center whitespace-nowrap rounded-xl px-3.5 text-sm font-semibold tracking-[0.02em] text-black/72 transition-colors hover:bg-black/[0.03] hover:text-black"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          <div className="hidden items-center gap-3 md:flex">
+            <nav className="flex items-center gap-1.5">
+              {content.nav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="inline-flex h-10 items-center whitespace-nowrap rounded-xl px-3.5 text-sm font-semibold tracking-[0.02em] text-black/72 transition-colors hover:bg-black/[0.03] hover:text-black"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+
+            <a
+              href="https://sclu.io/share/bulk/file/bf2w8ioROJvw"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-10 items-center whitespace-nowrap rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-4 text-sm font-semibold text-black transition-colors hover:bg-[#1db197]"
+            >
+              소개서 다운로드
+            </a>
+          </div>
         </div>
       </header>
 
