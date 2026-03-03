@@ -150,12 +150,19 @@ export type Content = {
     label: string;
     h2: string;
     lead: string;
+    midCtaEyebrow: string;
+    midCtaTitle: string;
     panelTitle: string;
     panelBody: string;
     panelHint: string;
     googleFormEmbedUrl: string;
     googleFormShareUrl: string;
     primaryCtaLabel: string;
+    phoneDisplay: string;
+    phoneHref: string;
+    quickCallLabel: string;
+    kakaoChatUrl: string;
+    kakaoCtaLabel: string;
     iframeTitle: string;
   };
   footer: {
@@ -184,7 +191,7 @@ export const content: Content = {
   seo: {
     siteUrl: "https://www.turnkey.haus",
     canonical: "https://www.turnkey.haus",
-    ogImagePath: "/og.png",
+    ogImagePath: "/og-image.jpg",
     title: "전문직 유튜브 브랜딩 대행 | Turnkeyhaus",
     description:
       "세무사, 변호사, 의사 등 전문직을 위한 유튜브 채널 기획·제작·운영 대행. 전략 중심 브랜딩 시스템.",
@@ -195,8 +202,8 @@ export const content: Content = {
       "의사 유튜브 마케팅",
       "유튜브 브랜딩 대행"
     ],
-    openGraphTitle: "전문직 유튜브 브랜딩 시스템",
-    openGraphDescription: "전문직만을 위한 유튜브 전략 설계 및 운영",
+    openGraphTitle: "전문직 유튜브 브랜딩 | Turnkeyhaus",
+    openGraphDescription: "전환 중심 전문직 유튜브 채널 운영 시스템",
     locale: "ko_KR"
   },
   nav: [
@@ -466,6 +473,8 @@ export const content: Content = {
     label: "[ 채널 구조 진단 ]",
     h2: "단 한 번의 컨설팅으로\n브랜드의 성장을 예측하세요.",
     lead: "현재 상황과 목표를 남겨주시면\n채널 구조 관점으로 빠르게 검토 후 회신드립니다.",
+    midCtaEyebrow: "채널 진단",
+    midCtaTitle: "지금 채널 상태, 10분만에 방향을 잡아드립니다.",
     panelTitle: "상담 예약하기",
     panelBody: "현재 상황과 목표를 남겨주시면\n채널 구조 관점으로 빠르게 검토 후 회신드립니다.",
     panelHint: "Google Form은 임베드 URL만 사용합니다. (forms.gle 공유 링크 직접 사용 금지)",
@@ -473,6 +482,11 @@ export const content: Content = {
       "https://docs.google.com/forms/d/e/1FAIpQLScnyuTnc051RnX8yaGNlPW6TSOe9INyaV-Gp8lc8xqUSL6kQg/viewform?embedded=true",
     googleFormShareUrl: "https://forms.gle/L58BK4pc3gEq81iM9",
     primaryCtaLabel: "내 채널 구조 점검 받기",
+    phoneDisplay: "0507-1463-3664",
+    phoneHref: "tel:050714633664",
+    quickCallLabel: "전화 상담",
+    kakaoChatUrl: "http://pf.kakao.com/_dyNPn/chat",
+    kakaoCtaLabel: "카카오톡 상담",
     iframeTitle: "Turnkeyhaus 상담 폼"
   },
   footer: {

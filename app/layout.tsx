@@ -35,7 +35,14 @@ export const metadata: Metadata = {
     locale: content.seo.locale,
     title: content.seo.openGraphTitle,
     description: content.seo.openGraphDescription,
-    images: [{ url: content.seo.ogImagePath, width: 1200, height: 630, alt: content.seo.title }]
+    images: [
+      {
+        url: `${content.seo.siteUrl}${content.seo.ogImagePath}`,
+        width: 1200,
+        height: 630,
+        alt: content.seo.openGraphTitle
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
@@ -52,8 +59,8 @@ export const metadata: Metadata = {
     }
   },
   icons: {
-    icon: [{ url: "/favicon.ico" }],
-    shortcut: ["/favicon.ico"]
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png"
   }
 };
 

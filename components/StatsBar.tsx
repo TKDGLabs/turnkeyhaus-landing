@@ -11,7 +11,7 @@ const toMan = (n: number, fractionDigits = 0) => {
 export default function StatsBar() {
   return (
     <section className="w-full bg-white">
-      <div className="mx-auto max-w-6xl px-6 pb-2 pt-5">
+      <div className="mx-auto max-w-6xl px-6 py-5">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           <StatItem
             value={20200000}
@@ -39,9 +39,6 @@ export default function StatsBar() {
             format={(n) => toMan(n, 0)}
           />
         </div>
-        <p className="mt-4 text-sm font-medium text-black/75 md:text-base">
-          우리는 많이 받지 않습니다. 대신, 맡은 채널은 끝까지 설계합니다.
-        </p>
         <p className="mt-3 text-xs text-black/45">*internal aggregated data 기준</p>
       </div>
     </section>
