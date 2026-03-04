@@ -2,8 +2,8 @@
 
 export default function ProofBadges() {
   const items = [
-    { big: '-2일', small: '콘텐츠 제작 기간 단축' },
-    { big: '+2,000', small: '영상 1편 구독자 증가' },
+    { big: '-2일', small: '기존 대비 제작 기간 단축' },
+    { big: '+2천 명', small: '영상 1편 당 최대 구독자 증가 수' },
   ];
 
   return (
@@ -16,6 +16,7 @@ export default function ProofBadges() {
           </div>
         ))}
       </div>
+      <p className="mt-3 text-xs text-black/45">*internal aggregated data 기준</p>
     </section>
   );
 }

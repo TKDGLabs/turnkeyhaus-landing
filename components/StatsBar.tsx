@@ -39,7 +39,6 @@ export default function StatsBar() {
             format={(n) => toMan(n, 0)}
           />
         </div>
-        <p className="mt-3 text-xs text-black/45">*internal aggregated data 기준</p>
       </div>
     </section>
   );
