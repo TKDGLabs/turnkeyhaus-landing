@@ -110,11 +110,9 @@ const ytThumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 export default function Page() {
   const insightPosts = getSortedInsights().slice(0, 4);
   const formEmbedUrl = content.contact.googleFormEmbedUrl.trim();
-  const formShareUrl = content.contact.googleFormShareUrl.trim();
   const phoneHref = content.contact.phoneHref.trim();
   const kakaoChatUrl = content.contact.kakaoChatUrl.trim();
   const hasFormEmbedUrl = isGoogleFormEmbedUrl(formEmbedUrl);
-  const hasFormShareUrl = formShareUrl.startsWith("http://") || formShareUrl.startsWith("https://");
   const hasPhoneHref = phoneHref.startsWith("tel:");
   const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
   const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
@@ -210,7 +208,6 @@ export default function Page() {
       </section>
 
       <StatsBar />
-      <MidCTA />
       <ProofBadges />
 
       <section id="strategy-frame" className="border-t border-black/10">
@@ -462,6 +459,8 @@ export default function Page() {
         </div>
       </section>
 
+      <MidCTA />
+
       <section id="pricing" className="border-t border-black/10">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
@@ -564,26 +563,6 @@ export default function Page() {
                 제작 견적이 아니라 구조 진단이 먼저입니다.
               </p>
 
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href="#contact-form"
-                  className="inline-flex rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black"
-                >
-                  내 채널 구조 점검 받기
-                </a>
-
-                {hasFormShareUrl ? (
-                  <a
-                    href={formShareUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
-                  >
-                    1:1 전략 상담 예약
-                  </a>
-                ) : null}
-              </div>
-
               <div className="flex flex-wrap gap-3 border-t border-black/10 pt-4">
                 {hasPhoneHref ? (
                   <a
@@ -599,7 +578,7 @@ export default function Page() {
                     href={kakaoChatUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:border-black/25 hover:bg-black/[0.02]"
+                    className="inline-flex rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#1db197]"
                   >
                     {content.contact.kakaoCtaLabel}
                   </a>
