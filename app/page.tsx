@@ -7,19 +7,21 @@ import StatsBar from "../components/StatsBar";
 import ProofBadges from "../components/ProofBadges";
 import ContactCTA from "../components/ContactCTA";
 import MidCTA from "../components/MidCTA";
+import IntroGate from "../components/IntroGate";
 import { getSortedInsights } from "../content/insights";
 
 const SplineHero = dynamic(() => import("../components/SplineHero"), { ssr: false });
 
 const clsCard =
-  "group overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_24px_rgba(11,15,14,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_16px_34px_rgba(11,15,14,0.08)]";
+  "group flex h-full flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_24px_rgba(11,15,14,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_16px_34px_rgba(11,15,14,0.08)]";
 const clsMedia =
   "relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-[#f7faf9] transition-colors hover:border-black/20";
 const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
 const sectionShell = "mx-auto max-w-[1280px] px-6 py-20 md:py-24";
 const sectionStack = "space-y-8 md:space-y-10";
 const bodyCopy = "max-w-[52ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg";
-const sectionLabelClass = "text-sm font-semibold tracking-[0.14em] text-black/45 md:text-base";
+const sectionLabelClass =
+  "inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-semibold tracking-[0.12em] text-black/45 md:text-base";
 const sectionTitleClass =
   "max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.26] tracking-tight text-[#0B0F0E] md:text-[42px] md:leading-[1.2]";
 
@@ -71,12 +73,15 @@ function SectionHeader({
   lead?: string;
 }) {
   return (
-    <div className="max-w-[52ch] space-y-4">
-      <SectionLabel>{label}</SectionLabel>
-      <h2 className={sectionTitleClass}>
-        {title}
-      </h2>
-      {lead ? <p className={bodyCopy}>{lead}</p> : null}
+    <div className="space-y-5">
+      <div className="max-w-[52ch] space-y-4">
+        <SectionLabel>{label}</SectionLabel>
+        <h2 className={sectionTitleClass}>
+          {title}
+        </h2>
+        {lead ? <p className={bodyCopy}>{lead}</p> : null}
+      </div>
+      <div className="h-px w-full bg-black/10" />
     </div>
   );
 }
@@ -123,6 +128,13 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-white pb-24 text-[#0B0F0E] md:pb-0">
+      <IntroGate
+        logoSrc="/logo.png"
+        logoAlt="Turnkeyhaus"
+        title="전략은 감각이 아니라 구조입니다."
+        subtitle="전문직 채널 운영의 기준을 먼저 보여드립니다."
+      />
+
       <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4">
           <Link href="#top" className="flex h-11 shrink-0 items-center">
@@ -233,7 +245,10 @@ export default function Page() {
                 key={step.title}
                 className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_6px_18px_rgba(11,15,14,0.03)] md:p-6"
               >
-                <div className="text-sm font-semibold tracking-[0.08em] text-black/45">{`0${index + 1}`}</div>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold tracking-[0.08em] text-black/45">{`0${index + 1}`}</div>
+                  <div className="h-1.5 w-1.5 rounded-full bg-[#21c1a2]/80" />
+                </div>
                 <h3 className="mt-3 text-lg font-semibold text-[#0B0F0E]">{step.title}</h3>
                 <p className="mt-2 text-sm leading-[1.9] text-black/70">{step.detail}</p>
               </article>
@@ -316,7 +331,7 @@ export default function Page() {
               <article key={card.title} className={clsCard}>
                 <MediaFrame image={card.image} sizes="(max-width: 768px) 100vw, 33vw" overlayClass="bg-black/12" />
 
-                <div className="space-y-4 p-5">
+                <div className="flex h-full flex-col space-y-4 p-5">
                   <h3 className="text-base font-semibold text-[#0B0F0E]">{card.title}</h3>
 
                   {(card.tags ?? []).length > 0 ? (
@@ -339,7 +354,7 @@ export default function Page() {
                     ))}
                   </ul>
 
-                  <ActionLink href={card.href} className="text-xs font-semibold text-[#21c1a2]">
+                  <ActionLink href={card.href} className="mt-auto pt-1 text-xs font-semibold text-[#21c1a2]">
                     {card.ctaLabel} →
                   </ActionLink>
                 </div>
@@ -404,7 +419,7 @@ export default function Page() {
                   </div>
                 </a>
 
-                <div className="space-y-4 p-5">
+                <div className="flex h-full flex-col space-y-4 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="text-base font-semibold text-[#0B0F0E]">{item.title}</h3>
                     <span className="shrink-0 rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs font-semibold text-black/70">
@@ -422,7 +437,7 @@ export default function Page() {
                     ))}
                   </div>
 
-                  <ActionLink href={item.href} className="text-xs font-semibold text-black/65">
+                  <ActionLink href={item.href} className="mt-auto pt-1 text-xs font-semibold text-black/65">
                     영상 보기 →
                   </ActionLink>
                 </div>
@@ -533,7 +548,7 @@ export default function Page() {
 
           <div className="grid gap-4 md:grid-cols-2">
             {content.faq.items.map((item) => (
-              <article key={item.q} className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_22px_rgba(11,15,14,0.03)] md:p-6">
+              <article key={item.q} className="h-full rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_22px_rgba(11,15,14,0.03)] md:p-6">
                 <h3 className="text-base font-semibold text-[#0B0F0E] md:text-lg">{item.q}</h3>
                 <p className="mt-3 text-sm leading-[1.9] text-black/72 md:text-base">{item.a}</p>
               </article>
