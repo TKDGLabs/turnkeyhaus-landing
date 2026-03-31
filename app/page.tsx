@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import dynamic from "next/dynamic";
 import { content } from "../content";
 import StatsBar from "../components/StatsBar";
 import ProofBadges from "../components/ProofBadges";
@@ -9,8 +8,6 @@ import ContactCTA from "../components/ContactCTA";
 import MidCTA from "../components/MidCTA";
 import IntroGate from "../components/IntroGate";
 import { getSortedInsights } from "../content/insights";
-
-const SplineHero = dynamic(() => import("../components/SplineHero"), { ssr: false });
 
 const clsCard =
   "group flex h-full flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_24px_rgba(11,15,14,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_16px_34px_rgba(11,15,14,0.08)]";
@@ -20,11 +17,11 @@ const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 
 const containerShell = "mx-auto max-w-[1360px] px-5 sm:px-6 lg:px-8";
 const sectionShell = `${containerShell} py-20 md:py-24`;
 const sectionStack = "space-y-8 md:space-y-10";
-const bodyCopy = "max-w-[56ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg";
+const bodyCopy = "max-w-[60ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/72 md:text-lg";
 const sectionLabelClass =
   "inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-semibold tracking-[0.12em] text-black/45 md:text-base";
 const sectionTitleClass =
-  "max-w-[22ch] whitespace-pre-line text-[32px] font-semibold leading-[1.24] tracking-tight text-[#0B0F0E] md:text-[46px] md:leading-[1.18] lg:text-[52px]";
+  "whitespace-pre-line break-keep text-[32px] font-semibold leading-[1.24] tracking-tight text-[#0B0F0E] md:text-[46px] md:leading-[1.18] lg:text-[52px]";
 
 function isExternalLink(href: string) {
   return href.startsWith("http://") || href.startsWith("https://");
@@ -75,7 +72,7 @@ function SectionHeader({
 }) {
   return (
     <div className="space-y-5">
-      <div className="max-w-[52ch] space-y-4">
+      <div className="max-w-[64ch] space-y-4">
         <SectionLabel>{label}</SectionLabel>
         <h2 className={sectionTitleClass}>
           {title}
@@ -209,7 +206,14 @@ export default function Page() {
 
       <section id="top" className="relative overflow-hidden border-b border-black/10 bg-[#f8fbfa]">
         <div className="relative mx-auto h-[60vh] min-h-[440px] max-h-[760px] w-full max-w-[1920px] md:h-auto md:aspect-[16/9]">
-          <SplineHero />
+          <Image
+            src="/images/showreel-cover-optimized.jpg"
+            alt="Turnkeyhaus hero background"
+            fill
+            className="pointer-events-none z-0 hidden object-cover md:block"
+            sizes="100vw"
+            priority
+          />
           <Image
             src="/images/mobile-hero-cover-optimized.jpg"
             alt="Turnkeyhaus mobile hero"
@@ -228,10 +232,10 @@ export default function Page() {
           <div className="rounded-[28px] border border-black/10 bg-white/95 p-6 shadow-[0_18px_48px_rgba(11,15,14,0.08)] backdrop-blur md:p-10">
             <div className="grid gap-8 md:grid-cols-[1.25fr_0.75fr] md:items-end">
               <div className="space-y-5">
-                <h1 className="max-w-[22ch] whitespace-pre-line text-[33px] font-semibold leading-[1.18] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.1]">
+                <h1 className="max-w-[24ch] whitespace-pre-line break-keep text-[33px] font-semibold leading-[1.18] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.1]">
                   {content.heroValue.headline}
                 </h1>
-                <p className="max-w-[50ch] whitespace-pre-line text-base leading-[1.9] text-black/72 md:text-[21px] md:leading-[1.7]">
+                <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.9] text-black/72 md:text-[21px] md:leading-[1.72]">
                   {content.heroValue.body}
                 </p>
               </div>
@@ -252,7 +256,7 @@ export default function Page() {
                   </ActionLink>
                 </div>
 
-                <p className="text-sm leading-[1.8] text-black/58 md:text-right">
+                <p className="text-sm leading-[1.75] text-black/58 md:text-right">
                   검색에서 발견되고 결정에서 선택되기까지,
                   <br className="hidden md:block" />
                   전환 기준으로 채널을 설계합니다.
@@ -348,7 +352,7 @@ export default function Page() {
             ))}
           </div>
 
-          <p className="max-w-[52ch] whitespace-pre-line rounded-2xl border border-black/10 bg-[#f8fbfa] px-5 py-5 text-base font-semibold leading-[1.9] text-black/80 md:text-lg">
+          <p className="w-full whitespace-pre-line break-keep rounded-2xl border border-black/10 bg-[#f8fbfa] px-5 py-5 text-base font-semibold leading-[1.9] text-black/80 md:text-lg">
             {content.approach.keyline}
           </p>
         </div>
@@ -644,7 +648,7 @@ export default function Page() {
                 {hasPhoneHref ? (
                   <a
                     href={phoneHref}
-                    className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:border-black/25 hover:bg-black/[0.02]"
+                    className="inline-flex items-center justify-center rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:border-black/25 hover:bg-black/[0.02]"
                   >
                     {content.contact.quickCallLabel} {content.contact.phoneDisplay}
                   </a>
@@ -655,7 +659,7 @@ export default function Page() {
                     href={kakaoChatUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#1db197]"
+                    className="inline-flex items-center justify-center rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#1db197]"
                   >
                     {content.contact.kakaoCtaLabel}
                   </a>
