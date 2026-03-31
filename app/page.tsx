@@ -17,13 +17,14 @@ const clsCard =
 const clsMedia =
   "relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-[#f7faf9] transition-colors hover:border-black/20";
 const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
-const sectionShell = "mx-auto max-w-[1280px] px-6 py-20 md:py-24";
+const containerShell = "mx-auto max-w-[1360px] px-5 sm:px-6 lg:px-8";
+const sectionShell = `${containerShell} py-20 md:py-24`;
 const sectionStack = "space-y-8 md:space-y-10";
-const bodyCopy = "max-w-[52ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg";
+const bodyCopy = "max-w-[56ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg";
 const sectionLabelClass =
   "inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-semibold tracking-[0.12em] text-black/45 md:text-base";
 const sectionTitleClass =
-  "max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.26] tracking-tight text-[#0B0F0E] md:text-[42px] md:leading-[1.2]";
+  "max-w-[22ch] whitespace-pre-line text-[32px] font-semibold leading-[1.24] tracking-tight text-[#0B0F0E] md:text-[46px] md:leading-[1.18] lg:text-[52px]";
 
 function isExternalLink(href: string) {
   return href.startsWith("http://") || href.startsWith("https://");
@@ -122,7 +123,7 @@ export default function Page() {
   const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
   const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
   const proofImage = content.studioProof.images[0] ?? {
-    src: "/images/showreel-cover.jpg",
+    src: "/images/showreel-cover-optimized.jpg",
     alt: "Turnkeyhaus 실행 기반 대표 이미지"
   };
 
@@ -136,7 +137,7 @@ export default function Page() {
       />
 
       <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4">
+        <div className={`${containerShell} flex items-center justify-between py-4`}>
           <Link href="#top" className="flex h-11 shrink-0 items-center">
             <Image
               src="/logo.png"
@@ -149,7 +150,7 @@ export default function Page() {
           </Link>
 
           <div className="hidden items-center gap-3 md:flex">
-            <nav className="flex items-center gap-1">
+            <nav className="flex items-center gap-1.5">
               {content.nav.map((item) => (
                 <Link
                   key={item.href}
@@ -170,30 +171,64 @@ export default function Page() {
               소개서 다운로드
             </a>
           </div>
+
+          <div className="flex items-center gap-2 md:hidden">
+            <a
+              href={content.contact.phoneHref}
+              className="inline-flex h-10 items-center rounded-xl border border-black/15 px-3 text-sm font-semibold text-black/80"
+            >
+              전화상담
+            </a>
+            <a
+              href={content.contact.kakaoChatUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-10 items-center rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-3 text-sm font-semibold text-black"
+            >
+              카카오톡
+            </a>
+          </div>
+        </div>
+
+        <div className="border-t border-black/10 md:hidden">
+          <div className={`${containerShell} py-2`}>
+            <nav className="no-scrollbar -mx-1 flex items-center gap-1 overflow-x-auto px-1 pb-1">
+              {content.nav.map((item) => (
+                <Link
+                  key={`mobile-${item.href}`}
+                  href={item.href}
+                  className="inline-flex h-9 shrink-0 items-center rounded-full border border-black/10 bg-white px-3 text-sm font-semibold text-black/70"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
         </div>
       </header>
 
       <section id="top" className="relative overflow-hidden border-b border-black/10 bg-[#f8fbfa]">
-        <div className="relative mx-auto w-full max-w-[1920px] aspect-square md:aspect-[16/9]">
+        <div className="relative mx-auto h-[60vh] min-h-[440px] max-h-[760px] w-full max-w-[1920px] md:h-auto md:aspect-[16/9]">
           <SplineHero />
-          <div className="pointer-events-none absolute inset-0 z-0 md:hidden">
-            <div
-              className="h-full w-full bg-cover bg-center bg-no-repeat"
-              style={{
-                backgroundImage: "url('/images/mobile-hero-cover.jpg')",
-              }}
-            />
-          </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent" />
+          <Image
+            src="/images/mobile-hero-cover-optimized.jpg"
+            alt="Turnkeyhaus mobile hero"
+            fill
+            className="pointer-events-none z-0 object-cover md:hidden"
+            sizes="100vw"
+            priority
+          />
+          <div className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(circle_at_75%_20%,rgba(33,193,162,0.17),transparent_58%)] md:block" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/80 to-transparent" />
         </div>
       </section>
 
-      <section className="relative z-10 -mt-16 border-b border-black/10 bg-white/0 md:-mt-24">
-        <div className="mx-auto max-w-[1280px] px-6 pb-12 md:pb-14">
-          <div className="rounded-2xl border border-black/10 bg-white/95 p-6 shadow-[0_18px_48px_rgba(11,15,14,0.08)] backdrop-blur md:p-10">
-            <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+      <section className="relative z-10 -mt-14 border-b border-black/10 bg-white/0 md:-mt-20">
+        <div className={`${containerShell} pb-12 md:pb-14`}>
+          <div className="rounded-[28px] border border-black/10 bg-white/95 p-6 shadow-[0_18px_48px_rgba(11,15,14,0.08)] backdrop-blur md:p-10">
+            <div className="grid gap-8 md:grid-cols-[1.25fr_0.75fr] md:items-end">
               <div className="space-y-5">
-                <h1 className="max-w-[22ch] whitespace-pre-line text-[34px] font-semibold leading-[1.2] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.12]">
+                <h1 className="max-w-[22ch] whitespace-pre-line text-[33px] font-semibold leading-[1.18] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.1]">
                   {content.heroValue.headline}
                 </h1>
                 <p className="max-w-[50ch] whitespace-pre-line text-base leading-[1.9] text-black/72 md:text-[21px] md:leading-[1.7]">
@@ -229,7 +264,7 @@ export default function Page() {
       </section>
 
       <section className="border-b border-black/10 bg-[#f7faf9]">
-        <div className="mx-auto max-w-[1280px] px-6 py-8 md:py-10">
+        <div className={`${containerShell} py-8 md:py-10`}>
           <StatsBar />
           <ProofBadges />
         </div>
@@ -258,7 +293,7 @@ export default function Page() {
       </section>
 
       <section id="problem" className="border-y border-black/10 bg-[#f8fbfa]">
-        <div className="mx-auto max-w-[1280px] px-6 py-20 md:py-24">
+        <div className={`${containerShell} py-20 md:py-24`}>
           <div className="space-y-10">
             <div className="grid gap-10 md:grid-cols-[1.15fr_0.85fr] md:items-center md:gap-12">
               <div className="space-y-8">
@@ -278,11 +313,12 @@ export default function Page() {
 
               <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-[0_8px_26px_rgba(11,15,14,0.05)] md:p-6">
                 <Image
-                  src="/images/reality-illustration.png"
+                  src="/images/reality-illustration-optimized.jpg"
                   alt="문제와 현실 점검 일러스트"
                   width={1200}
                   height={1200}
                   className="h-auto w-full max-h-56 object-contain md:max-h-[420px]"
+                  sizes="(max-width: 768px) 100vw, 520px"
                 />
               </div>
             </div>
@@ -365,7 +401,7 @@ export default function Page() {
       </section>
 
       <section id="proof" className="border-b border-black/10 bg-white">
-        <div className="mx-auto max-w-[1280px] space-y-8 px-6 py-20 md:grid md:grid-cols-[1fr_0.9fr] md:items-start md:gap-10 md:space-y-0 md:py-24">
+        <div className={`${containerShell} space-y-8 py-20 md:grid md:grid-cols-[1fr_0.9fr] md:items-start md:gap-10 md:space-y-0 md:py-24`}>
           <div className="space-y-6">
             <SectionLabel>{content.studioProof.label}</SectionLabel>
             <h2 className={sectionTitleClass}>
@@ -383,13 +419,14 @@ export default function Page() {
           </div>
 
           <div className="md:pt-2">
-            <div className="mx-auto w-full max-w-[640px] overflow-hidden rounded-[20px] border border-black/10 shadow-[0_14px_34px_rgba(11,15,14,0.07)] md:ml-auto">
+            <div className="mx-auto w-full max-w-[680px] overflow-hidden rounded-[24px] bg-black/[0.04] shadow-[0_16px_36px_rgba(11,15,14,0.1)] md:ml-auto">
               <Image
                 src={proofImage.src}
                 alt={proofImage.alt}
                 width={1600}
                 height={1067}
                 className="block h-auto w-full object-cover"
+                sizes="(max-width: 768px) 100vw, 680px"
               />
             </div>
           </div>
@@ -558,7 +595,7 @@ export default function Page() {
       </section>
 
       <section id="contact" className="border-b border-black/10 bg-[#f8fbfa]">
-        <div className="mx-auto max-w-[1280px] px-6 py-20 md:py-24">
+        <div className={`${containerShell} py-20 md:py-24`}>
           <div className="mb-10 max-w-[52ch] space-y-6">
             <SectionLabel>{content.contact.label}</SectionLabel>
             <h2 className={sectionTitleClass}>
@@ -658,7 +695,7 @@ export default function Page() {
       <ContactCTA />
 
       <footer className="border-t border-black/10 bg-white">
-        <div className="mx-auto max-w-[1280px] px-6 py-10 text-xs text-black/65">
+        <div className={`${containerShell} py-10 text-xs text-black/65`}>
           <div className="space-y-1">
             <div className="text-sm font-semibold text-[#0B0F0E]">{content.footer.companyName}</div>
             {content.footer.lines.map((line) => (

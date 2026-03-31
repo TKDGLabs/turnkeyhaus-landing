@@ -40,6 +40,10 @@ li {
   line-height: 1.9;
 }
 
+section[id] {
+  scroll-margin-top: 128px;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -64,6 +68,21 @@ a {
 
 .skip-link:focus {
   top: 0.5rem;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  section[id] {
+    scroll-margin-top: 122px;
+  }
 }
 
 @layer components {

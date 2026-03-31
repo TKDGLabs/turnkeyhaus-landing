@@ -364,7 +364,7 @@ export const content: Content = {
     crewNote: "",
     closing: "",
     images: [
-      { src: "/images/showreel-cover.jpg", alt: "Turnkeyhaus 실행 기반 대표 이미지" }
+      { src: "/images/showreel-cover-optimized.jpg", alt: "Turnkeyhaus 실행 기반 대표 이미지" }
     ]
   },
   portfolio: {

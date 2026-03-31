@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import "./globals.css";
 import { content } from "../content";
+import CursorFollower from "../components/CursorFollower";
 
 const a2z = localFont({
   src: [
@@ -117,6 +118,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
+        <CursorFollower />
         {children}
       </body>
     </html>
