@@ -43,7 +43,7 @@ export default function ContactCTA() {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 px-4 py-3 pb-[max(env(safe-area-inset-bottom),0.75rem)] backdrop-blur md:hidden">
-        <div className="mx-auto flex max-w-6xl gap-2">
+        <div className="mx-auto flex w-full max-w-[1280px] gap-2">
           {hasPhone ? (
             <a
               href={phoneHref}

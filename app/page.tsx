@@ -12,16 +12,16 @@ import { getSortedInsights } from "../content/insights";
 const SplineHero = dynamic(() => import("../components/SplineHero"), { ssr: false });
 
 const clsCard =
-  "group overflow-hidden rounded-2xl border border-black/10 bg-white transition-colors hover:border-black/20";
+  "group overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_24px_rgba(11,15,14,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_16px_34px_rgba(11,15,14,0.08)]";
 const clsMedia =
-  "relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-[#f8faf9] transition-colors hover:border-black/20";
+  "relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-[#f7faf9] transition-colors hover:border-black/20";
 const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
-const sectionShell = "mx-auto max-w-6xl px-5 py-16 md:py-20";
-const sectionStack = "space-y-6 md:space-y-8";
+const sectionShell = "mx-auto max-w-[1280px] px-6 py-20 md:py-24";
+const sectionStack = "space-y-8 md:space-y-10";
 const bodyCopy = "max-w-[52ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg";
 const sectionLabelClass = "text-sm font-semibold tracking-[0.14em] text-black/45 md:text-base";
 const sectionTitleClass =
-  "max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.28] tracking-tight text-[#0B0F0E] md:text-4xl md:leading-[1.26]";
+  "max-w-[22ch] whitespace-pre-line text-3xl font-semibold leading-[1.26] tracking-tight text-[#0B0F0E] md:text-[42px] md:leading-[1.2]";
 
 function isExternalLink(href: string) {
   return href.startsWith("http://") || href.startsWith("https://");
@@ -124,25 +124,25 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-white pb-24 text-[#0B0F0E] md:pb-0">
       <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-5">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4">
           <Link href="#top" className="flex h-11 shrink-0 items-center">
             <Image
               src="/logo.png"
               alt="Turnkeyhaus"
-              width={164}
-              height={44}
-              className="h-11 w-auto object-contain"
+              width={176}
+              height={48}
+              className="h-12 w-auto object-contain"
               priority
             />
           </Link>
 
           <div className="hidden items-center gap-3 md:flex">
-            <nav className="flex items-center gap-1.5">
+            <nav className="flex items-center gap-1">
               {content.nav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="inline-flex h-10 items-center whitespace-nowrap rounded-xl px-3.5 text-sm font-semibold tracking-[0.02em] text-black/72 transition-colors hover:bg-black/[0.03] hover:text-black"
+                  className="inline-flex h-10 items-center whitespace-nowrap rounded-xl px-3.5 text-[15px] font-semibold tracking-[0.01em] text-black/72 transition-colors hover:bg-black/[0.03] hover:text-black"
                 >
                   {item.label}
                 </Link>
@@ -161,7 +161,7 @@ export default function Page() {
         </div>
       </header>
 
-      <section id="top" className="relative overflow-hidden border-b border-black/10 bg-white">
+      <section id="top" className="relative overflow-hidden border-b border-black/10 bg-[#f8fbfa]">
         <div className="relative mx-auto w-full max-w-[1920px] aspect-square md:aspect-[16/9]">
           <SplineHero />
           <div className="pointer-events-none absolute inset-0 z-0 md:hidden">
@@ -172,92 +172,108 @@ export default function Page() {
               }}
             />
           </div>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent" />
         </div>
       </section>
 
-      <section className="border-t border-black/10">
-        <div className="mx-auto max-w-6xl px-5 py-10 md:py-12">
-          <div className="rounded-2xl border border-black/10 bg-white p-6 md:p-8">
-            <div className="grid gap-6 md:grid-cols-[1.2fr_auto] md:items-end">
-              <div className="space-y-4">
-                <h1 className="max-w-[22ch] whitespace-pre-line text-2xl font-semibold leading-[1.3] tracking-tight text-[#0B0F0E] md:text-3xl">
+      <section className="relative z-10 -mt-16 border-b border-black/10 bg-white/0 md:-mt-24">
+        <div className="mx-auto max-w-[1280px] px-6 pb-12 md:pb-14">
+          <div className="rounded-2xl border border-black/10 bg-white/95 p-6 shadow-[0_18px_48px_rgba(11,15,14,0.08)] backdrop-blur md:p-10">
+            <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-end">
+              <div className="space-y-5">
+                <h1 className="max-w-[22ch] whitespace-pre-line text-[34px] font-semibold leading-[1.2] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.12]">
                   {content.heroValue.headline}
                 </h1>
-                <p className="max-w-[52ch] whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg">
+                <p className="max-w-[50ch] whitespace-pre-line text-base leading-[1.9] text-black/72 md:text-[21px] md:leading-[1.7]">
                   {content.heroValue.body}
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <ActionLink
-                  href={content.heroValue.primaryCta.href}
-                  className="inline-flex rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black"
-                >
-                  {content.heroValue.primaryCta.label}
-                </ActionLink>
-                <ActionLink
-                  href={content.heroValue.secondaryCta.href}
-                  className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
-                >
-                  {content.heroValue.secondaryCta.label}
-                </ActionLink>
+              <div className="space-y-4 md:justify-self-end">
+                <div className="flex flex-wrap items-center gap-3 md:justify-end">
+                  <ActionLink
+                    href={content.heroValue.primaryCta.href}
+                    className="inline-flex rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black shadow-[0_8px_16px_rgba(33,193,162,0.25)]"
+                  >
+                    {content.heroValue.primaryCta.label}
+                  </ActionLink>
+                  <ActionLink
+                    href={content.heroValue.secondaryCta.href}
+                    className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
+                  >
+                    {content.heroValue.secondaryCta.label}
+                  </ActionLink>
+                </div>
+
+                <p className="text-sm leading-[1.8] text-black/58 md:text-right">
+                  검색에서 발견되고 결정에서 선택되기까지,
+                  <br className="hidden md:block" />
+                  전환 기준으로 채널을 설계합니다.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <StatsBar />
-      <ProofBadges />
+      <section className="border-b border-black/10 bg-[#f7faf9]">
+        <div className="mx-auto max-w-[1280px] px-6 py-8 md:py-10">
+          <StatsBar />
+          <ProofBadges />
+        </div>
+      </section>
 
-      <section id="strategy-frame" className="border-t border-black/10">
+      <section id="strategy-frame" className="bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.strategyFrame.label} title={content.strategyFrame.h2} />
 
           <div className="grid gap-4 md:grid-cols-4">
             {content.strategyFrame.steps.map((step, index) => (
-              <article key={step.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+              <article
+                key={step.title}
+                className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_6px_18px_rgba(11,15,14,0.03)] md:p-6"
+              >
                 <div className="text-sm font-semibold tracking-[0.08em] text-black/45">{`0${index + 1}`}</div>
                 <h3 className="mt-3 text-lg font-semibold text-[#0B0F0E]">{step.title}</h3>
-                <p className="mt-2 text-sm leading-[1.95] text-black/70">{step.detail}</p>
+                <p className="mt-2 text-sm leading-[1.9] text-black/70">{step.detail}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="problem" className="border-t border-black/10">
-        <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
+      <section id="problem" className="border-y border-black/10 bg-[#f8fbfa]">
+        <div className="mx-auto max-w-[1280px] px-6 py-20 md:py-24">
           <div className="space-y-10">
-            <div className="grid gap-10 md:grid-cols-[1.2fr_0.8fr] md:items-center md:gap-12">
+            <div className="grid gap-10 md:grid-cols-[1.15fr_0.85fr] md:items-center md:gap-12">
               <div className="space-y-8">
                 <SectionLabel>{content.problem.label}</SectionLabel>
                 <h2 className={sectionTitleClass}>
                   {content.problem.h2}
                 </h2>
 
-                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[2] text-black/75 md:text-lg">
+                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[1.95] text-black/75 md:text-lg">
                   {problemSupport}
                 </p>
 
-                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[2] text-black/75 md:text-lg">
+                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[1.95] text-black/75 md:text-lg">
                   {problemDetail}
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-black/10 bg-black/5 p-4 md:p-6">
+              <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-[0_8px_26px_rgba(11,15,14,0.05)] md:p-6">
                 <Image
                   src="/images/reality-illustration.png"
                   alt="문제와 현실 점검 일러스트"
                   width={1200}
                   height={1200}
-                  className="w-full h-auto max-h-56 object-contain md:max-h-[420px]"
+                  className="h-auto w-full max-h-56 object-contain md:max-h-[420px]"
                 />
               </div>
             </div>
 
             <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 p-6">
-              <p className="text-base font-semibold leading-[1.95] text-black md:text-lg">
+              <p className="text-base font-semibold leading-[1.9] text-black md:text-lg">
                 {content.problem.emphasis}
               </p>
             </div>
@@ -265,26 +281,29 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="approach" className="border-t border-black/10">
+      <section id="approach" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.approach.label} title={content.approach.h2} lead={content.approach.lead} />
 
           <div className="grid gap-4 md:grid-cols-2">
             {content.approach.steps.map((step) => (
-              <article key={step.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+              <article
+                key={step.title}
+                className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_24px_rgba(11,15,14,0.03)] md:p-6"
+              >
                 <h3 className="text-lg font-semibold text-[#0B0F0E]">{step.title}</h3>
-                <p className="mt-2 text-sm leading-[1.95] text-black/72">{step.detail}</p>
+                <p className="mt-2 text-sm leading-[1.9] text-black/72">{step.detail}</p>
               </article>
             ))}
           </div>
 
-          <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.95] text-black/80 md:text-lg">
+          <p className="max-w-[52ch] whitespace-pre-line rounded-2xl border border-black/10 bg-[#f8fbfa] px-5 py-5 text-base font-semibold leading-[1.9] text-black/80 md:text-lg">
             {content.approach.keyline}
           </p>
         </div>
       </section>
 
-      <section id="professional" className="border-t border-black/10">
+      <section id="professional" className="border-b border-black/10 bg-[#f8fbfa]">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader
             label={content.professionalTargets.label}
@@ -310,9 +329,9 @@ export default function Page() {
                     </div>
                   ) : null}
 
-                  <p className="whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg">{card.oneLiner}</p>
+                  <p className="whitespace-pre-line text-base leading-[1.9] text-black/72 md:text-lg">{card.oneLiner}</p>
 
-                  <ul className="space-y-2 text-sm text-black/72">
+                  <ul className="space-y-2 text-sm leading-[1.8] text-black/72">
                     {card.bullets.map((bullet) => (
                       <li key={bullet} className="list-inside list-disc">
                         {bullet}
@@ -330,8 +349,8 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="proof" className="border-t border-black/10">
-        <div className="mx-auto max-w-6xl space-y-8 px-5 py-20 md:grid md:grid-cols-[1fr_0.9fr] md:items-start md:gap-10 md:space-y-0 md:py-24">
+      <section id="proof" className="border-b border-black/10 bg-white">
+        <div className="mx-auto max-w-[1280px] space-y-8 px-6 py-20 md:grid md:grid-cols-[1fr_0.9fr] md:items-start md:gap-10 md:space-y-0 md:py-24">
           <div className="space-y-6">
             <SectionLabel>{content.studioProof.label}</SectionLabel>
             <h2 className={sectionTitleClass}>
@@ -341,7 +360,7 @@ export default function Page() {
 
             <ul className="space-y-3">
               {content.studioProof.operationSystem.map((item) => (
-                <li key={item} className="rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm leading-[1.95] text-black/75">
+                <li key={item} className="rounded-2xl border border-black/10 bg-[#f8fbfa] px-5 py-4 text-sm leading-[1.9] text-black/75">
                   {item}
                 </li>
               ))}
@@ -349,20 +368,20 @@ export default function Page() {
           </div>
 
           <div className="md:pt-2">
-            <div className="mx-auto w-full max-w-[640px] overflow-hidden rounded-[20px] border border-black/10 md:ml-auto">
+            <div className="mx-auto w-full max-w-[640px] overflow-hidden rounded-[20px] border border-black/10 shadow-[0_14px_34px_rgba(11,15,14,0.07)] md:ml-auto">
               <Image
                 src={proofImage.src}
                 alt={proofImage.alt}
                 width={1600}
                 height={1067}
-                className="block w-full h-auto object-cover"
+                className="block h-auto w-full object-cover"
               />
             </div>
           </div>
         </div>
       </section>
 
-      <section id="portfolio" className="border-t border-black/10">
+      <section id="portfolio" className="border-b border-black/10 bg-[#f8fbfa]">
         <div className={`${sectionShell} ${sectionStack}`}>
           <div className="max-w-[52ch] space-y-4">
             <SectionLabel>{content.portfolio.h2}</SectionLabel>
@@ -393,7 +412,7 @@ export default function Page() {
                     </span>
                   </div>
 
-                  <p className="whitespace-pre-line text-base leading-[1.95] text-black/72 md:text-lg">{item.oneLiner}</p>
+                  <p className="whitespace-pre-line text-base leading-[1.9] text-black/72 md:text-lg">{item.oneLiner}</p>
 
                   <div className="flex flex-wrap gap-2">
                     {item.tags.map((tag) => (
@@ -413,14 +432,17 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="blog" className="border-t border-black/10">
+      <section id="blog" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
 
           {insightPosts.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2">
               {insightPosts.map((post) => (
-                <article key={post.slug} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+                <article
+                  key={post.slug}
+                  className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_24px_rgba(11,15,14,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgba(11,15,14,0.07)] md:p-6"
+                >
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <span className="rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs font-medium text-black/65">
                       {post.keywords[0] ?? "인사이트"}
@@ -429,7 +451,7 @@ export default function Page() {
                   </div>
 
                   <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E] md:text-xl">{post.title}</h3>
-                  <p className="mt-3 text-sm leading-[1.95] text-black/72 md:text-base">{post.description}</p>
+                  <p className="mt-3 text-sm leading-[1.9] text-black/72 md:text-base">{post.description}</p>
 
                   <Link
                     href={`/insights/${post.slug}`}
@@ -461,7 +483,7 @@ export default function Page() {
 
       <MidCTA />
 
-      <section id="pricing" className="border-t border-black/10">
+      <section id="pricing" className="border-b border-black/10 bg-[#f8fbfa]">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
 
@@ -470,7 +492,10 @@ export default function Page() {
               const targetText = level.target.replace(/^대상:\s*/, "");
 
               return (
-                <article key={level.title} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+                <article
+                  key={level.title}
+                  className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_24px_rgba(11,15,14,0.03)] md:p-6"
+                >
                   <div className="mb-4 space-y-1">
                     <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E]">{level.title}</h3>
                     <p className="text-sm font-medium text-black/65">{level.priceBand}</p>
@@ -484,7 +509,7 @@ export default function Page() {
                     ))}
                   </ul>
 
-                  <p className="mt-5 border-t border-black/10 pt-4 text-sm leading-[1.9] text-black/65 md:text-base">
+                  <p className="mt-5 border-t border-black/10 pt-4 text-sm leading-[1.85] text-black/65 md:text-base">
                     <span className="font-medium text-black/72">대상:</span>
                     <br />
                     <span>{targetText}</span>
@@ -495,30 +520,30 @@ export default function Page() {
           </div>
 
           <div className="rounded-2xl border border-black/10 bg-white p-6">
-            <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.95] text-black/80 md:text-lg">
+            <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.9] text-black/80 md:text-lg">
               {content.pricing.emphasis}
             </p>
           </div>
         </div>
       </section>
 
-      <section id="faq" className="border-t border-black/10">
+      <section id="faq" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.faq.label} title={content.faq.h2} />
 
           <div className="grid gap-4 md:grid-cols-2">
             {content.faq.items.map((item) => (
-              <article key={item.q} className="rounded-2xl border border-black/10 bg-white p-5 md:p-6">
+              <article key={item.q} className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_22px_rgba(11,15,14,0.03)] md:p-6">
                 <h3 className="text-base font-semibold text-[#0B0F0E] md:text-lg">{item.q}</h3>
-                <p className="mt-3 text-sm leading-[1.95] text-black/72 md:text-base">{item.a}</p>
+                <p className="mt-3 text-sm leading-[1.9] text-black/72 md:text-base">{item.a}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="contact" className="border-t border-black/10">
-        <div className="mx-auto max-w-6xl px-5 py-20 md:py-24">
+      <section id="contact" className="border-b border-black/10 bg-[#f8fbfa]">
+        <div className="mx-auto max-w-[1280px] px-6 py-20 md:py-24">
           <div className="mb-10 max-w-[52ch] space-y-6">
             <SectionLabel>{content.contact.label}</SectionLabel>
             <h2 className={sectionTitleClass}>
@@ -528,7 +553,7 @@ export default function Page() {
           </div>
 
           <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-start">
-            <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 md:p-8">
+            <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 shadow-[0_10px_26px_rgba(11,15,14,0.04)] md:p-8">
               <div className="space-y-6">
                 <h3 className="text-2xl font-semibold tracking-tight text-[#0B0F0E]">채널 구조 진단</h3>
                 <p className="whitespace-pre-line text-base leading-[1.95] text-black/70">
@@ -588,7 +613,7 @@ export default function Page() {
 
             <div
               id="contact-form"
-              className="overflow-hidden rounded-2xl border border-black/10 bg-white"
+              className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_12px_28px_rgba(11,15,14,0.05)]"
             >
               {hasFormEmbedUrl ? (
                 <iframe
@@ -618,7 +643,7 @@ export default function Page() {
       <ContactCTA />
 
       <footer className="border-t border-black/10 bg-white">
-        <div className="mx-auto max-w-6xl px-5 py-10 text-xs text-black/65">
+        <div className="mx-auto max-w-[1280px] px-6 py-10 text-xs text-black/65">
           <div className="space-y-1">
             <div className="text-sm font-semibold text-[#0B0F0E]">{content.footer.companyName}</div>
             {content.footer.lines.map((line) => (

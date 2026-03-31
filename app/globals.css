@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --bg: #041411;
+  --bg: #ffffff;
   --accent: #21c1a2;
-  --text: #effffb;
-  --muted: #a8c1bb;
-  --line: rgba(239, 255, 251, 0.16);
-  --line-strong: rgba(239, 255, 251, 0.28);
+  --text: #0b0f0e;
+  --muted: #5f696d;
+  --line: rgba(11, 15, 14, 0.12);
+  --line-strong: rgba(11, 15, 14, 0.24);
   --radius-system: 14px;
 }
 
@@ -21,7 +21,7 @@ body {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
-  line-height: 2.05;
+  line-height: 1.9;
   font-family: var(--font-a2z), "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   text-rendering: optimizeLegibility;
 }
@@ -37,7 +37,7 @@ p {
 
 p,
 li {
-  line-height: 2.05;
+  line-height: 1.9;
 }
 
 a {

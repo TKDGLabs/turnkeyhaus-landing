@@ -7,11 +7,11 @@ export default function ProofBadges() {
   ];
 
   return (
-    <section className="mx-auto max-w-6xl px-6 pb-12 pt-2">
+    <section className="pb-2 pt-4">
       <div className="grid gap-4 md:grid-cols-2">
         {items.map((it) => (
-          <div key={it.big} className="rounded-2xl bg-black/[0.02] p-6">
-            <div className="text-3xl font-semibold tracking-tight">{it.big}</div>
+          <div key={it.big} className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_8px_22px_rgba(11,15,14,0.03)]">
+            <div className="text-3xl font-semibold tracking-tight text-[#0B0F0E]">{it.big}</div>
             <div className="mt-2 text-sm text-black/60">{it.small}</div>
           </div>
         ))}
