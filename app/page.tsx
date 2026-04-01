@@ -205,20 +205,12 @@ export default function Page() {
       </header>
 
       <section id="top" className="relative overflow-hidden border-b border-black/10 bg-[#f8fbfa]">
-        <div className="relative mx-auto h-[60vh] min-h-[440px] max-h-[760px] w-full max-w-[1920px] md:h-auto md:aspect-[16/9]">
+        <div className="relative mx-auto aspect-[4/3] w-full max-w-[1920px] md:aspect-[16/9]">
           <Image
-            src="/images/showreel-cover-optimized.jpg"
-            alt="Turnkeyhaus hero background"
+            src="/images/hero-team-office.png"
+            alt="Turnkeyhaus team in a Seoul office"
             fill
-            className="pointer-events-none z-0 hidden object-cover md:block"
-            sizes="100vw"
-            priority
-          />
-          <Image
-            src="/images/mobile-hero-cover-optimized.jpg"
-            alt="Turnkeyhaus mobile hero"
-            fill
-            className="pointer-events-none z-0 object-cover md:hidden"
+            className="pointer-events-none z-0 object-cover object-center md:object-[center_42%]"
             sizes="100vw"
             priority
           />
@@ -332,6 +324,8 @@ export default function Page() {
                 {content.problem.emphasis}
               </p>
             </div>
+
+            <MidCTA />
           </div>
         </div>
       </section>
@@ -536,8 +530,6 @@ export default function Page() {
           </div>
         </div>
       </section>
-
-      <MidCTA />
 
       <section id="pricing" className="border-b border-black/10 bg-[#f8fbfa]">
         <div className={`${sectionShell} ${sectionStack}`}>
