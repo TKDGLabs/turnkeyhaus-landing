@@ -169,43 +169,12 @@ export default function Page() {
             </a>
           </div>
 
-          <div className="flex items-center gap-2 md:hidden">
-            <a
-              href={content.contact.phoneHref}
-              className="inline-flex h-10 items-center rounded-xl border border-black/15 px-3 text-sm font-semibold text-black/80"
-            >
-              전화상담
-            </a>
-            <a
-              href={content.contact.kakaoChatUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex h-10 items-center rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-3 text-sm font-semibold text-black"
-            >
-              카카오톡
-            </a>
-          </div>
         </div>
 
-        <div className="border-t border-black/10 md:hidden">
-          <div className={`${containerShell} py-2`}>
-            <nav className="no-scrollbar -mx-1 flex items-center gap-1 overflow-x-auto px-1 pb-1">
-              {content.nav.map((item) => (
-                <Link
-                  key={`mobile-${item.href}`}
-                  href={item.href}
-                  className="inline-flex h-9 shrink-0 items-center rounded-full border border-black/10 bg-white px-3 text-sm font-semibold text-black/70"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-        </div>
       </header>
 
       <section id="top" className="relative overflow-hidden border-b border-black/10 bg-white">
-        <div className="relative mx-auto aspect-[4/3] w-full max-w-[1920px] md:aspect-[16/9]">
+        <div className="relative aspect-[4/3] w-full md:aspect-[16/9]">
           <video
             autoPlay
             muted
