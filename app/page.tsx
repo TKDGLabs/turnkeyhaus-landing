@@ -7,6 +7,7 @@ import ProofBadges from "../components/ProofBadges";
 import ContactCTA from "../components/ContactCTA";
 import MidCTA from "../components/MidCTA";
 import IntroGate from "../components/IntroGate";
+import SignalInsights from "../components/SignalInsights";
 import { getSortedInsights } from "../content/insights";
 
 const clsCard =
@@ -206,14 +207,17 @@ export default function Page() {
 
       <section id="top" className="relative overflow-hidden border-b border-black/10 bg-[#f8fbfa]">
         <div className="relative mx-auto aspect-[4/3] w-full max-w-[1920px] md:aspect-[16/9]">
-          <Image
-            src="/images/hero-team-office.png"
-            alt="Turnkeyhaus team in a Seoul office"
-            fill
-            className="pointer-events-none z-0 object-cover object-center md:object-[center_42%]"
-            sizes="100vw"
-            priority
-          />
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/images/hero-team-office.png"
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center md:object-[center_42%]"
+          >
+            <source src="/videos/hero-render-1080.mp4" type="video/mp4" />
+          </video>
           <div className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(circle_at_75%_20%,rgba(33,193,162,0.17),transparent_58%)] md:block" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/80 to-transparent" />
         </div>
@@ -307,16 +311,12 @@ export default function Page() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-[0_8px_26px_rgba(11,15,14,0.05)] md:p-6">
-                <Image
-                  src="/images/reality-illustration-optimized.jpg"
-                  alt="문제와 현실 점검 일러스트"
-                  width={1200}
-                  height={1200}
-                  className="h-auto w-full max-h-56 object-contain md:max-h-[420px]"
-                  sizes="(max-width: 768px) 100vw, 520px"
-                />
-              </div>
+              <SignalInsights
+                label={content.signalInsights.label}
+                title={content.signalInsights.h2}
+                lead={content.signalInsights.lead}
+                items={content.signalInsights.items}
+              />
             </div>
 
             <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 p-6">

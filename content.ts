@@ -56,6 +56,14 @@ export type StrategyStep = {
   detail: string;
 };
 
+export type SignalInsightItem = {
+  eyebrow: string;
+  title: string;
+  summary: string;
+  note: string;
+  variant: "dependency" | "ctr" | "setup";
+};
+
 export type FaqItem = {
   q: string;
   a: string;
@@ -97,6 +105,12 @@ export type Content = {
     label: string;
     h2: string;
     steps: StrategyStep[];
+  };
+  signalInsights: {
+    label: string;
+    h2: string;
+    lead: string;
+    items: SignalInsightItem[];
   };
   approach: {
     label: string;
@@ -249,6 +263,34 @@ export const content: Content = {
       {
         title: "운영",
         detail: "SEO·CTA·성과 분석을 결합해 전환 흐름을 안정화합니다."
+      }
+    ]
+  },
+  signalInsights: {
+    label: "[ 운영 신호 ]",
+    h2: "실제 성과는\n이 신호에서 먼저 움직입니다.",
+    lead: "광고 의존도, 클릭률, 채널 세팅.\n이 세 가지가 먼저 정리되어야 상담 구조가 안정됩니다.",
+    items: [
+      {
+        eyebrow: "광고 의존도",
+        title: "광고비를 줄여도 버티는 구조",
+        summary: "보여주기용 콘텐츠가 아니라\n상담과 내원으로 이어지는 구조를 먼저 만듭니다.",
+        note: "광고 의존도는 낮추고, 상담 연결 흐름은 높이는 방향으로 설계합니다.",
+        variant: "dependency"
+      },
+      {
+        eyebrow: "클릭률",
+        title: "초반 30초보다 먼저 CTR",
+        summary: "썸네일과 제목에서 클릭이 일어나지 않으면\n좋은 영상도 출발하지 못합니다.",
+        note: "초기 시청보다 먼저, 클릭을 만드는 첫 관문을 점검합니다.",
+        variant: "ctr"
+      },
+      {
+        eyebrow: "채널 세팅",
+        title: "영상 퀄리티보다 채널 세팅",
+        summary: "개별 영상보다 중요한 건\n누가, 왜, 어떤 맥락으로 들어오는지에 대한 설계입니다.",
+        note: "타깃 질문과 유입 경로, 전환 동선을 먼저 고정합니다.",
+        variant: "setup"
       }
     ]
   },

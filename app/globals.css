@@ -79,9 +79,204 @@ a {
   display: none;
 }
 
+.signal-gridline {
+  stroke: rgba(11, 15, 14, 0.1);
+  stroke-width: 1;
+}
+
+.signal-frame {
+  fill: rgba(33, 193, 162, 0.04);
+  stroke: rgba(11, 15, 14, 0.09);
+}
+
+.signal-line {
+  fill: none;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 180;
+  stroke-dashoffset: 180;
+  animation: signalDash 2.8s ease-out forwards infinite;
+}
+
+.signal-line--accent {
+  stroke: rgba(33, 193, 162, 0.95);
+}
+
+.signal-line--muted {
+  stroke: rgba(11, 15, 14, 0.28);
+  animation-delay: 0.18s;
+}
+
+.signal-line--short {
+  stroke-dasharray: 110;
+}
+
+.signal-wash {
+  fill: none;
+  stroke-width: 17;
+  stroke-linecap: round;
+  opacity: 0.14;
+}
+
+.signal-wash--accent {
+  stroke: rgba(33, 193, 162, 0.55);
+}
+
+.signal-wash--muted {
+  stroke: rgba(11, 15, 14, 0.12);
+}
+
+.signal-dot {
+  fill: rgba(33, 193, 162, 0.96);
+  transform-origin: center;
+  animation: signalPulse 2.6s ease-in-out infinite;
+}
+
+.signal-dot--muted {
+  fill: rgba(11, 15, 14, 0.34);
+  animation-delay: 0.28s;
+}
+
+.signal-node {
+  fill: #ffffff;
+  stroke: rgba(11, 15, 14, 0.18);
+  stroke-width: 2;
+}
+
+.signal-node--accent {
+  fill: rgba(33, 193, 162, 0.16);
+  stroke: rgba(33, 193, 162, 0.95);
+}
+
+.signal-node-ring {
+  fill: none;
+  stroke: rgba(33, 193, 162, 0.22);
+  stroke-width: 2;
+  transform-origin: center;
+  animation: signalPulseRing 2.4s ease-out infinite;
+}
+
+.signal-gate {
+  fill: none;
+  stroke: rgba(11, 15, 14, 0.18);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.signal-bar {
+  fill: rgba(11, 15, 14, 0.14);
+  transform-origin: center bottom;
+  animation: signalRise 2.2s ease-in-out infinite;
+}
+
+.signal-bar--delay-1 {
+  animation-delay: 0s;
+}
+
+.signal-bar--delay-2 {
+  animation-delay: 0.14s;
+}
+
+.signal-bar--delay-3 {
+  animation-delay: 0.28s;
+}
+
+.signal-bar--delay-4 {
+  animation-delay: 0.42s;
+}
+
+.signal-travel {
+  animation: signalTravel 2.6s ease-in-out infinite;
+}
+
+@keyframes signalDash {
+  0% {
+    stroke-dashoffset: 180;
+    opacity: 0.45;
+  }
+
+  35%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes signalRise {
+  0%,
+  100% {
+    transform: scaleY(0.58);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes signalPulse {
+  0%,
+  100% {
+    transform: scale(0.88);
+    opacity: 0.75;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes signalPulseRing {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 0.55;
+  }
+
+  100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+}
+
+@keyframes signalTravel {
+  0%,
+  12% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+
+  20%,
+  75% {
+    opacity: 1;
+  }
+
+  88%,
+  100% {
+    transform: translateX(84px);
+    opacity: 0;
+  }
+}
+
 @media (max-width: 767px) {
   section[id] {
     scroll-margin-top: 122px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-line,
+  .signal-dot,
+  .signal-node-ring,
+  .signal-bar,
+  .signal-travel {
+    animation: none !important;
   }
 }
 
