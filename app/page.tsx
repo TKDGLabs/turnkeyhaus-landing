@@ -5,7 +5,6 @@ import { content } from "../content";
 import StatsBar from "../components/StatsBar";
 import ProofBadges from "../components/ProofBadges";
 import ContactCTA from "../components/ContactCTA";
-import MidCTA from "../components/MidCTA";
 import IntroGate from "../components/IntroGate";
 import SignalInsights from "../components/SignalInsights";
 import { getSortedInsights } from "../content/insights";
@@ -13,7 +12,7 @@ import { getSortedInsights } from "../content/insights";
 const clsCard =
   "group flex h-full flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_24px_rgba(11,15,14,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_16px_34px_rgba(11,15,14,0.08)]";
 const clsMedia =
-  "relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-[#f7faf9] transition-colors hover:border-black/20";
+  "relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-black/[0.02] transition-colors hover:border-black/20";
 const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
 const containerShell = "mx-auto max-w-[1360px] px-5 sm:px-6 lg:px-8";
 const sectionShell = `${containerShell} py-20 md:py-24`;
@@ -205,7 +204,7 @@ export default function Page() {
         </div>
       </header>
 
-      <section id="top" className="relative overflow-hidden border-b border-black/10 bg-[#f8fbfa]">
+      <section id="top" className="relative overflow-hidden border-b border-black/10 bg-white">
         <div className="relative mx-auto aspect-[4/3] w-full max-w-[1920px] md:aspect-[16/9]">
           <video
             autoPlay
@@ -263,7 +262,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="border-b border-black/10 bg-[#f7faf9]">
+      <section className="border-b border-black/10 bg-white">
         <div className={`${containerShell} py-8 md:py-10`}>
           <StatsBar />
           <ProofBadges />
@@ -292,40 +291,40 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="problem" className="border-y border-black/10 bg-[#f8fbfa]">
+      <section id="problem" className="border-y border-black/10 bg-white">
         <div className={`${containerShell} py-20 md:py-24`}>
-          <div className="space-y-10">
-            <div className="grid gap-10 md:grid-cols-[1.15fr_0.85fr] md:items-center md:gap-12">
-              <div className="space-y-8">
+          <div className="space-y-12 md:space-y-14">
+            <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-end">
+              <div className="space-y-6">
                 <SectionLabel>{content.problem.label}</SectionLabel>
-                <h2 className={sectionTitleClass}>
+                <h2 className={`${sectionTitleClass} max-w-[14ch]`}>
                   {content.problem.h2}
                 </h2>
+              </div>
 
-                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[1.95] text-black/75 md:text-lg">
+              <div className="space-y-5 md:justify-self-end">
+                <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/75 md:text-lg">
                   {problemSupport}
                 </p>
 
-                <p className="max-w-[55ch] whitespace-pre-line text-base leading-[1.95] text-black/75 md:text-lg">
+                <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/70 md:text-lg">
                   {problemDetail}
                 </p>
               </div>
-
-              <SignalInsights
-                label={content.signalInsights.label}
-                title={content.signalInsights.h2}
-                lead={content.signalInsights.lead}
-                items={content.signalInsights.items}
-              />
             </div>
 
-            <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 p-6">
+            <SignalInsights
+              label={content.signalInsights.label}
+              title={content.signalInsights.h2}
+              lead={content.signalInsights.lead}
+              items={content.signalInsights.items}
+            />
+
+            <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 p-6 md:p-7">
               <p className="text-base font-semibold leading-[1.9] text-black md:text-lg">
                 {content.problem.emphasis}
               </p>
             </div>
-
-            <MidCTA />
           </div>
         </div>
       </section>
@@ -346,13 +345,13 @@ export default function Page() {
             ))}
           </div>
 
-          <p className="w-full whitespace-pre-line break-keep rounded-2xl border border-black/10 bg-[#f8fbfa] px-5 py-5 text-base font-semibold leading-[1.9] text-black/80 md:text-lg">
+          <p className="w-full whitespace-pre-line break-keep rounded-2xl border border-black/10 bg-black/[0.02] px-5 py-5 text-base font-semibold leading-[1.9] text-black/80 md:text-lg">
             {content.approach.keyline}
           </p>
         </div>
       </section>
 
-      <section id="professional" className="border-b border-black/10 bg-[#f8fbfa]">
+      <section id="professional" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader
             label={content.professionalTargets.label}
@@ -409,7 +408,7 @@ export default function Page() {
 
             <ul className="space-y-3">
               {content.studioProof.operationSystem.map((item) => (
-                <li key={item} className="rounded-2xl border border-black/10 bg-[#f8fbfa] px-5 py-4 text-sm leading-[1.9] text-black/75">
+                <li key={item} className="rounded-2xl border border-black/10 bg-black/[0.02] px-5 py-4 text-sm leading-[1.9] text-black/75">
                   {item}
                 </li>
               ))}
@@ -417,7 +416,7 @@ export default function Page() {
           </div>
 
           <div className="md:pt-2">
-            <div className="mx-auto w-full max-w-[680px] overflow-hidden rounded-[24px] bg-black/[0.04] shadow-[0_16px_36px_rgba(11,15,14,0.1)] md:ml-auto">
+            <div className="mx-auto w-full max-w-[680px] overflow-hidden rounded-[28px] md:ml-auto">
               <Image
                 src={proofImage.src}
                 alt={proofImage.alt}
@@ -431,7 +430,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="portfolio" className="border-b border-black/10 bg-[#f8fbfa]">
+      <section id="portfolio" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
           <div className="max-w-[52ch] space-y-4">
             <SectionLabel>{content.portfolio.h2}</SectionLabel>
@@ -531,7 +530,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="pricing" className="border-b border-black/10 bg-[#f8fbfa]">
+      <section id="pricing" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
 
@@ -590,7 +589,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="contact" className="border-b border-black/10 bg-[#f8fbfa]">
+      <section id="contact" className="border-b border-black/10 bg-white">
         <div className={`${containerShell} py-20 md:py-24`}>
           <div className="mb-10 max-w-[52ch] space-y-6">
             <SectionLabel>{content.contact.label}</SectionLabel>

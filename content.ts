@@ -231,8 +231,8 @@ export const content: Content = {
     { label: "채널 진단", href: "#contact" }
   ],
   heroValue: {
-    headline: "전문분야 브랜딩은\n턴키로 한 번에 맡기세요.",
-    body: "고객 입장에서 설계하는\n전환 중심 브랜딩 시스템",
+    headline: "전문직 유튜브,\n상담 전환까지 설계합니다.",
+    body: "검색 유입부터 결정 전환까지\n고객 기준으로 운영 구조를 만듭니다.",
     primaryCta: { label: "무료 전략 점검 받기", href: "#contact" },
     secondaryCta: { label: "실제 성장 사례 보기", href: "#portfolio" }
   },

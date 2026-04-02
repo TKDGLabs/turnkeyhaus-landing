@@ -12,7 +12,7 @@ function DependencyGraphic() {
     <svg
       viewBox="0 0 148 108"
       aria-hidden="true"
-      className="h-[108px] w-[148px]"
+      className="h-full w-full"
       fill="none"
     >
       <path d="M18 20.5H130" className="signal-gridline" />
@@ -39,7 +39,7 @@ function CtrGraphic() {
     <svg
       viewBox="0 0 148 108"
       aria-hidden="true"
-      className="h-[108px] w-[148px]"
+      className="h-full w-full"
       fill="none"
     >
       <rect x="17" y="15" width="114" height="78" rx="18" className="signal-frame" />
@@ -60,7 +60,7 @@ function SetupGraphic() {
     <svg
       viewBox="0 0 148 108"
       aria-hidden="true"
-      className="h-[108px] w-[148px]"
+      className="h-full w-full"
       fill="none"
     >
       <path d="M32 33H116" className="signal-gridline" />
@@ -90,45 +90,46 @@ export default function SignalInsights({
   items
 }: SignalInsightsProps) {
   return (
-    <div className="signal-board rounded-[28px] border border-black/10 bg-white shadow-[0_8px_26px_rgba(11,15,14,0.05)]">
-      <div className="space-y-4 border-b border-black/10 px-5 py-5 md:px-6 md:py-6">
+    <div className="signal-board overflow-hidden rounded-[32px] border border-black/10 bg-white shadow-[0_16px_44px_rgba(11,15,14,0.06)]">
+      <div className="space-y-4 px-6 py-6 md:px-8 md:py-8">
         <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/45">
           {label}
         </div>
-        <h3 className="max-w-[18ch] whitespace-pre-line text-[24px] font-semibold leading-[1.28] tracking-tight text-[#0B0F0E] md:text-[30px]">
-          {title}
-        </h3>
-        <p className="max-w-[34ch] whitespace-pre-line text-sm leading-[1.85] text-black/66 md:text-[15px]">
-          {lead}
-        </p>
+        <div className="grid gap-4 md:grid-cols-[0.92fr_1.08fr] md:items-end">
+          <h3 className="max-w-[16ch] whitespace-pre-line break-keep text-[28px] font-semibold leading-[1.18] tracking-tight text-[#0B0F0E] md:text-[36px]">
+            {title}
+          </h3>
+          <p className="max-w-[42ch] whitespace-pre-line break-keep text-sm leading-[1.9] text-black/66 md:justify-self-end md:text-[15px]">
+            {lead}
+          </p>
+        </div>
       </div>
 
-      <div className="divide-y divide-black/10">
+      <div className="grid gap-px border-t border-black/10 bg-black/10 md:grid-cols-3">
         {items.map((item) => (
-          <div
+          <article
             key={item.title}
-            className="grid gap-5 px-5 py-5 md:grid-cols-[minmax(0,1fr)_148px] md:items-center md:px-6"
+            className="flex h-full flex-col bg-white p-5 md:p-6"
           >
-            <div className="space-y-2.5">
+            <div className="mb-5 rounded-[24px] border border-black/10 bg-black/[0.02] p-4 md:p-5">
+              <div className="h-40 md:h-48 lg:h-52">
+                <SignalGraphic variant={item.variant} />
+              </div>
+            </div>
+
+            <div className="space-y-3">
               <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#21c1a2]">
                 {item.eyebrow}
               </div>
-              <h4 className="text-base font-semibold leading-[1.45] text-[#0B0F0E] md:text-[17px]">
+              <h4 className="text-lg font-semibold leading-[1.45] text-[#0B0F0E] md:text-[20px]">
                 {item.title}
               </h4>
-              <p className="whitespace-pre-line text-sm leading-[1.8] text-black/72 md:text-[15px]">
+              <p className="whitespace-pre-line break-keep text-sm leading-[1.9] text-black/72 md:text-[15px]">
                 {item.summary}
               </p>
-              <div className="pt-1 md:hidden">
-                <SignalGraphic variant={item.variant} />
-              </div>
-              <p className="text-xs leading-[1.75] text-black/48 md:text-[13px]">{item.note}</p>
+              <p className="text-xs leading-[1.8] text-black/48 md:text-[13px]">{item.note}</p>
             </div>
-
-            <div className="hidden justify-self-end md:block">
-              <SignalGraphic variant={item.variant} />
-            </div>
-          </div>
+          </article>
         ))}
       </div>
     </div>
