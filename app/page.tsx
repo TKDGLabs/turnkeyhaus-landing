@@ -282,17 +282,13 @@ export default function Page() {
               </div>
             </div>
 
-            <SignalInsights
-              label={content.signalInsights.label}
-              title={content.signalInsights.h2}
-              lead={content.signalInsights.lead}
-              items={content.signalInsights.items}
-            />
-
-            <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 p-6 md:p-7">
-              <p className="text-base font-semibold leading-[1.9] text-black md:text-lg">
-                {content.problem.emphasis}
-              </p>
+            <div className="border-t border-black/10 pt-10 md:pt-12">
+              <SignalInsights
+                label={content.signalInsights.label}
+                title={content.signalInsights.h2}
+                lead={content.signalInsights.lead}
+                items={content.signalInsights.items}
+              />
             </div>
           </div>
         </div>

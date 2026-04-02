@@ -89,6 +89,8 @@ export default function SignalInsights({
   lead,
   items
 }: SignalInsightsProps) {
+  const [leadBody, leadEmphasis] = lead.split("\n\n");
+
   return (
     <div className="signal-board overflow-hidden rounded-[32px] border border-black/10 bg-white shadow-[0_16px_44px_rgba(11,15,14,0.06)]">
       <div className="space-y-4 px-6 py-6 md:px-8 md:py-8">
@@ -99,9 +101,16 @@ export default function SignalInsights({
           <h3 className="max-w-[16ch] whitespace-pre-line break-keep text-[28px] font-semibold leading-[1.18] tracking-tight text-[#0B0F0E] md:text-[36px]">
             {title}
           </h3>
-          <p className="max-w-[42ch] whitespace-pre-line break-keep text-sm leading-[1.9] text-black/66 md:justify-self-end md:text-[15px]">
-            {lead}
-          </p>
+          <div className="space-y-3 md:justify-self-end">
+            <p className="max-w-[42ch] whitespace-pre-line break-keep text-sm leading-[1.9] text-black/66 md:text-[15px]">
+              {leadBody}
+            </p>
+            {leadEmphasis ? (
+              <p className="max-w-[42ch] whitespace-pre-line break-keep text-base font-semibold leading-[1.75] text-black/80 md:text-[17px]">
+                {leadEmphasis}
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -112,7 +121,7 @@ export default function SignalInsights({
             className="flex h-full flex-col bg-white p-5 md:p-6"
           >
             <div className="mb-5 rounded-[24px] border border-black/10 bg-black/[0.02] p-4 md:p-5">
-              <div className="h-40 md:h-48 lg:h-52">
+              <div className="h-44 md:h-52 lg:h-56">
                 <SignalGraphic variant={item.variant} />
               </div>
             </div>
