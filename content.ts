@@ -91,6 +91,7 @@ export type Content = {
   heroValue: {
     headline: string;
     body: string;
+    scrollGuide: string;
     primaryCta: CtaLink;
     secondaryCta: CtaLink;
   };
@@ -233,6 +234,8 @@ export const content: Content = {
   heroValue: {
     headline: "전문직 유튜브,\n상담 전환까지 설계합니다.",
     body: "검색 유입부터 결정 전환까지\n고객 기준으로 운영 구조를 만듭니다.",
+    scrollGuide:
+      "상담을 받지 않으셔도 괜찮습니다.\n끝까지 스크롤하시면 브랜딩 채널 운영에 유익한 기준을 얻어가실 수 있습니다.",
     primaryCta: { label: "무료 전략 점검 받기", href: "#contact" },
     secondaryCta: { label: "실제 성장 사례 보기", href: "#portfolio" }
   },

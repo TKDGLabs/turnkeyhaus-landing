@@ -228,6 +228,15 @@ export default function Page() {
               </div>
             </div>
           </div>
+
+          <div className="mt-5 flex justify-center">
+            <div className="w-full max-w-[820px] rounded-2xl border border-black/10 bg-white/92 px-5 py-4 text-center shadow-[0_10px_26px_rgba(11,15,14,0.04)] backdrop-blur md:rounded-full md:px-7 md:py-4">
+              <div className="mx-auto mb-2 h-1.5 w-1.5 rounded-full bg-[#21c1a2] shadow-[0_0_0_6px_rgba(33,193,162,0.12)]" />
+              <p className="whitespace-pre-line break-keep text-sm leading-[1.85] text-black/60 md:text-[15px]">
+                {content.heroValue.scrollGuide}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -238,31 +247,9 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="strategy-frame" className="bg-white">
-        <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader label={content.strategyFrame.label} title={content.strategyFrame.h2} />
-
-          <div className="grid gap-4 md:grid-cols-4">
-            {content.strategyFrame.steps.map((step, index) => (
-              <article
-                key={step.title}
-                className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_6px_18px_rgba(11,15,14,0.03)] md:p-6"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold tracking-[0.08em] text-black/45">{`0${index + 1}`}</div>
-                  <div className="h-1.5 w-1.5 rounded-full bg-[#21c1a2]/80" />
-                </div>
-                <h3 className="mt-3 text-lg font-semibold text-[#0B0F0E]">{step.title}</h3>
-                <p className="mt-2 text-sm leading-[1.9] text-black/70">{step.detail}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section id="problem" className="border-y border-black/10 bg-white">
         <div className={`${containerShell} py-20 md:py-24`}>
-          <div className="space-y-12 md:space-y-14">
+          <div className="space-y-12 md:space-y-16">
             <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-end">
               <div className="space-y-6">
                 <SectionLabel>{content.problem.label}</SectionLabel>
@@ -279,6 +266,31 @@ export default function Page() {
                 <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/70 md:text-lg">
                   {problemDetail}
                 </p>
+              </div>
+            </div>
+
+            <div className="space-y-8 border-t border-black/10 pt-10 md:space-y-10 md:pt-12">
+              <div className="max-w-[64ch] space-y-4">
+                <SectionLabel>{content.strategyFrame.label}</SectionLabel>
+                <h3 className={`${sectionTitleClass} max-w-[15ch] md:max-w-[16ch]`}>
+                  {content.strategyFrame.h2}
+                </h3>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {content.strategyFrame.steps.map((step, index) => (
+                  <article
+                    key={step.title}
+                    className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_6px_18px_rgba(11,15,14,0.03)] md:p-6"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-semibold tracking-[0.08em] text-black/45">{`0${index + 1}`}</div>
+                      <div className="h-1.5 w-1.5 rounded-full bg-[#21c1a2]/80" />
+                    </div>
+                    <h4 className="mt-3 text-lg font-semibold text-[#0B0F0E]">{step.title}</h4>
+                    <p className="mt-2 text-sm leading-[1.9] text-black/70">{step.detail}</p>
+                  </article>
+                ))}
               </div>
             </div>
 
