@@ -11,7 +11,7 @@ type IntroGateProps = {
 };
 
 const STORAGE_KEY = "turnkeyhaus_intro_seen_v1";
-const SHOW_MS = 1300;
+const SHOW_MS = 2000;
 const FADE_MS = 420;
 
 export default function IntroGate({ logoSrc, logoAlt, title, subtitle }: IntroGateProps) {
@@ -73,15 +73,17 @@ export default function IntroGate({ logoSrc, logoAlt, title, subtitle }: IntroGa
         setPhase("hidden");
       }}
     >
-      <div className="mx-auto max-w-[760px] px-6 text-center">
+      <div className="mx-auto max-w-[860px] px-6 text-center">
         <div className="mx-auto mb-8 w-fit rounded-2xl border border-black/10 bg-white px-6 py-4 shadow-[0_8px_24px_rgba(11,15,14,0.06)]">
           <Image src={logoSrc} alt={logoAlt} width={188} height={52} className="h-12 w-auto object-contain" priority />
         </div>
 
-        <p className="text-[30px] font-semibold leading-[1.2] tracking-tight text-[#0B0F0E] md:text-[44px]">
+        <p className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.28] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.18]">
           {title}
         </p>
-        <p className="mt-3 text-base leading-[1.8] text-black/65 md:text-lg">{subtitle}</p>
+        <p className="mt-4 whitespace-pre-line break-keep text-[17px] font-medium leading-[1.8] text-black/65 md:text-[22px]">
+          {subtitle}
+        </p>
       </div>
     </div>
   );

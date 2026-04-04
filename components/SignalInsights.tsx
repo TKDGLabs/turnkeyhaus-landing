@@ -93,20 +93,20 @@ export default function SignalInsights({
 
   return (
     <div className="signal-board overflow-hidden rounded-[32px] border border-black/10 bg-white shadow-[0_16px_44px_rgba(11,15,14,0.06)]">
-      <div className="space-y-5 px-6 py-6 md:px-8 md:py-8">
-        <div className="text-sm font-semibold tracking-[0.12em] text-black/45 md:text-base">
+      <div className="space-y-6 px-7 py-7 md:px-10 md:py-10">
+        <div className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-semibold tracking-[0.12em] text-black/45 md:text-base">
           {label}
         </div>
-        <div className="grid gap-4 md:grid-cols-[0.92fr_1.08fr] md:items-end">
-          <h3 className="max-w-[15ch] whitespace-pre-line break-keep text-[32px] font-semibold leading-[1.24] tracking-tight text-[#0B0F0E] md:text-[46px] md:leading-[1.18] lg:text-[52px]">
+        <div className="grid gap-6 md:grid-cols-[0.92fr_1.08fr] md:items-end">
+          <h3 className="max-w-[16ch] whitespace-pre-line break-keep text-[32px] font-semibold leading-[1.24] tracking-tight text-[#0B0F0E] md:text-[46px] md:leading-[1.18] lg:text-[52px]">
             {title}
           </h3>
           <div className="space-y-3 md:justify-self-end">
-            <p className="max-w-[48ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/68 md:text-lg">
+            <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/68 md:text-lg">
               {leadBody}
             </p>
             {leadEmphasis ? (
-              <p className="max-w-[48ch] whitespace-pre-line break-keep text-base font-semibold leading-[1.85] text-black/82 md:text-lg">
+              <p className="max-w-[56ch] whitespace-pre-line break-keep text-base font-semibold leading-[1.85] text-black/82 md:text-lg">
                 {leadEmphasis}
               </p>
             ) : null}
@@ -118,25 +118,25 @@ export default function SignalInsights({
         {items.map((item) => (
           <article
             key={item.title}
-            className="flex h-full flex-col bg-white p-6 md:p-7"
+            className="flex h-full flex-col bg-white p-7 md:p-8"
           >
-            <div className="mb-6 rounded-[24px] border border-black/10 bg-black/[0.02] p-4 md:p-5">
-              <div className="h-44 md:h-52 lg:h-56">
+            <div className="mb-7 rounded-[24px] border border-black/10 bg-black/[0.02] p-5 md:p-6">
+              <div className="h-48 md:h-56 lg:h-60">
                 <SignalGraphic variant={item.variant} />
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="text-sm font-semibold tracking-[0.12em] text-[#21c1a2]">
+              <div className="text-sm font-semibold tracking-[0.12em] text-[#21c1a2] md:text-base">
                 {item.eyebrow}
               </div>
-              <h4 className="text-[22px] font-semibold leading-[1.4] tracking-tight text-[#0B0F0E] md:text-[24px]">
+              <h4 className="text-[24px] font-semibold leading-[1.4] tracking-tight text-[#0B0F0E] md:text-[28px]">
                 {item.title}
               </h4>
-              <p className="whitespace-pre-line break-keep text-base leading-[1.9] text-black/72">
+              <p className="whitespace-pre-line break-keep text-base leading-[1.9] text-black/72 md:text-lg">
                 {item.summary}
               </p>
-              <p className="text-sm leading-[1.85] text-black/52">{item.note}</p>
+              <p className="text-[15px] leading-[1.9] text-black/52 md:text-base">{item.note}</p>
             </div>
           </article>
         ))}

@@ -119,6 +119,8 @@ export default function Page() {
   const hasPhoneHref = phoneHref.startsWith("tel:");
   const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
   const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
+  const [introTitle = "", ...introSubtitleLines] = content.heroValue.scrollGuide.split("\n");
+  const introSubtitle = introSubtitleLines.join("\n");
   const proofImage = content.studioProof.images[0] ?? {
     src: "/images/showreel-cover-optimized.jpg",
     alt: "Turnkeyhaus 실행 기반 대표 이미지"
@@ -129,8 +131,8 @@ export default function Page() {
       <IntroGate
         logoSrc="/logo.png"
         logoAlt="Turnkeyhaus"
-        title="전략은 감각이 아니라 구조입니다."
-        subtitle="전문직 채널 운영의 기준을 먼저 보여드립니다."
+        title={introTitle}
+        subtitle={introSubtitle}
       />
 
       <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
@@ -229,14 +231,6 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="mt-5 flex justify-center">
-            <div className="w-full max-w-[820px] rounded-2xl border border-black/10 bg-white/92 px-5 py-4 text-center shadow-[0_10px_26px_rgba(11,15,14,0.04)] backdrop-blur md:rounded-full md:px-7 md:py-4">
-              <div className="mx-auto mb-2 h-1.5 w-1.5 rounded-full bg-[#21c1a2] shadow-[0_0_0_6px_rgba(33,193,162,0.12)]" />
-              <p className="whitespace-pre-line break-keep text-sm leading-[1.85] text-black/60 md:text-[15px]">
-                {content.heroValue.scrollGuide}
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -341,8 +335,8 @@ export default function Page() {
               <article key={card.title} className={clsCard}>
                 <MediaFrame image={card.image} sizes="(max-width: 768px) 100vw, 33vw" overlayClass="bg-black/12" />
 
-                <div className="flex h-full flex-col space-y-4 p-5">
-                  <h3 className="text-base font-semibold text-[#0B0F0E]">{card.title}</h3>
+                <div className="flex h-full flex-col space-y-4 p-6">
+                  <h3 className="text-lg font-semibold tracking-[-0.01em] text-[#0B0F0E]">{card.title}</h3>
 
                   {(card.tags ?? []).length > 0 ? (
                     <div className="flex flex-wrap gap-2">
@@ -356,7 +350,7 @@ export default function Page() {
 
                   <p className="whitespace-pre-line text-base leading-[1.9] text-black/72 md:text-lg">{card.oneLiner}</p>
 
-                  <ul className="space-y-2 text-sm leading-[1.8] text-black/72">
+                  <ul className="space-y-2.5 text-sm leading-[1.85] text-black/72">
                     {card.bullets.map((bullet) => (
                       <li key={bullet} className="list-inside list-disc">
                         {bullet}
@@ -364,7 +358,10 @@ export default function Page() {
                     ))}
                   </ul>
 
-                  <ActionLink href={card.href} className="mt-auto pt-1 text-xs font-semibold text-[#21c1a2]">
+                  <ActionLink
+                    href={card.href}
+                    className="mt-auto inline-flex items-center gap-1.5 border-t border-black/8 pt-4 text-sm font-semibold tracking-[-0.01em] text-[#21c1a2] md:text-base"
+                  >
                     {card.ctaLabel} →
                   </ActionLink>
                 </div>
