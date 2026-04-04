@@ -111,14 +111,6 @@ function isGoogleFormEmbedUrl(url: string) {
 
 const ytThumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 const formatInteger = (n: number) => Math.round(n).toLocaleString("ko-KR");
-const formatViewsInMan = (n: number) => {
-  const man = n / 10000;
-  const digits = man < 10 ? 1 : 0;
-  return man.toLocaleString("ko-KR", {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits
-  });
-};
 
 export default function Page() {
   const insightPosts = getSortedInsights().slice(0, 4);
@@ -465,7 +457,7 @@ export default function Page() {
                     <div className="rounded-xl border border-black/10 bg-black/[0.02] px-3 py-3">
                       <p className="text-xs font-medium tracking-[0.01em] text-black/55">구독자</p>
                       <p className="mt-1 text-2xl font-semibold tracking-tight text-[#0B0F0E]">
-                        <CountUp value={item.subscriberCurrent} format={formatInteger} />
+                        <CountUp value={item.subscriberCurrent} />
                         <span className="ml-1 text-sm font-medium text-black/58">명</span>
                       </p>
                     </div>
@@ -475,12 +467,16 @@ export default function Page() {
                       <p className="mt-1 text-2xl font-semibold tracking-tight text-[#0B0F0E]">
                         {item.maxVideoViews >= 10000 ? (
                           <>
-                            <CountUp value={item.maxVideoViews} format={formatViewsInMan} suffix="만" />
+                            <CountUp
+                              value={item.maxVideoViews / 10000}
+                              decimals={item.maxVideoViews % 10000 === 0 ? 0 : 1}
+                              suffix="만"
+                            />
                             <span className="ml-1 text-sm font-medium text-black/58">회</span>
                           </>
                         ) : (
                           <>
-                            <CountUp value={item.maxVideoViews} format={formatInteger} />
+                            <CountUp value={item.maxVideoViews} />
                             <span className="ml-1 text-sm font-medium text-black/58">회</span>
                           </>
                         )}
