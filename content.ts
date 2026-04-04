@@ -23,6 +23,9 @@ export type PortfolioItem = {
   oneLiner: string;
   tags: string[];
   result: string;
+  subscriberStart: number;
+  subscriberCurrent: number;
+  maxVideoViews: number;
   href: string;
   youtubeId?: string;
   imageSrc: string;
@@ -241,11 +244,11 @@ export const content: Content = {
   },
   problem: {
     label: "[ 문제 · 현실 점검 ]",
-    h2: "이런 고민이 있다면\n이미 늦은 겁니다.",
+    h2: "대부분의 채널은\n성장이 쉽지 않습니다.",
     lead:
-      "촬영은 하는데 전환이 안 됩니다.\n조회수는 나오는데 상담이 없습니다.\n대본을 매번 직접 써야 합니다.\n대행사인데 왜 내가 더 힘든지 모르겠습니다.\n\n유튜브는 '업로드'가 아니라 '설계'의 영역입니다.",
+      "콘텐츠를 꾸준히 올려도\n채널의 방향이 선명해지지 않는 경우가 많습니다.\n\n유튜브는 단기 제작이 아니라 운영 설계입니다.\n조회수보다 중요한 것은\n일관된 기준과 구조입니다.",
     items: [],
-    emphasis: "문제는 양이 아니라 구조입니다."
+    emphasis: "유튜브는 '업로드'가 아니라 '설계'의 영역입니다."
   },
   strategyFrame: {
     label: "[ 전략 설계 프레임 ]",
@@ -415,14 +418,17 @@ export const content: Content = {
   },
   portfolio: {
     label: "[ 포트폴리오 ]",
-    h2: "[ 포트폴리오 ]",
-    lead: "썸네일을 클릭하면 해당 영상으로 이동합니다.",
+    h2: "실행의 결과는\n숫자로 증명됩니다.",
+    lead: "대표 채널 3개의 구독자 변화와 단일 영상 최고 조회수를 함께 확인하세요.",
     items: [
       {
         title: "주치아 앞선tube",
         oneLiner: "신규 런칭 · 원장 브랜딩 · 운영 설계",
         tags: ["치과", "런칭", "운영"],
-        result: "구독자 0 → 517명",
+        result: "구독자 0 → 541명",
+        subscriberStart: 0,
+        subscriberCurrent: 541,
+        maxVideoViews: 23000,
         href: "https://youtu.be/ajOQC_X-5bE",
         youtubeId: "ajOQC_X-5bE",
         imageSrc: "/images/studio-1.jpg"
@@ -431,7 +437,10 @@ export const content: Content = {
         title: "법 잘하는 변호사들 · 로맨즈",
         oneLiner: "채널 리빌딩 · SEO/운영 설계 · 전환 구조",
         tags: ["로펌", "리빌딩", "브랜딩"],
-        result: "구독자 500 → 5.7천명",
+        result: "구독자 500 → 5,970명",
+        subscriberStart: 500,
+        subscriberCurrent: 5970,
+        maxVideoViews: 370000,
         href: "https://youtu.be/mozP07dCcuk",
         youtubeId: "mozP07dCcuk",
         imageSrc: "/images/pro-law.jpg"
@@ -441,6 +450,9 @@ export const content: Content = {
         oneLiner: "채널 운영 설계 · 포맷 구조화 · 장기 자산화",
         tags: ["채널 운영", "구조화", "자산화"],
         result: "구독자 2.2천 → 11.7만",
+        subscriberStart: 2200,
+        subscriberCurrent: 117000,
+        maxVideoViews: 2180000,
         href: "https://youtu.be/Fii93LBGjSY",
         youtubeId: "Fii93LBGjSY",
         imageSrc: "/images/studio-2.jpg"

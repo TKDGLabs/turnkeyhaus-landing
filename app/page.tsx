@@ -7,10 +7,11 @@ import ProofBadges from "../components/ProofBadges";
 import ContactCTA from "../components/ContactCTA";
 import IntroGate from "../components/IntroGate";
 import SignalInsights from "../components/SignalInsights";
+import CountUp from "../components/CountUp";
 import { getSortedInsights } from "../content/insights";
 
 const clsCard =
-  "group flex h-full flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_24px_rgba(11,15,14,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_16px_34px_rgba(11,15,14,0.08)]";
+  "group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_24px_rgba(11,15,14,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_16px_34px_rgba(11,15,14,0.08)]";
 const clsMedia =
   "relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-black/[0.02] transition-colors hover:border-black/20";
 const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
@@ -109,6 +110,15 @@ function isGoogleFormEmbedUrl(url: string) {
 }
 
 const ytThumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+const formatInteger = (n: number) => Math.round(n).toLocaleString("ko-KR");
+const formatViewsInMan = (n: number) => {
+  const man = n / 10000;
+  const digits = man < 10 ? 1 : 0;
+  return man.toLocaleString("ko-KR", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  });
+};
 
 export default function Page() {
   const insightPosts = getSortedInsights().slice(0, 4);
@@ -183,7 +193,7 @@ export default function Page() {
             loop
             playsInline
             preload="metadata"
-            poster="/images/hero-team-office.png"
+            poster="/images/showreel-cover-optimized.jpg"
             className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center md:object-[center_42%]"
           >
             <source src="/videos/hero-render-1080.mp4" type="video/mp4" />
@@ -221,12 +231,6 @@ export default function Page() {
                     {content.heroValue.secondaryCta.label}
                   </ActionLink>
                 </div>
-
-                <p className="text-sm leading-[1.75] text-black/58 md:text-right">
-                  검색에서 발견되고 결정에서 선택되기까지,
-                  <br className="hidden md:block" />
-                  전환 기준으로 채널을 설계합니다.
-                </p>
               </div>
             </div>
           </div>
@@ -244,21 +248,40 @@ export default function Page() {
       <section id="problem" className="border-y border-black/10 bg-white">
         <div className={`${containerShell} py-20 md:py-24`}>
           <div className="space-y-12 md:space-y-16">
-            <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-end">
-              <div className="space-y-6">
-                <SectionLabel>{content.problem.label}</SectionLabel>
-                <h2 className={`${sectionTitleClass} max-w-[14ch]`}>
-                  {content.problem.h2}
-                </h2>
+            <div className="space-y-8 md:space-y-10">
+              <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-start">
+                <div className="space-y-6">
+                  <SectionLabel>{content.problem.label}</SectionLabel>
+                  <h2 className={`${sectionTitleClass} max-w-[14ch]`}>
+                    {content.problem.h2}
+                  </h2>
+                </div>
+
+                <div className="space-y-6 md:justify-self-end">
+                  <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/75 md:text-lg">
+                    {problemSupport}
+                  </p>
+
+                  <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/70 md:text-lg">
+                    {problemDetail}
+                  </p>
+
+                  <div className="max-w-[560px] overflow-hidden rounded-2xl border border-black/10 bg-black/[0.02] md:ml-auto">
+                    <Image
+                      src="/images/reality-illustration-optimized.jpg"
+                      alt="문제·현실 점검 보조 시각화"
+                      width={1400}
+                      height={900}
+                      className="h-auto w-full object-cover"
+                      sizes="(max-width: 768px) 100vw, 560px"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-5 md:justify-self-end">
-                <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/75 md:text-lg">
-                  {problemSupport}
-                </p>
-
-                <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/70 md:text-lg">
-                  {problemDetail}
+              <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 px-6 py-5">
+                <p className="text-base font-semibold leading-[1.8] text-black md:text-lg">
+                  {content.problem.emphasis}
                 </p>
               </div>
             </div>
@@ -330,12 +353,12 @@ export default function Page() {
             lead={content.professionalTargets.lead}
           />
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3 md:items-start">
             {content.professionalTargets.cards.map((card) => (
               <article key={card.title} className={clsCard}>
                 <MediaFrame image={card.image} sizes="(max-width: 768px) 100vw, 33vw" overlayClass="bg-black/12" />
 
-                <div className="flex h-full flex-col space-y-4 p-6">
+                <div className="space-y-4 p-6 md:space-y-5">
                   <h3 className="text-lg font-semibold tracking-[-0.01em] text-[#0B0F0E]">{card.title}</h3>
 
                   {(card.tags ?? []).length > 0 ? (
@@ -360,7 +383,7 @@ export default function Page() {
 
                   <ActionLink
                     href={card.href}
-                    className="mt-auto inline-flex items-center gap-1.5 border-t border-black/8 pt-4 text-sm font-semibold tracking-[-0.01em] text-[#21c1a2] md:text-base"
+                    className="inline-flex items-center gap-1.5 border-t border-black/8 pt-4 text-[17px] font-semibold tracking-[-0.01em] text-[#21c1a2] md:text-lg"
                   >
                     {card.ctaLabel} →
                   </ActionLink>
@@ -406,8 +429,9 @@ export default function Page() {
 
       <section id="portfolio" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
-          <div className="max-w-[52ch] space-y-4">
-            <SectionLabel>{content.portfolio.h2}</SectionLabel>
+          <div className="max-w-[64ch] space-y-4">
+            <SectionLabel>{content.portfolio.label}</SectionLabel>
+            <h2 className={sectionTitleClass}>{content.portfolio.h2}</h2>
             <p className={bodyCopy}>{content.portfolio.lead}</p>
           </div>
 
@@ -427,15 +451,46 @@ export default function Page() {
                   </div>
                 </a>
 
-                <div className="flex h-full flex-col space-y-4 p-5">
+                <div className="space-y-4 p-5 md:space-y-5 md:p-6">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-base font-semibold text-[#0B0F0E]">{item.title}</h3>
+                    <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E]">{item.title}</h3>
                     <span className="shrink-0 rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs font-semibold text-black/70">
                       {item.result}
                     </span>
                   </div>
 
-                  <p className="whitespace-pre-line text-base leading-[1.9] text-black/72 md:text-lg">{item.oneLiner}</p>
+                  <p className="whitespace-pre-line text-base leading-[1.9] text-black/72">{item.oneLiner}</p>
+
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className="rounded-xl border border-black/10 bg-black/[0.02] px-3 py-3">
+                      <p className="text-xs font-medium tracking-[0.01em] text-black/55">구독자</p>
+                      <p className="mt-1 text-2xl font-semibold tracking-tight text-[#0B0F0E]">
+                        <CountUp value={item.subscriberCurrent} format={formatInteger} />
+                        <span className="ml-1 text-sm font-medium text-black/58">명</span>
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-black/10 bg-black/[0.02] px-3 py-3">
+                      <p className="text-xs font-medium tracking-[0.01em] text-black/55">단일 영상 최고 조회수</p>
+                      <p className="mt-1 text-2xl font-semibold tracking-tight text-[#0B0F0E]">
+                        {item.maxVideoViews >= 10000 ? (
+                          <>
+                            <CountUp value={item.maxVideoViews} format={formatViewsInMan} suffix="만" />
+                            <span className="ml-1 text-sm font-medium text-black/58">회</span>
+                          </>
+                        ) : (
+                          <>
+                            <CountUp value={item.maxVideoViews} format={formatInteger} />
+                            <span className="ml-1 text-sm font-medium text-black/58">회</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-black/55">
+                    구독자 {formatInteger(item.subscriberStart)}명 → {formatInteger(item.subscriberCurrent)}명
+                  </p>
 
                   <div className="flex flex-wrap gap-2">
                     {item.tags.map((tag) => (
@@ -445,7 +500,7 @@ export default function Page() {
                     ))}
                   </div>
 
-                  <ActionLink href={item.href} className="mt-auto pt-1 text-xs font-semibold text-black/65">
+                  <ActionLink href={item.href} className="pt-1 text-sm font-semibold text-black/70">
                     영상 보기 →
                   </ActionLink>
                 </div>
@@ -519,7 +574,9 @@ export default function Page() {
                 >
                   <div className="mb-4 space-y-1">
                     <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E]">{level.title}</h3>
-                    <p className="text-sm font-medium text-black/65">{level.priceBand}</p>
+                    <p className="price-band-pop text-[30px] font-semibold leading-[1.08] tracking-tight text-[#0B0F0E] md:text-[36px]">
+                      {level.priceBand}
+                    </p>
                   </div>
 
                   <ul className="space-y-2 text-sm leading-relaxed text-black/72">
@@ -530,7 +587,7 @@ export default function Page() {
                     ))}
                   </ul>
 
-                  <p className="mt-5 border-t border-black/10 pt-4 text-sm leading-[1.85] text-black/65 md:text-base">
+                  <p className="mt-5 border-t border-black/10 pt-4 text-base leading-[1.85] text-black/65 md:text-lg">
                     <span className="font-medium text-black/72">대상:</span>
                     <br />
                     <span>{targetText}</span>
