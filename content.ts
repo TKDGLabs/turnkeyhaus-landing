@@ -72,11 +72,6 @@ export type FaqItem = {
   a: string;
 };
 
-export type CoveragePoint = {
-  city: string;
-  note: string;
-};
-
 export type Content = {
   brand: {
     name: string;
@@ -145,12 +140,6 @@ export type Content = {
     crewNote: string;
     closing: string;
     images: ImageAsset[];
-  };
-  nationwideCoverage: {
-    label: string;
-    h2: string;
-    lead: string;
-    points: CoveragePoint[];
   };
   portfolio: {
     label: string;
@@ -240,7 +229,6 @@ export const content: Content = {
     { label: "방식", href: "#approach" },
     { label: "전문직 적용", href: "#professional" },
     { label: "실행 증거", href: "#proof" },
-    { label: "전국 커버리지", href: "#coverage" },
     { label: "포트폴리오", href: "#portfolio" },
     { label: "인사이트", href: "/insights" },
     { label: "운영 레벨", href: "#pricing" },
@@ -426,20 +414,6 @@ export const content: Content = {
     closing: "",
     images: [
       { src: "/images/showreel-cover-optimized.jpg", alt: "Turnkeyhaus 실행 기반 대표 이미지" }
-    ]
-  },
-  nationwideCoverage: {
-    label: "[ 전국 운영 커버리지 ]",
-    h2: "한반도 전역으로\n운영 기준을 확장합니다.",
-    lead:
-      "서울 기준으로 기획·촬영·운영 체계를 전국 단위로 적용합니다.\n지역마다 메시지는 달라도, 운영 기준은 동일하게 유지합니다.",
-    points: [
-      { city: "수도권", note: "전략·촬영 동시 운영" },
-      { city: "충청권", note: "업종별 전환 구조 적용" },
-      { city: "영남권", note: "법률·의료 채널 운영" },
-      { city: "호남권", note: "세무·회계 채널 확장" },
-      { city: "강원권", note: "원거리 촬영 표준화" },
-      { city: "제주권", note: "출장 포함 운영 대응" }
     ]
   },
   portfolio: {

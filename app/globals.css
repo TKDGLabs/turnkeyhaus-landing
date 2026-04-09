@@ -196,60 +196,6 @@ a {
   animation: signalTravel 2.6s ease-in-out infinite;
 }
 
-/* Nationwide coverage map animation */
-.korea-map-sweep {
-  background: linear-gradient(
-    90deg,
-    rgba(33, 193, 162, 0) 0%,
-    rgba(33, 193, 162, 0.12) 40%,
-    rgba(33, 193, 162, 0) 100%
-  );
-  transform: translateX(-26%);
-  animation: koreaMapSweep 4.6s ease-in-out infinite;
-}
-
-.korea-route {
-  stroke: rgba(33, 193, 162, 0.86);
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-dasharray: 260;
-  stroke-dashoffset: 260;
-  opacity: 0.9;
-  animation: koreaRouteDraw 3s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-}
-
-.korea-route-dot {
-  fill: rgba(33, 193, 162, 0.95);
-  transform-origin: center;
-  animation: koreaRouteDot 3s ease-in-out infinite;
-}
-
-.korea-route-dot--hub {
-  fill: rgba(11, 15, 14, 0.88);
-  animation-duration: 2.4s;
-}
-
-.korea-route-pulse {
-  fill: none;
-  stroke: rgba(33, 193, 162, 0.34);
-  stroke-width: 2;
-  transform-origin: center;
-  animation: koreaRoutePulse 3s ease-out infinite;
-}
-
-.korea-route-pulse--hub {
-  stroke: rgba(11, 15, 14, 0.25);
-  animation-duration: 2.4s;
-}
-
-.korea-city-label {
-  fill: rgba(11, 15, 14, 0.7);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  animation: koreaLabelFade 3s ease-in-out infinite;
-}
-
 @keyframes signalDash {
   0% {
     stroke-dashoffset: 180;
@@ -324,92 +270,6 @@ a {
   }
 }
 
-@keyframes koreaRouteDraw {
-  0% {
-    stroke-dashoffset: 260;
-    opacity: 0.25;
-  }
-
-  40%,
-  72% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-
-  100% {
-    stroke-dashoffset: -24;
-    opacity: 0.52;
-  }
-}
-
-@keyframes koreaRouteDot {
-  0%,
-  24% {
-    transform: scale(0.68);
-    opacity: 0;
-  }
-
-  45% {
-    transform: scale(1.05);
-    opacity: 1;
-  }
-
-  72% {
-    transform: scale(0.92);
-    opacity: 0.95;
-  }
-
-  100% {
-    transform: scale(0.78);
-    opacity: 0.55;
-  }
-}
-
-@keyframes koreaRoutePulse {
-  0%,
-  24% {
-    transform: scale(0.82);
-    opacity: 0;
-  }
-
-  54% {
-    opacity: 0.55;
-  }
-
-  100% {
-    transform: scale(1.7);
-    opacity: 0;
-  }
-}
-
-@keyframes koreaMapSweep {
-  0%,
-  100% {
-    transform: translateX(-28%);
-    opacity: 0.6;
-  }
-
-  50% {
-    transform: translateX(28%);
-    opacity: 1;
-  }
-}
-
-@keyframes koreaLabelFade {
-  0%,
-  24% {
-    opacity: 0.4;
-  }
-
-  52% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0.64;
-  }
-}
-
 @keyframes pricePulse {
   0%,
   100% {
@@ -439,12 +299,7 @@ a {
   .signal-dot,
   .signal-node-ring,
   .signal-bar,
-  .signal-travel,
-  .korea-map-sweep,
-  .korea-route,
-  .korea-route-dot,
-  .korea-route-pulse,
-  .korea-city-label {
+  .signal-travel {
     animation: none !important;
   }
 }

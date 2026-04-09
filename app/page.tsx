@@ -8,7 +8,6 @@ import ContactCTA from "../components/ContactCTA";
 import IntroGate from "../components/IntroGate";
 import SignalInsights from "../components/SignalInsights";
 import CountUp from "../components/CountUp";
-import KoreaCoverageMap from "../components/KoreaCoverageMap";
 import { getSortedInsights } from "../content/insights";
 
 const clsCard =
@@ -415,58 +414,6 @@ export default function Page() {
                 className="block h-auto w-full object-cover"
                 sizes="(max-width: 768px) 100vw, 680px"
               />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="coverage" className="border-b border-black/10 bg-white">
-        <div className={`${containerShell} py-20 md:py-24`}>
-          <div className="space-y-8 md:space-y-10">
-            <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-              <div className="space-y-5">
-                <SectionLabel>{content.nationwideCoverage.label}</SectionLabel>
-                <h2 className={`${sectionTitleClass} max-w-[16ch]`}>
-                  {content.nationwideCoverage.h2}
-                </h2>
-                <p className={`${bodyCopy} max-w-[58ch]`}>{content.nationwideCoverage.lead}</p>
-              </div>
-
-              <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 px-5 py-4 text-sm font-semibold leading-[1.85] text-[#0B0F0E] md:px-6 md:text-base lg:justify-self-end">
-                전국 어디서든 동일한 운영 기준으로 기획부터 실행까지 연결합니다.
-              </div>
-            </div>
-
-            <KoreaCoverageMap points={content.nationwideCoverage.points} />
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <p className="text-sm font-semibold tracking-[0.08em] text-black/45 md:text-base">
-                  NATIONWIDE EXECUTION
-                </p>
-                <p className="text-xl font-semibold leading-tight text-[#0B0F0E] md:text-[26px]">
-                  지역별 운영 포인트
-                </p>
-              </div>
-
-              <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {content.nationwideCoverage.points.map((point, index) => (
-                  <li
-                    key={point.city}
-                    className="flex items-start justify-between gap-4 rounded-xl border border-black/10 bg-black/[0.015] px-4 py-3.5"
-                  >
-                    <div className="space-y-1">
-                      <p className="text-base font-semibold leading-tight text-[#0B0F0E] md:text-lg">
-                        {point.city}
-                      </p>
-                      <p className="text-sm leading-[1.85] text-black/68 md:text-base">{point.note}</p>
-                    </div>
-                    <span className="shrink-0 rounded-full border border-[#21c1a2]/35 bg-[#21c1a2]/10 px-2.5 py-1 text-xs font-semibold tracking-[0.08em] text-[#148d77] md:text-sm">
-                      {`0${index + 1}`}
-                    </span>
-                  </li>
-                ))}
-              </ol>
             </div>
           </div>
         </div>
