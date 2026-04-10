@@ -9,7 +9,7 @@ const modalContent = {
     title: '01. 진단\n경험과 공감',
     description: '단순한 수치 분석을 넘어 원장님/대표님의 철학과 운영 환경을 깊숙이 공감하고 이해합니다.',
     footnote: '*저희 팀이 직접 작성한 제안서의 내용입니다.',
-    image: '/images/diagnosis.png', // 확장자 확인 필수! (.png 또는 .jpg)
+    image: '/images/diagnosis.png',
     alt: '진단 단계 제안서 이미지'
   },
   positioning: {
@@ -44,7 +44,6 @@ export default function StrategyModals() {
   return (
     <section className="py-24 bg-white border-y border-black/10">
       <div className="mx-auto max-w-[1360px] px-5 sm:px-6 lg:px-8">
-        {/* 헤더 영역 */}
         <div className="text-center mb-16 space-y-4">
           <div className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-semibold tracking-[0.12em] text-black/45 md:text-base">
             SERVICE FRAME
@@ -57,12 +56,11 @@ export default function StrategyModals() {
           </p>
         </div>
         
-        {/* 카드 리스트: 클린 화이트 테마 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {(Object.keys(modalContent) as ModalKey[]).map((key) => (
             <motion.button
               key={key}
-              whileHover={{ y: -8, shadow: '0 20px 40px rgba(0,0,0,0.06)' }}
+              whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.08)' }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setActiveModal(key)}
               className="group flex flex-col justify-between overflow-hidden rounded-[28px] border border-black/10 bg-white p-8 text-left shadow-[0_10px_24px_rgba(11,15,14,0.02)] transition-all duration-300 min-h-[240px]"
@@ -85,11 +83,9 @@ export default function StrategyModals() {
           ))}
         </div>
 
-        {/* 1400px 가로폭 대형 모달 (가독성 개선본) */}
         <AnimatePresence>
           {activeModal && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
-              {/* 뒷배경 블러 */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -98,14 +94,12 @@ export default function StrategyModals() {
                 className="absolute inset-0 bg-black/60 backdrop-blur-md"
               />
               
-              {/* 모달 본체 */}
               <motion.div
                 initial={{ opacity: 0, y: 40, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.95 }}
                 className="relative flex h-full max-h-[90vh] w-full max-w-[1400px] flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:flex-row z-10"
               >
-                {/* 닫기 버튼 */}
                 <button 
                   onClick={() => setActiveModal(null)}
                   className="absolute right-8 top-8 z-50 rounded-full bg-black/5 p-3 text-black transition-colors hover:bg-black/10"
@@ -113,25 +107,19 @@ export default function StrategyModals() {
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
 
-                {/* ✅ 좌측: 설명 텍스트 (480px로 대폭 확대) */}
                 <div className="flex w-full flex-col justify-center bg-[#FBFBFB] p-12 md:w-[480px] md:p-16 shrink-0 text-left">
                   <div className="space-y-10">
                     <div className="text-sm font-bold tracking-[0.2em] text-[#21c1a2] uppercase font-mono">
                       TURNKEYHAUS METHODOLOGY
                     </div>
-                    {/* ✅ 제목 크기 확대 */}
                     <h3 className="whitespace-pre-line text-4xl font-extrabold leading-[1.15] tracking-tight text-[#0B0F0E] lg:text-5xl">
                       {modalContent[activeModal].title}
                     </h3>
                     <div className="h-px w-16 bg-black/10" />
-                    
-                    {/* ✅ 본문 크기(17px) 및 행간(leading-[1.8]) 대폭 확대 (가독성 핵심) */}
                     <p className="break-keep text-[17px] leading-[1.8] text-black/80 font-medium">
                       {modalContent[activeModal].description}
                     </p>
-                    
                     <div className="pt-4">
-                      {/* ✅ 각주 디자인 개선 */}
                       <p className="inline-block rounded-lg bg-black/5 px-4 py-2 text-[13px] font-semibold text-black/50 italic">
                         {modalContent[activeModal].footnote}
                       </p>
@@ -139,7 +127,6 @@ export default function StrategyModals() {
                   </div>
                 </div>
 
-                {/* 우측: 이미지 영역 */}
                 <div className="relative flex flex-1 items-center justify-center bg-white p-6 md:p-12">
                   <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-black/5 shadow-[0_20px_50px_rgba(0,0,0,0.1)] bg-white p-2">
                     <Image 
@@ -147,7 +134,7 @@ export default function StrategyModals() {
                       alt={modalContent[activeModal].alt}
                       fill
                       priority
-                      className="object-contain" // PDF 비율 완벽 유지
+                      className="object-contain"
                       sizes="(max-width: 1400px) 100vw, 1200px"
                     />
                   </div>
