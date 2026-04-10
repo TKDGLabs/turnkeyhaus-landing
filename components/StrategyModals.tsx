@@ -88,21 +88,36 @@ export default function StrategyModals() {
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
             
-            {/* 모달 전체 크기를 키우기 위해 min-h-[500px] md:min-h-[600px] 속성 추가 */}
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.97 }}
               className="relative flex h-full max-h-[90vh] w-full max-w-[1200px] min-h-[500px] md:min-h-[600px] flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl md:flex-row z-10"
             >
+              {/* 닫기 버튼 */}
               <button 
                 onClick={() => setActiveIndex(null)}
-                className="absolute right-6 top-6 z-50 rounded-full bg-black/5 p-2.5 text-black/70 transition-colors hover:bg-black/10 hover:text-black"
+                className="absolute right-4 top-4 md:right-6 md:top-6 z-[60] rounded-full bg-white/90 backdrop-blur-md shadow-sm p-2.5 text-black/70 transition-colors hover:bg-black/10 hover:text-black"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
 
-              <div className="flex w-full flex-col justify-center bg-white p-8 md:w-[420px] md:p-12 shrink-0 text-left border-b md:border-b-0 md:border-r border-black/5">
+              {/* 이미지 영역: 모바일 상단 배치(order-1), PC 우측 배치(md:order-2) */}
+              <div className="order-1 md:order-2 relative flex shrink-0 md:flex-1 items-center justify-center bg-zinc-50 p-4 md:p-6 lg:p-8 h-[40vh] md:h-auto border-b md:border-b-0 border-black/5">
+                <div className="relative h-full w-full overflow-hidden rounded-2xl shadow-lg bg-white border border-black/5">
+                  <Image 
+                    src={activeExtra.image} 
+                    alt={activeExtra.alt}
+                    fill
+                    priority
+                    className="object-contain p-2 md:p-4"
+                    sizes="(max-width: 1200px) 100vw, 800px"
+                  />
+                </div>
+              </div>
+
+              {/* 텍스트 영역: 모바일 하단 배치(order-2), PC 좌측 배치(md:order-1) */}
+              <div className="order-2 md:order-1 flex w-full flex-col justify-start md:justify-center bg-white p-6 md:w-[420px] md:p-12 shrink-0 text-left md:border-r border-black/5 overflow-y-auto">
                 <div className="space-y-8">
                   <div className="text-[12px] font-bold tracking-[0.2em] text-[#21c1a2] uppercase font-mono">
                     METHODOLOGY
@@ -116,26 +131,11 @@ export default function StrategyModals() {
                     <br /><br />
                     {activeExtra.description}
                   </p>
-                  <div className="pt-2">
+                  <div className="pt-2 pb-6 md:pb-0">
                     <p className="inline-block rounded-lg bg-zinc-100 px-3 py-2 text-[12px] font-medium text-black/50">
                       {activeExtra.footnote}
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* 회색 배경 패딩 대폭 축소 (p-4 md:p-6 lg:p-8) */}
-              <div className="relative flex flex-1 items-center justify-center bg-zinc-50 p-4 md:p-6 lg:p-8">
-                {/* 16:9 비율 제한 해제 (h-full w-full 적용)하여 이미지가 가질 수 있는 최대 면적 확보 */}
-                <div className="relative h-full w-full overflow-hidden rounded-2xl shadow-lg bg-white border border-black/5">
-                  <Image 
-                    src={activeExtra.image} 
-                    alt={activeExtra.alt}
-                    fill
-                    priority
-                    className="object-contain p-2 md:p-4" // 액자처럼 끝부분이 살짝 띄워지게 패딩 설정
-                    sizes="(max-width: 1200px) 100vw, 800px"
-                  />
                 </div>
               </div>
             </motion.div>
