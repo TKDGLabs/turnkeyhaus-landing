@@ -28,35 +28,35 @@ const packageData = {
   foundation: {
     level: 'Foundation Level',
     price: '3,000,000',
-    target: '유튜브를 처음 시작하거나, 채널의 기본기를 탄탄하게 다지고 싶은 원장님',
+    target: '유튜브를 처음 시작하거나, 채널의 기본기를 탄탄하게 다지고 싶은 원장님께 추천드립니다.',
     includes: [
       '롱폼 기획/촬영/편집 (월 2회)',
       '숏폼 기획/편집 (월 2회)',
-      '썸네일/채널 아트 디자인',
-      '채널 방향성 및 초기 기획 컨설팅'
+      '썸네일/채널 아트 디자인 포함',
+      '채널 방향성 및 초기 기획 컨설팅 제공'
     ]
   },
   growth: {
     level: 'Growth Level',
     price: '4,000,000',
-    target: '안정적인 채널 성장과 실질적인 DB 전환(매출)이 필요한 전문직',
+    target: '안정적인 채널 성장과 실질적인 매출(DB) 전환이 필요한 전문직 원장님께 추천드립니다.',
     includes: [
       '롱폼 기획/촬영/편집 (월 4회)',
       '숏폼 기획/편집 (월 4회)',
-      '썸네일/채널 아트 디자인',
-      '유튜브 SEO 최적화 및 업로드 대행'
+      '썸네일/채널 아트 디자인 포함',
+      '유튜브 SEO 최적화 및 업로드 전담 대행'
     ]
   },
   intensive: {
     level: 'Intensive Level',
     price: '6,000,000',
-    target: '대규모 트래픽 확보와 하이엔드 브랜딩이 동시에 필요한 병원/기업',
+    target: '대규모 트래픽 확보와 하이엔드 브랜딩이 동시에 필요한 병원/기업에 추천드립니다.',
     includes: [
       '롱폼 기획/촬영/편집 (월 4회)',
       '숏폼 기획/편집 (월 8회)',
-      '썸네일/채널 아트 디자인',
+      '썸네일/채널 아트 디자인 포함',
       '유튜브 SEO 최적화 및 업로드 대행',
-      '전담 PD 배정 및 월 1회 전략 회의'
+      '전담 PD 배정 및 월 1회 대면 전략 회의'
     ]
   }
 };
@@ -81,18 +81,17 @@ export default function DiagnosticCalculator() {
   const result = getRecommendation();
 
   return (
-    <section className="py-20 bg-zinc-50 border-t border-black/10">
-      <div className="max-w-3xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <span className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-semibold tracking-[0.12em] text-black/45 mb-4">
-            QUICK DIAGNOSIS
+    <section className="py-24 bg-zinc-50 border-t border-black/10">
+      <div className="max-w-[1100px] mx-auto px-5">
+        <div className="text-center mb-16">
+          <span className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-xs font-bold tracking-[0.15em] text-black/40 mb-4 uppercase">
+            Quick Diagnosis
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-[#0B0F0E]">1분 맞춤형 채널 진단</h2>
-          <p className="text-black/60 mt-4 font-medium">단순 제작 견적이 아니라, 원장님께 필요한 최적의 운영 레벨을 진단해 드립니다.</p>
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#0B0F0E]">1분 맞춤형 채널 진단</h2>
+          <p className="text-black/60 mt-5 text-lg font-medium">단순 제작 견적이 아닌, 최적의 성장 전략 레벨을 도출합니다.</p>
         </div>
 
-        <div className="bg-[#0B0F0E] rounded-3xl p-6 md:p-12 min-h-[450px] relative overflow-hidden shadow-2xl">
-          {/* @ts-ignore */}
+        <div className="bg-[#0B0F0E] rounded-[40px] p-6 md:p-16 min-h-[500px] relative overflow-hidden shadow-2xl">
           <AnimatePresence mode="wait">
             {step < questions.length ? (
               <motion.div
@@ -100,17 +99,16 @@ export default function DiagnosticCalculator() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="flex flex-col h-full justify-center text-white"
+                className="flex flex-col h-full justify-center max-w-2xl mx-auto"
               >
-                <div className="w-full bg-white/10 h-1 mb-10 rounded-full overflow-hidden">
+                <div className="w-full bg-white/10 h-1.5 mb-12 rounded-full overflow-hidden">
                   <motion.div 
                     className="bg-[#21c1a2] h-full" 
                     initial={{ width: `${(step / questions.length) * 100}%` }}
                     animate={{ width: `${((step + 1) / questions.length) * 100}%` }}
                   />
                 </div>
-
-                <h3 className="text-2xl md:text-3xl font-bold mb-10 text-center leading-tight">
+                <h3 className="text-3xl md:text-4xl font-bold mb-12 text-center text-white leading-tight break-keep">
                   {questions[step].title}
                 </h3>
                 <div className="grid gap-4">
@@ -118,79 +116,85 @@ export default function DiagnosticCalculator() {
                     <button
                       key={opt.value}
                       onClick={() => handleSelect(questions[step].id, opt.value)}
-                      className="w-full p-5 md:p-6 text-left border border-white/10 rounded-xl hover:bg-white/5 hover:border-[#21c1a2]/50 transition-all text-base md:text-lg font-medium group"
+                      className="w-full p-6 text-left border border-white/10 rounded-2xl hover:bg-white/5 hover:border-[#21c1a2]/50 transition-all text-lg font-medium text-white/80 group"
                     >
-                      <span className="text-[#21c1a2] opacity-0 group-hover:opacity-100 transition-opacity mr-2">✓</span>
+                      <span className="text-[#21c1a2] opacity-0 group-hover:opacity-100 transition-opacity mr-3">✓</span>
                       {opt.label}
                     </button>
                   ))}
                 </div>
               </motion.div>
             ) : (
-              /* 결과 화면: 고급 영수증 / 제안서 리포트 형태 */
+              /* ✅ 대폭 개선된 웅장한 리포트 화면 */
               <motion.div
                 key="result"
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white text-[#0B0F0E] rounded-2xl p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative"
+                className="bg-white text-[#0B0F0E] rounded-[32px] overflow-hidden shadow-2xl flex flex-col"
               >
-                <div className="border-b-2 border-[#0B0F0E] pb-6 mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-                  <div>
-                    <h3 className="text-3xl font-black tracking-tighter">DIAGNOSIS REPORT</h3>
-                    <p className="text-sm text-black/50 font-mono mt-1 font-medium">TURNKEYHAUS CHANNEL STRATEGY</p>
-                  </div>
-                  <div className="text-left md:text-right">
-                    <p className="text-[10px] font-bold text-black/40 tracking-widest uppercase mb-1">Date</p>
-                    <p className="text-sm font-mono font-medium">{new Date().toLocaleDateString()}</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-8">
-                  <div className="grid md:grid-cols-[1fr_auto] gap-6 items-end">
+                {/* 리포트 상단부 */}
+                <div className="p-10 md:p-16 border-b border-black/5 bg-zinc-50/50">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-12">
                     <div>
-                      <p className="text-[11px] font-bold text-black/40 tracking-widest uppercase mb-2">Recommended Package</p>
-                      <h4 className="text-2xl md:text-3xl font-extrabold text-[#0B0F0E]">{result.level}</h4>
-                      <p className="text-sm text-black/70 mt-3 font-medium leading-relaxed max-w-[40ch]">
+                      <h3 className="text-5xl font-black tracking-tighter text-[#0B0F0E] mb-2">DIAGNOSIS REPORT</h3>
+                      <p className="text-sm font-bold text-black/30 tracking-[0.3em] font-mono">TURNKEYHAUS STRATEGY CENTER</p>
+                    </div>
+                    <div className="text-left md:text-right">
+                      <p className="text-[11px] font-bold text-black/40 tracking-widest uppercase mb-1">Issue Date</p>
+                      <p className="text-lg font-mono font-bold">{new Date().toLocaleDateString()}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-[1fr_auto] gap-12 items-start">
+                    <div>
+                      <span className="inline-block px-3 py-1 bg-black text-white text-[11px] font-bold tracking-widest rounded mb-4">RECOMMENDED</span>
+                      <h4 className="text-4xl md:text-6xl font-black text-[#0B0F0E] tracking-tighter mb-6">
+                        {result.level}
+                      </h4>
+                      <p className="text-xl text-black/70 font-medium leading-relaxed max-w-[500px] break-keep">
                         {result.target}
                       </p>
                     </div>
-                    <div className="text-left md:text-right bg-zinc-50 p-5 rounded-xl border border-black/5">
-                      <p className="text-[11px] font-bold text-black/40 tracking-widest uppercase mb-1">Estimated Budget</p>
-                      <p className="text-2xl md:text-3xl font-bold tracking-tight text-[#21c1a2]">
-                        <span className="text-lg text-black mr-1">₩</span>{result.price} <span className="text-sm font-medium text-black/50 tracking-normal">/ 월</span>
+                    
+                    <div className="bg-white border border-black/10 p-8 rounded-3xl shadow-sm min-w-[300px]">
+                      <p className="text-[12px] font-bold text-black/40 tracking-widest uppercase mb-3">Estimated Monthly Budget</p>
+                      <p className="text-4xl md:text-5xl font-black text-[#21c1a2] tracking-tighter">
+                        <span className="text-2xl text-black/30 mr-2">₩</span>{result.price}
                       </p>
+                      <p className="text-sm font-bold text-black/40 mt-2">VAT 별도 / 월 단위 계약</p>
                     </div>
-                  </div>
-
-                  <div className="h-px w-full bg-black/10"></div>
-
-                  <div>
-                    <p className="text-[11px] font-bold text-black/40 tracking-widest uppercase mb-4">Service Details</p>
-                    <ul className="space-y-3">
-                      {result.includes.map((item, idx) => (
-                         <li key={idx} className="flex items-start gap-3 text-sm md:text-base text-black/80 font-medium">
-                           <span className="text-[#21c1a2] mt-0.5 font-bold">✓</span>
-                           {item}
-                         </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
 
-                {/* 하단 CTA: 카카오톡 플러스 친구 상담으로 새 창 연결 */}
-                <div className="mt-10 pt-6 border-t border-black/10">
-                  <p className="text-xs text-black/40 mb-6 font-medium leading-relaxed">
-                    * 본 리포트는 입력하신 데이터를 바탕으로 도출된 가이드라인입니다. 상세 제안 및 확정 견적은 대면/줌 미팅을 통한 채널 정밀 진단 이후 제공됩니다.
-                  </p>
-                  
-                  {/* 버튼 대신 <a> 태그를 써서 새 창으로 링크 연결 */}
+                {/* 리포트 하단부: 서비스 상세 내역 */}
+                <div className="p-10 md:p-16">
+                  <div className="mb-12">
+                    <p className="text-[13px] font-bold text-black/40 tracking-widest uppercase mb-8 border-l-4 border-[#21c1a2] pl-4">Included Service Details</p>
+                    <div className="grid sm:grid-cols-2 gap-x-12 gap-y-6">
+                      {result.includes.map((item, idx) => (
+                         <div key={idx} className="flex items-start gap-4 text-lg md:text-xl text-black/80 font-semibold border-b border-black/5 pb-4">
+                           <span className="text-[#21c1a2] font-bold text-2xl leading-none">✓</span>
+                           {item}
+                         </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-zinc-50 rounded-2xl p-6 mb-12">
+                    <p className="text-sm text-black/50 font-medium leading-relaxed break-keep">
+                      * 본 리포트는 원장님의 자가 진단 데이터를 기반으로 산출된 권장 레벨입니다. 턴키하우스의 전문 PD팀과의 대면 정밀 진단을 통해 원장님 채널의 고유한 강점과 시장 분석을 거쳐 최종 제안서가 확정됩니다.
+                    </p>
+                  </div>
+
+                  {/* 최종 CTA 버튼: 더 크고 선명하게 */}
                   <a 
                     href="https://pf.kakao.com/_dyNPn/chat" 
                     target="_blank" 
                     rel="noreferrer" 
-                    className="w-full block text-center bg-[#0B0F0E] text-white font-bold py-4 rounded-xl hover:bg-zinc-800 transition-colors text-[15px] shadow-[0_8px_16px_rgba(11,15,14,0.1)]"
+                    className="group relative flex items-center justify-center bg-[#0B0F0E] text-white text-xl font-bold py-6 rounded-[20px] hover:bg-zinc-800 transition-all shadow-xl"
                   >
-                    이 레벨로 정밀 진단 신청하기 (카카오톡 1:1 상담) &rarr;
+                    이 레벨로 정밀 진단 신청하기 (카카오톡 상담)
+                    <span className="ml-3 group-hover:translate-x-2 transition-transform">→</span>
                   </a>
                 </div>
               </motion.div>
