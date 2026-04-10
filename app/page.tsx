@@ -201,10 +201,12 @@ export default function Page() {
           <div className="rounded-[28px] border border-black/10 bg-white/95 p-6 shadow-[0_18px_48px_rgba(11,15,14,0.08)] backdrop-blur md:p-10">
             <div className="grid gap-8 md:grid-cols-[1.25fr_0.75fr] md:items-end">
               <div className="space-y-5">
-                <h1 className="max-w-[24ch] whitespace-pre-line break-keep text-[33px] font-semibold leading-[1.18] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.1]">
+                {/* ✅ 행간을 leading-[1.3] (모바일), md:leading-[1.25] (PC) 로 대폭 넓혔습니다 */}
+                <h1 className="max-w-[24ch] whitespace-pre-line break-keep text-[33px] font-semibold leading-[1.3] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.25]">
                   {content.heroValue.headline}
                 </h1>
-                <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.9] text-black/72 md:text-[21px] md:leading-[1.72]">
+                {/* ✅ 본문 행간도 leading-[2.0] (모바일), md:leading-[1.85] (PC) 로 시원하게 넓혔습니다 */}
+                <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[2.0] text-black/72 md:text-[21px] md:leading-[1.85]">
                   {content.heroValue.body}
                 </p>
               </div>
@@ -374,7 +376,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* ✅ 완전히 새로워진 포트폴리오 섹션 */}
       <section id="portfolio" className="border-b border-black/10 bg-[#FAFAFA]">
         <div className={`${sectionShell} ${sectionStack}`}>
           <div className="max-w-[64ch] space-y-4">
@@ -383,12 +384,10 @@ export default function Page() {
             <p className={bodyCopy}>{content.portfolio.lead}</p>
           </div>
 
-          {/* 3열에서 2열로 변경하여 영상을 훨씬 크고 시원하게 배치 */}
           <div className="grid gap-8 md:grid-cols-2">
             {content.portfolio.items.map((item) => (
               <article key={item.title} className="group flex flex-col overflow-hidden rounded-[32px] border border-black/10 bg-white shadow-[0_12px_30px_rgba(11,15,14,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(11,15,14,0.08)]">
                 
-                {/* 썸네일 대신 유튜브 영상 직접 임베드 */}
                 <div className="relative aspect-video w-full overflow-hidden bg-black border-b border-black/5">
                   {item.youtubeId ? (
                     <iframe
