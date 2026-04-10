@@ -238,7 +238,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 문제 제기 및 통합된 전략 모달 섹션 */}
       <section id="problem" className="border-y border-black/10 bg-white">
         <div className={`${containerShell} py-20 md:py-24`}>
           <div className="space-y-12 md:space-y-16">
@@ -280,7 +279,6 @@ export default function Page() {
               </div>
             </div>
 
-            {/* 통합된 전략 모달 컴포넌트 호출 */}
             <StrategyModals />
 
             <div className="border-t border-black/10 pt-10 md:pt-12">
@@ -513,7 +511,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 진단 계산기 - 오직 계산기만 단독으로 보여줍니다 */}
       <DiagnosticCalculator />
 
       <section id="faq" className="border-b border-black/10 bg-white">
