@@ -99,8 +99,9 @@ export default function DiagnosticCalculator() {
   const result = step >= questions.length ? getRecommendation() : null;
 
   return (
-    <section className="py-24 bg-[#FAFAFA] border-y border-black/10">
+    <section className="py-24 bg-white border-y border-black/10">
       <div className="mx-auto max-w-[900px] px-5 sm:px-6">
+        
         <div className="text-center mb-14 space-y-4">
           <div className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-[13px] font-bold tracking-[0.1em] text-black/40">
             [ 운영 레벨 진단 ]
