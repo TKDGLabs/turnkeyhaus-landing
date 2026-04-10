@@ -238,6 +238,7 @@ export default function Page() {
         </div>
       </section>
 
+      {/* 문제 제기 및 통합된 전략 모달 섹션 */}
       <section id="problem" className="border-y border-black/10 bg-white">
         <div className={`${containerShell} py-20 md:py-24`}>
           <div className="space-y-12 md:space-y-16">
@@ -279,6 +280,9 @@ export default function Page() {
               </div>
             </div>
 
+            {/* 통합된 전략 모달 컴포넌트 호출 */}
+            <StrategyModals />
+
             <div className="border-t border-black/10 pt-10 md:pt-12">
               <SignalInsights
                 label={content.signalInsights.label}
@@ -290,33 +294,11 @@ export default function Page() {
           </div>
         </div>
       </section>
-      
-      {/* 새롭게 고도화된 전략 설계 프레임이 바로 이어집니다 */}
-      <StrategyModals />
 
-      <section id="approach" className="border-b border-black/10 bg-white">
-        <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader label={content.approach.label} title={content.approach.h2} lead={content.approach.lead} />
+      {/* 진단 계산기 (기존 중복 텍스트 걷어내고 바로 연결) */}
+      <DiagnosticCalculator />
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {content.approach.steps.map((step) => (
-              <article
-                key={step.title}
-                className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_24px_rgba(11,15,14,0.03)] md:p-6"
-              >
-                <h3 className="text-lg font-semibold text-[#0B0F0E]">{step.title}</h3>
-                <p className="mt-2 text-sm leading-[1.9] text-black/72">{step.detail}</p>
-              </article>
-            ))}
-          </div>
-
-          <p className="w-full whitespace-pre-line break-keep rounded-2xl border border-black/10 bg-black/[0.02] px-5 py-5 text-base font-semibold leading-[1.9] text-black/80 md:text-lg">
-            {content.approach.keyline}
-          </p>
-        </div>
-      </section>
-
-      <section id="professional" className="border-b border-black/10 bg-white">
+      <section id="professional" className="border-y border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
           <SectionHeader
             label={content.professionalTargets.label}
@@ -507,209 +489,3 @@ export default function Page() {
                   <p className="mt-3 text-sm leading-[1.9] text-black/72 md:text-base">{post.description}</p>
 
                   <Link
-                    href={`/insights/${post.slug}`}
-                    className="mt-4 inline-flex text-sm font-semibold text-[#21c1a2]"
-                  >
-                    글 읽기 →
-                  </Link>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-black/10 bg-white p-6 text-sm leading-[1.9] text-black/60 md:text-base">
-              인사이트 글이 아직 없습니다.{" "}
-              <code className="rounded bg-black/[0.04] px-2 py-1 text-xs">content/insights.ts</code>에 글을
-              추가하면 자동으로 반영됩니다.
-            </div>
-          )}
-
-          <div>
-            <Link
-              href="/insights"
-              className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
-            >
-              {content.blog.ctaLabel}
-            </Link>
-          </div>
-        </div>
-      </section>
-      
-      {/* 이 부분에 방금 만든 맞춤형 채널 진단 계산기가 뜹니다 */}
-      <DiagnosticCalculator />
-
-      <section id="pricing" className="border-b border-black/10 bg-white">
-        <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {content.pricing.levels.map((level) => {
-              const targetText = level.target.replace(/^대상:\s*/, "");
-
-              return (
-                <article
-                  key={level.title}
-                  className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_24px_rgba(11,15,14,0.03)] md:p-6"
-                >
-                  <div className="mb-4 space-y-1">
-                    <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E]">{level.title}</h3>
-                    <p className="price-band-pop text-[30px] font-semibold leading-[1.08] tracking-tight text-[#0B0F0E] md:text-[36px]">
-                      {level.priceBand}
-                    </p>
-                  </div>
-
-                  <ul className="space-y-2 text-sm leading-relaxed text-black/72">
-                    {level.bullets.map((bullet) => (
-                      <li key={bullet} className="list-inside list-disc">
-                        {bullet}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <p className="mt-5 border-t border-black/10 pt-4 text-base leading-[1.85] text-black/65 md:text-lg">
-                    <span className="font-medium text-black/72">대상:</span>
-                    <br />
-                    <span>{targetText}</span>
-                  </p>
-                </article>
-              );
-            })}
-          </div>
-
-          <div className="rounded-2xl border border-black/10 bg-white p-6">
-            <p className="max-w-[52ch] whitespace-pre-line text-base font-semibold leading-[1.9] text-black/80 md:text-lg">
-              {content.pricing.emphasis}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section id="faq" className="border-b border-black/10 bg-white">
-        <div className={`${sectionShell} ${sectionStack}`}>
-          <SectionHeader label={content.faq.label} title={content.faq.h2} />
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {content.faq.items.map((item) => (
-              <article key={item.q} className="h-full rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_22px_rgba(11,15,14,0.03)] md:p-6">
-                <h3 className="text-base font-semibold text-[#0B0F0E] md:text-lg">{item.q}</h3>
-                <p className="mt-3 text-sm leading-[1.9] text-black/72 md:text-base">{item.a}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="contact" className="border-b border-black/10 bg-white">
-        <div className={`${containerShell} py-20 md:py-24`}>
-          <div className="mb-10 max-w-[52ch] space-y-6">
-            <SectionLabel>{content.contact.label}</SectionLabel>
-            <h2 className={sectionTitleClass}>
-              {content.contact.h2}
-            </h2>
-            <p className={bodyCopy}>{content.contact.lead}</p>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-start">
-            <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 shadow-[0_10px_26px_rgba(11,15,14,0.04)] md:p-8">
-              <div className="space-y-6">
-                <h3 className="text-2xl font-semibold tracking-tight text-[#0B0F0E]">채널 구조 진단</h3>
-                <p className="whitespace-pre-line text-base leading-[1.95] text-black/70">
-                  현재 상황과 목표를 남겨주시면
-                  {"\n"}
-                  채널 구조 관점으로 검토 후 회신드립니다.
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <div className="text-sm font-medium text-black/70">소요시간: 약 5–10분</div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs font-medium text-black/65">
-                    신규 유입
-                  </span>
-                  <span className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs font-medium text-black/65">
-                    리빌딩
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-3 rounded-2xl border border-black/10 bg-[#fbfcfb] p-5">
-                <div className="text-sm font-semibold text-[#0B0F0E]">진단 산출물</div>
-                <ul className="space-y-2 text-sm leading-relaxed text-black/72">
-                  <li className="list-inside list-disc">채널 포지셔닝/톤 점검</li>
-                  <li className="list-inside list-disc">콘텐츠 역할(롱폼·숏폼) 재정의</li>
-                  <li className="list-inside list-disc">전환 동선(CTA) 개선 포인트</li>
-                </ul>
-              </div>
-
-              <p className="text-sm leading-[1.95] text-black/60 md:text-base">
-                제작 견적이 아니라 구조 진단이 먼저입니다.
-              </p>
-
-              <div className="flex flex-wrap gap-3 border-t border-black/10 pt-4">
-                {hasPhoneHref ? (
-                  <a
-                    href={phoneHref}
-                    className="inline-flex items-center justify-center rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:border-black/25 hover:bg-black/[0.02]"
-                  >
-                    {content.contact.quickCallLabel} {content.contact.phoneDisplay}
-                  </a>
-                ) : null}
-
-                {hasKakaoChatUrl ? (
-                  <a
-                    href={kakaoChatUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center justify-center rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#1db197]"
-                  >
-                    {content.contact.kakaoCtaLabel}
-                  </a>
-                ) : null}
-              </div>
-            </div>
-
-            <div
-              id="contact-form"
-              className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_12px_28px_rgba(11,15,14,0.05)]"
-            >
-              {hasFormEmbedUrl ? (
-                <iframe
-                  src={formEmbedUrl}
-                  className="h-[860px] w-full md:h-[920px]"
-                  loading="lazy"
-                  title={content.contact.iframeTitle}
-                  referrerPolicy="strict-origin-when-cross-origin"
-                />
-              ) : (
-                <div className="grid h-[860px] place-items-center p-6 text-center text-sm leading-relaxed text-black/60 md:h-[920px]">
-                  Google Form 임베드 URL이 아직 설정되지 않았습니다.
-                  <br />
-                  README 안내대로 임베드 URL을 복사해
-                  <br />
-                  <code className="mt-2 rounded bg-black/[0.04] px-2 py-1 text-xs text-black/70">
-                    content.contact.googleFormEmbedUrl
-                  </code>
-                  에 입력해 주세요.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <ContactCTA />
-
-      <footer className="border-t border-black/10 bg-white">
-        <div className={`${containerShell} py-10 text-xs text-black/65`}>
-          <div className="space-y-1">
-            <div className="text-sm font-semibold text-[#0B0F0E]">{content.footer.companyName}</div>
-            {content.footer.lines.map((line) => (
-              <div key={line.label}>
-                {line.label}: {line.value}
-              </div>
-            ))}
-          </div>
-        </div>
-      </footer>
-    </main>
-  );
-}
