@@ -9,6 +9,8 @@ import IntroGate from "../components/IntroGate";
 import SignalInsights from "../components/SignalInsights";
 import CountUp from "../components/CountUp";
 import { getSortedInsights } from "../content/insights";
+import StrategyModals from "../components/StrategyModals";
+import DiagnosticCalculator from "../components/DiagnosticCalculator";
 
 const clsCard =
   "group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_24px_rgba(11,15,14,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_16px_34px_rgba(11,15,14,0.08)]";
@@ -314,6 +316,7 @@ export default function Page() {
           </div>
         </div>
       </section>
+      <StrategyModals />
 
       <section id="approach" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
@@ -554,6 +557,7 @@ export default function Page() {
           </div>
         </div>
       </section>
+      <DiagnosticCalculator />
 
       <section id="pricing" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
