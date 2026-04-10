@@ -201,11 +201,9 @@ export default function Page() {
           <div className="rounded-[28px] border border-black/10 bg-white/95 p-6 shadow-[0_18px_48px_rgba(11,15,14,0.08)] backdrop-blur md:p-10">
             <div className="grid gap-8 md:grid-cols-[1.25fr_0.75fr] md:items-end">
               <div className="space-y-5">
-                {/* ✅ 행간을 leading-[1.3] (모바일), md:leading-[1.25] (PC) 로 대폭 넓혔습니다 */}
                 <h1 className="max-w-[24ch] whitespace-pre-line break-keep text-[33px] font-semibold leading-[1.3] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.25]">
                   {content.heroValue.headline}
                 </h1>
-                {/* ✅ 본문 행간도 leading-[2.0] (모바일), md:leading-[1.85] (PC) 로 시원하게 넓혔습니다 */}
                 <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[2.0] text-black/72 md:text-[21px] md:leading-[1.85]">
                   {content.heroValue.body}
                 </p>
@@ -376,7 +374,8 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="portfolio" className="border-b border-black/10 bg-[#FAFAFA]">
+      {/* ✅ 포트폴리오 섹션 배경 화이트로 통일 */}
+      <section id="portfolio" className="border-b border-black/10 bg-white">
         <div className={`${sectionShell} ${sectionStack}`}>
           <div className="max-w-[64ch] space-y-4">
             <SectionLabel>{content.portfolio.label}</SectionLabel>
