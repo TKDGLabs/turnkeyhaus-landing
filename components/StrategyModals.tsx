@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { content } from '../content';
 
-// 기존 카드에 없던 추가 데이터 (모달용 설명, 이미지 등)
 const modalExtraData = [
   {
     id: 'diagnosis',
@@ -45,7 +44,6 @@ export default function StrategyModals() {
 
   return (
     <div className="space-y-8 border-t border-black/10 pt-10 md:space-y-10 md:pt-12">
-      {/* 기존 홈페이지와 100% 동일한 헤더 적용 */}
       <div className="max-w-[64ch] space-y-4">
         <div className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-semibold tracking-[0.12em] text-black/45 md:text-base">
           {content.strategyFrame.label}
@@ -55,7 +53,6 @@ export default function StrategyModals() {
         </h3>
       </div>
 
-      {/* 기존 하얀색 카드 디자인 유지 + 클릭 모달 애니메이션 추가 */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {content.strategyFrame.steps.map((step, index) => (
           <motion.button
@@ -80,7 +77,6 @@ export default function StrategyModals() {
         ))}
       </div>
 
-      {/* 모달창 (깔끔한 화이트톤 유지) */}
       <AnimatePresence>
         {activeIndex !== null && activeStep && activeExtra && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
@@ -92,11 +88,12 @@ export default function StrategyModals() {
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
             
+            {/* 모달 전체 크기를 키우기 위해 min-h-[500px] md:min-h-[600px] 속성 추가 */}
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.97 }}
-              className="relative flex h-full max-h-[85vh] w-full max-w-[1200px] flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl md:flex-row z-10"
+              className="relative flex h-full max-h-[90vh] w-full max-w-[1200px] min-h-[500px] md:min-h-[600px] flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl md:flex-row z-10"
             >
               <button 
                 onClick={() => setActiveIndex(null)}
@@ -127,14 +124,16 @@ export default function StrategyModals() {
                 </div>
               </div>
 
-              <div className="relative flex flex-1 items-center justify-center bg-zinc-50 p-6 md:p-10">
-                <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white">
+              {/* 회색 배경 패딩 대폭 축소 (p-4 md:p-6 lg:p-8) */}
+              <div className="relative flex flex-1 items-center justify-center bg-zinc-50 p-4 md:p-6 lg:p-8">
+                {/* 16:9 비율 제한 해제 (h-full w-full 적용)하여 이미지가 가질 수 있는 최대 면적 확보 */}
+                <div className="relative h-full w-full overflow-hidden rounded-2xl shadow-lg bg-white border border-black/5">
                   <Image 
                     src={activeExtra.image} 
                     alt={activeExtra.alt}
                     fill
                     priority
-                    className="object-contain"
+                    className="object-contain p-2 md:p-4" // 액자처럼 끝부분이 살짝 띄워지게 패딩 설정
                     sizes="(max-width: 1200px) 100vw, 800px"
                   />
                 </div>
