@@ -42,40 +42,44 @@ export default function StrategyModals() {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
   return (
-    <section className="py-24 bg-white border-y border-black/10">
-      <div className="mx-auto max-w-[1360px] px-5 sm:px-6 lg:px-8">
+    <section className="py-24 bg-[#FAFAFA] border-y border-black/10">
+      <div className="mx-auto max-w-[1200px] px-5 sm:px-6 lg:px-8">
+        
+        {/* 헤더 영역 */}
         <div className="text-center mb-16 space-y-4">
-          <div className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-semibold tracking-[0.12em] text-black/45 md:text-base">
+          <div className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-[13px] font-bold tracking-[0.1em] text-black/40">
             SERVICE FRAME
           </div>
-          <h2 className="whitespace-pre-line break-keep text-[32px] font-semibold leading-[1.24] tracking-tight text-[#0B0F0E] md:text-[46px] md:leading-[1.18] lg:text-[52px]">
+          <h2 className="whitespace-pre-line break-keep text-[32px] font-bold leading-[1.3] tracking-tight text-[#0B0F0E] md:text-[42px]">
             전략 설계 프레임
           </h2>
-          <p className="mx-auto max-w-[60ch] text-base leading-[1.95] text-black/72 md:text-lg">
+          <p className="mx-auto max-w-[60ch] text-base leading-[1.8] text-black/60 md:text-[17px]">
             카드를 클릭하여 턴키하우스만의 차별화된 컨설팅 세부 내용을 확인해 보세요.
           </p>
         </div>
         
+        {/* 카드 리스트 영역 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {(Object.keys(modalContent) as ModalKey[]).map((key) => (
             <motion.button
               key={key}
-              whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.08)' }}
+              whileHover={{ y: -6, boxShadow: '0 12px 30px rgba(0,0,0,0.06)' }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setActiveModal(key)}
-              className="group flex flex-col justify-between overflow-hidden rounded-[28px] border border-black/10 bg-white p-8 text-left shadow-[0_10px_24px_rgba(11,15,14,0.02)] transition-all duration-300 min-h-[240px]"
+              className="group flex flex-col justify-between overflow-hidden rounded-[24px] border border-black/10 bg-white p-8 text-left shadow-sm transition-all duration-300 min-h-[220px]"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[13px] font-bold tracking-widest text-black/30 uppercase">
+                <span className="text-[13px] font-bold tracking-widest text-black/40 uppercase">
                   {modalContent[key].title.split('\n')[0]}
                 </span>
                 <div className="h-2 w-2 rounded-full bg-[#21c1a2]" />
               </div>
-              <div>
-                <h3 className="text-2xl font-bold tracking-tight text-[#0B0F0E] whitespace-pre-line leading-tight">
+              <div className="mt-6">
+                {/* 카드 제목 행간 최적화 */}
+                <h3 className="text-[22px] font-bold tracking-tight text-[#0B0F0E] whitespace-pre-line leading-[1.4]">
                   {modalContent[key].title.split('\n')[1]}
                 </h3>
-                <p className="mt-4 text-[15px] font-semibold text-[#21c1a2] opacity-0 transition-opacity group-hover:opacity-100">
+                <p className="mt-4 text-[14px] font-semibold text-[#21c1a2] opacity-0 transition-opacity group-hover:opacity-100">
                   세부 내용 보기 →
                 </p>
               </div>
@@ -83,59 +87,67 @@ export default function StrategyModals() {
           ))}
         </div>
 
+        {/* 팝업(모달) 영역 */}
         <AnimatePresence>
           {activeModal && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
+              {/* 뒷배경 */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setActiveModal(null)}
-                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               />
               
+              {/* 모달 창: max-w-[1200px]로 축소하여 밀도감 상승 */}
               <motion.div
-                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                initial={{ opacity: 0, y: 20, scale: 0.97 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                className="relative flex h-full max-h-[90vh] w-full max-w-[1400px] flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl md:flex-row z-10"
+                exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                className="relative flex h-full max-h-[85vh] w-full max-w-[1200px] flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl md:flex-row z-10"
               >
+                {/* 닫기 버튼 */}
                 <button 
                   onClick={() => setActiveModal(null)}
-                  className="absolute right-8 top-8 z-50 rounded-full bg-black/5 p-3 text-black transition-colors hover:bg-black/10"
+                  className="absolute right-6 top-6 z-50 rounded-full bg-black/5 p-2.5 text-black/70 transition-colors hover:bg-black/10 hover:text-black"
                 >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
 
-                <div className="flex w-full flex-col justify-center bg-[#FBFBFB] p-12 md:w-[480px] md:p-16 shrink-0 text-left">
-                  <div className="space-y-10">
-                    <div className="text-sm font-bold tracking-[0.2em] text-[#21c1a2] uppercase font-mono">
-                      TURNKEYHAUS METHODOLOGY
+                {/* 좌측 텍스트 영역: 여백을 줄이고 행간을 넓혀 가독성 개선 */}
+                <div className="flex w-full flex-col justify-center bg-white p-8 md:w-[420px] md:p-12 shrink-0 text-left border-b md:border-b-0 md:border-r border-black/5">
+                  <div className="space-y-8">
+                    <div className="text-[12px] font-bold tracking-[0.2em] text-[#21c1a2] uppercase font-mono">
+                      METHODOLOGY
                     </div>
-                    <h3 className="whitespace-pre-line text-4xl font-extrabold leading-[1.15] tracking-tight text-[#0B0F0E] lg:text-5xl">
+                    {/* 모달 제목 폰트 굵기 완화 및 행간 최적화 */}
+                    <h3 className="whitespace-pre-line text-3xl md:text-4xl font-bold leading-[1.3] tracking-tight text-[#0B0F0E]">
                       {modalContent[activeModal].title}
                     </h3>
-                    <div className="h-px w-16 bg-black/10" />
-                    <p className="break-keep text-[17px] leading-[1.8] text-black/80 font-medium">
+                    <div className="h-[2px] w-12 bg-black/10" />
+                    {/* 본문 텍스트 행간(1.7) 및 컬러 조정 */}
+                    <p className="break-keep text-[16px] leading-[1.7] text-black/70 font-medium">
                       {modalContent[activeModal].description}
                     </p>
-                    <div className="pt-4">
-                      <p className="inline-block rounded-lg bg-black/5 px-4 py-2 text-[13px] font-semibold text-black/50 italic">
+                    <div className="pt-2">
+                      <p className="inline-block rounded-lg bg-zinc-100 px-3 py-2 text-[12px] font-medium text-black/50">
                         {modalContent[activeModal].footnote}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="relative flex flex-1 items-center justify-center bg-white p-6 md:p-12">
-                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-black/5 shadow-[0_20px_50px_rgba(0,0,0,0.1)] bg-white p-2">
+                {/* 우측 이미지 영역: 쓸데없는 흰 여백을 날리고 이미지를 최대한 키움 */}
+                <div className="relative flex flex-1 items-center justify-center bg-zinc-50 p-6 md:p-10">
+                  <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white">
                     <Image 
                       src={modalContent[activeModal].image} 
                       alt={modalContent[activeModal].alt}
                       fill
                       priority
                       className="object-contain"
-                      sizes="(max-width: 1400px) 100vw, 1200px"
+                      sizes="(max-width: 1200px) 100vw, 800px"
                     />
                   </div>
                 </div>
