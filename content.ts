@@ -235,7 +235,7 @@ export const content: Content = {
     { label: "채널 진단", href: "#contact" }
   ],
   heroValue: {
-    headline: "전문직 유튜브,\n상담 전환까지 설계합니다.",
+    headline: "전문분야 브랜딩 채널 \n상담 전환까지 설계합니다.",
     body: "검색 유입부터 결정 전환까지\n고객 기준으로 운영 구조를 만듭니다.",
     scrollGuide:
       "상담을 받지 않으셔도 괜찮습니다.\n끝까지 스크롤하시면 브랜딩 채널 운영에 유익한 기준을 얻어가실 수 있습니다.",
