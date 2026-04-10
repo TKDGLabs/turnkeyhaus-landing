@@ -1,3 +1,5 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -174,9 +176,7 @@ export default function Page() {
               소개서 다운로드
             </a>
           </div>
-
         </div>
-
       </header>
 
       <section id="top" className="relative overflow-hidden border-b border-black/10 bg-white">
@@ -228,7 +228,6 @@ export default function Page() {
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
@@ -280,31 +279,6 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="space-y-8 border-t border-black/10 pt-10 md:space-y-10 md:pt-12">
-              <div className="max-w-[64ch] space-y-4">
-                <SectionLabel>{content.strategyFrame.label}</SectionLabel>
-                <h3 className={`${sectionTitleClass} max-w-[15ch] md:max-w-[16ch]`}>
-                  {content.strategyFrame.h2}
-                </h3>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {content.strategyFrame.steps.map((step, index) => (
-                  <article
-                    key={step.title}
-                    className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_6px_18px_rgba(11,15,14,0.03)] md:p-6"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm font-semibold tracking-[0.08em] text-black/45">{`0${index + 1}`}</div>
-                      <div className="h-1.5 w-1.5 rounded-full bg-[#21c1a2]/80" />
-                    </div>
-                    <h4 className="mt-3 text-lg font-semibold text-[#0B0F0E]">{step.title}</h4>
-                    <p className="mt-2 text-sm leading-[1.9] text-black/70">{step.detail}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
-
             <div className="border-t border-black/10 pt-10 md:pt-12">
               <SignalInsights
                 label={content.signalInsights.label}
@@ -316,6 +290,8 @@ export default function Page() {
           </div>
         </div>
       </section>
+      
+      {/* 새롭게 고도화된 전략 설계 프레임이 바로 이어집니다 */}
       <StrategyModals />
 
       <section id="approach" className="border-b border-black/10 bg-white">
@@ -557,6 +533,8 @@ export default function Page() {
           </div>
         </div>
       </section>
+      
+      {/* 이 부분에 방금 만든 맞춤형 채널 진단 계산기가 뜹니다 */}
       <DiagnosticCalculator />
 
       <section id="pricing" className="border-b border-black/10 bg-white">
