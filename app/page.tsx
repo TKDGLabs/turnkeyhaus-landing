@@ -113,7 +113,6 @@ function isGoogleFormEmbedUrl(url: string) {
   );
 }
 
-const ytThumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 const formatInteger = (n: number) => Math.round(n).toLocaleString("ko-KR");
 
 export default function Page() {
@@ -375,7 +374,8 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="portfolio" className="border-b border-black/10 bg-white">
+      {/* ✅ 완전히 새로워진 포트폴리오 섹션 */}
+      <section id="portfolio" className="border-b border-black/10 bg-[#FAFAFA]">
         <div className={`${sectionShell} ${sectionStack}`}>
           <div className="max-w-[64ch] space-y-4">
             <SectionLabel>{content.portfolio.label}</SectionLabel>
@@ -383,44 +383,57 @@ export default function Page() {
             <p className={bodyCopy}>{content.portfolio.lead}</p>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
+          {/* 3열에서 2열로 변경하여 영상을 훨씬 크고 시원하게 배치 */}
+          <div className="grid gap-8 md:grid-cols-2">
             {content.portfolio.items.map((item) => (
-              <article key={item.title} className={clsCard}>
-                <a href={item.href} target="_blank" rel="noreferrer" className="block">
-                  <div className={clsMedia}>
+              <article key={item.title} className="group flex flex-col overflow-hidden rounded-[32px] border border-black/10 bg-white shadow-[0_12px_30px_rgba(11,15,14,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(11,15,14,0.08)]">
+                
+                {/* 썸네일 대신 유튜브 영상 직접 임베드 */}
+                <div className="relative aspect-video w-full overflow-hidden bg-black border-b border-black/5">
+                  {item.youtubeId ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${item.youtubeId}?rel=0&modestbranding=1`}
+                      title={item.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="absolute inset-0 h-full w-full border-0"
+                    />
+                  ) : (
                     <Image
-                      src={item.youtubeId ? ytThumb(item.youtubeId) : item.imageSrc}
+                      src={item.imageSrc}
                       alt={`${item.title} 썸네일`}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
+                      sizes="(max-width: 1200px) 100vw, 50vw"
                     />
-                    <div className="absolute inset-0 bg-black/10" />
-                  </div>
-                </a>
+                  )}
+                </div>
 
-                <div className="space-y-4 p-5 md:space-y-5 md:p-6">
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E]">{item.title}</h3>
-                    <span className="shrink-0 rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs font-semibold text-black/70">
+                <div className="flex flex-col flex-1 p-6 md:p-8">
+                  <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                    <h3 className="text-[22px] md:text-[26px] font-bold tracking-tight text-[#0B0F0E] leading-[1.3] break-keep">{item.title}</h3>
+                    <span className="shrink-0 rounded-full bg-[#21c1a2]/10 border border-[#21c1a2]/20 px-3 py-1.5 text-[13px] font-bold text-[#21c1a2] mt-1">
                       {item.result}
                     </span>
                   </div>
 
-                  <p className="whitespace-pre-line text-base leading-[1.9] text-black/72">{item.oneLiner}</p>
+                  <p className="whitespace-pre-line text-[16px] leading-[1.8] text-black/70 mb-8 flex-1 break-keep">{item.oneLiner}</p>
 
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div className="rounded-xl border border-black/10 bg-black/[0.02] px-3 py-3">
-                      <p className="text-xs font-medium tracking-[0.01em] text-black/55">구독자</p>
-                      <p className="mt-1 text-2xl font-semibold tracking-tight text-[#0B0F0E]">
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="rounded-2xl border border-black/5 bg-[#FBFBFB] p-5">
+                      <p className="text-[12px] font-bold tracking-wider text-black/40 uppercase mb-1">Subscriber Growth</p>
+                      <p className="mt-1 text-[24px] md:text-[28px] font-bold tracking-tight text-[#0B0F0E] leading-none">
                         <CountUp value={item.subscriberCurrent} />
-                        <span className="ml-1 text-sm font-medium text-black/58">명</span>
+                        <span className="ml-1 text-[15px] font-medium text-black/50">명</span>
+                      </p>
+                      <p className="text-[13px] text-black/40 mt-2 font-medium">
+                        기존 {formatInteger(item.subscriberStart)}명
                       </p>
                     </div>
 
-                    <div className="rounded-xl border border-black/10 bg-black/[0.02] px-3 py-3">
-                      <p className="text-xs font-medium tracking-[0.01em] text-black/55">단일 영상 최고 조회수</p>
-                      <p className="mt-1 text-2xl font-semibold tracking-tight text-[#0B0F0E]">
+                    <div className="rounded-2xl border border-black/5 bg-[#FBFBFB] p-5">
+                      <p className="text-[12px] font-bold tracking-wider text-black/40 uppercase mb-1">Max Video Views</p>
+                      <p className="mt-1 text-[24px] md:text-[28px] font-bold tracking-tight text-[#21c1a2] leading-none">
                         {item.maxVideoViews >= 10000 ? (
                           <>
                             <CountUp
@@ -428,33 +441,28 @@ export default function Page() {
                               decimals={item.maxVideoViews % 10000 === 0 ? 0 : 1}
                               suffix="만"
                             />
-                            <span className="ml-1 text-sm font-medium text-black/58">회</span>
+                            <span className="ml-1 text-[15px] font-medium text-[#21c1a2]/70">회</span>
                           </>
                         ) : (
                           <>
                             <CountUp value={item.maxVideoViews} />
-                            <span className="ml-1 text-sm font-medium text-black/58">회</span>
+                            <span className="ml-1 text-[15px] font-medium text-[#21c1a2]/70">회</span>
                           </>
                         )}
+                      </p>
+                      <p className="text-[13px] text-[#21c1a2]/80 font-bold mt-2">
+                        압도적 노출 달성 🔥
                       </p>
                     </div>
                   </div>
 
-                  <p className="text-xs text-black/55">
-                    구독자 {formatInteger(item.subscriberStart)}명 → {formatInteger(item.subscriberCurrent)}명
-                  </p>
-
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-black/5">
                     {item.tags.map((tag) => (
-                      <span key={tag} className={clsTag}>
-                        {tag}
+                      <span key={tag} className="rounded-lg bg-black/5 px-3 py-1.5 text-[13px] font-semibold text-black/60">
+                        #{tag}
                       </span>
                     ))}
                   </div>
-
-                  <ActionLink href={item.href} className="pt-1 text-sm font-semibold text-black/70">
-                    영상 보기 →
-                  </ActionLink>
                 </div>
               </article>
             ))}
