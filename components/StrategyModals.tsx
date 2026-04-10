@@ -2,129 +2,148 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
-const questions = [
-  {
-    id: 'frequency',
-    title: 'Q1. 한 달에 촬영에 할애할 수 있는 시간은 어느 정도인가요?',
-    options: [
-      { label: '월 1회 (하루 날을 잡아 반나절 몰아서 촬영)', value: '1' },
-      { label: '월 2회 이상 (여유로운 일정으로 분할 촬영)', value: '2' },
-    ]
+const modalContent = {
+  diagnosis: {
+    title: '01. 진단\n경험과 공감',
+    description: '단순한 수치 분석을 넘어 원장님/대표님의 철학과 운영 환경을 깊숙이 공감하고 이해합니다.',
+    footnote: '*저희 팀이 직접 작성한 제안서의 내용입니다.',
+    image: '/images/diagnosis.png',
+    alt: '진단 단계 제안서 이미지'
   },
-  {
-    id: 'format',
-    title: 'Q2. 어떤 형태의 영상이 주력이길 원하시나요?',
-    options: [
-      { label: '전문적인 정보 전달 위주의 롱폼 (가로 영상)', value: 'long' },
-      { label: '빠른 확산과 노출을 위한 숏폼 (세로 영상)', value: 'short' },
-      { label: '롱폼과 숏폼의 균형 있는 병행', value: 'mixed' },
-    ]
+  positioning: {
+    title: '02. 포지셔닝\n압도적 전문성',
+    description: '타겟 고객의 니즈에 맞춰 원장님만의 압도적 전문성을 시장에 각인시키는 전략을 수립합니다.',
+    footnote: '*저희 팀이 직접 작성한 제안서의 내용입니다.',
+    image: '/images/positioning.png',
+    alt: '포지셔닝 단계 제안서 이미지'
   },
-  {
-    id: 'volume',
-    title: 'Q3. 희망하는 월간 영상 업로드 빈도는 어떻게 되나요?',
-    options: [
-      { label: '기본적인 채널 유지보수 (월 2편 내외)', value: 'basic' },
-      { label: '꾸준한 성장 곡선 형성 (월 3~4편 내외)', value: 'standard' },
-      { label: '공격적인 트래픽 및 DB 확보 (월 4편 이상)', value: 'premium' },
-    ]
-  }
-];
-
-const packageData = {
-  basic: {
-    level: 'Basic Package',
-    price: '3,800,000',
-    target: '유튜브 브랜딩의 기초를 다지고 효율적으로 운영하고 싶은 분께 추천합니다.',
-    details: [
-      { label: '촬영 (PD 2인, 3CAM)', value: '월 1회' },
-      { label: '콘텐츠 기획 및 연출', value: '6편' },
-      { label: '롱폼 편집 (10분 이내)', value: '2편' },
-      { label: '쇼츠 편집 (재편집)', value: '8편' },
-      { label: '숏폼 편집 (신규 촬영)', value: '4편' },
-      { label: '썸네일 디자인', value: '2편' }
-    ]
+  organization: {
+    title: '03. 편성\n전략적 3-track',
+    description: '조회수, DB 전환, 브랜딩을 동시에 잡기 위해 숏폼/롱폼 콘텐츠를 전략적으로 배치합니다.',
+    footnote: '*저희 팀이 직접 작성한 제안서의 내용입니다.',
+    image: '/images/organization.png',
+    alt: '편성 단계 제안서 이미지'
   },
-  standard: {
-    level: 'Standard Package',
-    price: '4,400,000',
-    target: '꾸준한 콘텐츠 업로드로 안정적인 채널 성장을 원하시는 분께 추천합니다.',
-    details: [
-      { label: '촬영 (PD 2인, 3CAM)', value: '월 1회' },
-      { label: '콘텐츠 기획 및 연출', value: '7편' },
-      { label: '롱폼 편집 (10분 이내)', value: '3편' },
-      { label: '쇼츠 편집 (재편집)', value: '12편' },
-      { label: '숏폼 편집 (신규 촬영)', value: '4편' },
-      { label: '썸네일 디자인', value: '3편' }
-    ]
-  },
-  premium: {
-    level: 'Premium Package',
-    price: '5,000,000',
-    target: '공격적인 트래픽 확보와 하이엔드 퀄리티 브랜딩이 필요한 분께 추천합니다.',
-    details: [
-      { label: '촬영 (PD 2인, 3CAM)', value: '월 2회' },
-      { label: '콘텐츠 기획 및 연출', value: '12편' },
-      { label: '롱폼 편집 (10분 이내)', value: '4편' },
-      { label: '쇼츠 편집 (재편집)', value: '20편' },
-      { label: '숏폼 편집 (신규 촬영)', value: '8편' },
-      { label: '썸네일 디자인', value: '4편' }
-    ]
+  operation: {
+    title: '04. 운영\n최적화 설계',
+    description: '알고리즘이 사랑하고 시청자가 기다리는 최적의 업로드 패턴과 운영 로직을 설계합니다.',
+    footnote: '*저희 팀이 직접 작성한 제안서의 내용입니다.',
+    image: '/images/operation.png',
+    alt: '운영 단계 제안서 이미지'
   }
 };
 
-export default function DiagnosticCalculator() {
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+type ModalKey = keyof typeof modalContent;
+type ModalType = ModalKey | null;
 
-  const handleSelect = (questionId: string, value: string) => {
-    setAnswers({ ...answers, [questionId]: value });
-    if (step < questions.length) {
-      setTimeout(() => setStep(step + 1), 300);
-    }
-  };
-
-  const getRecommendation = () => {
-    let score = 0;
-    if (answers.frequency === '2') score += 2;
-    if (answers.volume === 'premium') score += 2;
-    if (answers.volume === 'standard') score += 1;
-
-    if (score >= 3) return packageData.premium;
-    if (score === 1 || score === 2) return packageData.standard;
-    return packageData.basic;
-  };
-
-  const result = step >= questions.length ? getRecommendation() : null;
+export default function StrategyModals() {
+  const [activeModal, setActiveModal] = useState<ModalType>(null);
 
   return (
     <section className="py-24 bg-[#FAFAFA] border-y border-black/10">
-      <div className="mx-auto max-w-[900px] px-5 sm:px-6">
-        
-        <div className="text-center mb-14 space-y-4">
+      <div className="mx-auto max-w-[1200px] px-5 sm:px-6 lg:px-8">
+        <div className="text-center mb-16 space-y-4">
           <div className="inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-[13px] font-bold tracking-[0.1em] text-black/40">
-            [ 운영 레벨 진단 ]
+            SERVICE FRAME
           </div>
-          <h2 className="whitespace-pre-line text-[32px] font-bold leading-[1.3] tracking-tight text-[#0B0F0E] md:text-[42px]">
-            유튜브는 건별 제작이 아니라<br />운영 단위로 설계됩니다.
+          <h2 className="whitespace-pre-line break-keep text-[32px] font-bold leading-[1.3] tracking-tight text-[#0B0F0E] md:text-[42px]">
+            전략 설계 프레임
           </h2>
-          <p className="mx-auto max-w-[55ch] text-[16px] leading-[1.8] text-black/60 md:text-[17px]">
-            원하시는 채널의 목표와 예산에 맞는 질문에 답해주시면, 최적의 월간 패키지와 세부 견적을 산출해 드립니다.
+          <p className="mx-auto max-w-[60ch] text-base leading-[1.8] text-black/60 md:text-[17px]">
+            카드를 클릭하여 턴키하우스만의 차별화된 컨설팅 세부 내용을 확인해 보세요.
           </p>
         </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {(Object.keys(modalContent) as ModalKey[]).map((key) => (
+            <motion.button
+              key={key}
+              whileHover={{ y: -6, boxShadow: '0 12px 30px rgba(0,0,0,0.06)' }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setActiveModal(key)}
+              className="group flex flex-col justify-between overflow-hidden rounded-[24px] border border-black/10 bg-white p-8 text-left shadow-sm transition-all duration-300 min-h-[220px]"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[13px] font-bold tracking-widest text-black/40 uppercase">
+                  {modalContent[key].title.split('\n')[0]}
+                </span>
+                <div className="h-2 w-2 rounded-full bg-[#21c1a2]" />
+              </div>
+              <div className="mt-6">
+                <h3 className="text-[22px] font-bold tracking-tight text-[#0B0F0E] whitespace-pre-line leading-[1.4]">
+                  {modalContent[key].title.split('\n')[1]}
+                </h3>
+                <p className="mt-4 text-[14px] font-semibold text-[#21c1a2] opacity-0 transition-opacity group-hover:opacity-100">
+                  세부 내용 보기 →
+                </p>
+              </div>
+            </motion.button>
+          ))}
+        </div>
 
-        <div className="bg-white rounded-[32px] border border-black/10 p-8 md:p-12 relative overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.04)] min-h-[420px] flex flex-col justify-center">
-          <AnimatePresence mode="wait">
-            {step < questions.length ? (
+        <AnimatePresence>
+          {activeModal && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
               <motion.div
-                key={step}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setActiveModal(null)}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              />
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                className="relative flex h-full max-h-[85vh] w-full max-w-[1200px] flex-col overflow-hidden rounded-[32px] bg-white shadow-2xl md:flex-row z-10"
               >
-                <div className="w-full bg-zinc-100 h-1.5 mb-10 rounded-full overflow-hidden">
-                  <motion.div 
-                    className="bg-[#21c1a2] h-full" 
-                    initial={{ width: `${(step / questions.length) * 100}%` }}
+                <button 
+                  onClick={() => setActiveModal(null)}
+                  className="absolute right-6 top-6 z-50 rounded-full bg-black/5 p-2.5 text-black/70 transition-colors hover:bg-black/10 hover:text-black"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+
+                <div className="flex w-full flex-col justify-center bg-white p-8 md:w-[420px] md:p-12 shrink-0 text-left border-b md:border-b-0 md:border-r border-black/5">
+                  <div className="space-y-8">
+                    <div className="text-[12px] font-bold tracking-[0.2em] text-[#21c1a2] uppercase font-mono">
+                      METHODOLOGY
+                    </div>
+                    <h3 className="whitespace-pre-line text-3xl md:text-4xl font-bold leading-[1.3] tracking-tight text-[#0B0F0E]">
+                      {modalContent[activeModal].title}
+                    </h3>
+                    <div className="h-[2px] w-12 bg-black/10" />
+                    <p className="break-keep text-[16px] leading-[1.7] text-black/70 font-medium">
+                      {modalContent[activeModal].description}
+                    </p>
+                    <div className="pt-2">
+                      <p className="inline-block rounded-lg bg-zinc-100 px-3 py-2 text-[12px] font-medium text-black/50">
+                        {modalContent[activeModal].footnote}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative flex flex-1 items-center justify-center bg-zinc-50 p-6 md:p-10">
+                  <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] bg-white">
+                    <Image 
+                      src={modalContent[activeModal].image} 
+                      alt={modalContent[activeModal].alt}
+                      fill
+                      priority
+                      className="object-contain"
+                      sizes="(max-width: 1200px) 100vw, 800px"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </div>
+    </section>
+  );
+}
