@@ -41,7 +41,7 @@ export default function ProofBadges() {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-xs tracking-[0.01em] text-black/45">*internal aggregated data 기준</p>
+      <p className="mt-3 text-xs tracking-[0.01em] text-black/45">*사내 운영 채널 집계 데이터(2025-2026) 기준</p>
     </section>
   );
 }

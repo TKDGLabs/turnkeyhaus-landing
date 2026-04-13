@@ -15,7 +15,6 @@ export default function CursorFollower() {
   const visibleRef = useRef(false);
 
   const [enabled, setEnabled] = useState(false);
-  const [active, setActive] = useState(false);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -43,7 +42,6 @@ export default function CursorFollower() {
       const nextActive = Boolean(interactive);
       if (nextActive !== activeRef.current) {
         activeRef.current = nextActive;
-        setActive(nextActive);
       }
     };
 

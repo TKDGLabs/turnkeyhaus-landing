@@ -1,32 +1,18 @@
-'use client';
-
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { content } from "../content";
-import StatsBar from "../components/StatsBar";
-import ProofBadges from "../components/ProofBadges";
-import ContactCTA from "../components/ContactCTA";
 import IntroGate from "../components/IntroGate";
-import SignalInsights from "../components/SignalInsights";
-import CountUp from "../components/CountUp";
+import ContactCTA from "../components/ContactCTA";
+import { content } from "../content";
 import { getSortedInsights } from "../content/insights";
-import StrategyModals from "../components/StrategyModals";
-import DiagnosticCalculator from "../components/DiagnosticCalculator";
 
-const clsCard =
-  "group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_24px_rgba(11,15,14,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-black/20 hover:shadow-[0_16px_34px_rgba(11,15,14,0.08)]";
-const clsMedia =
-  "relative aspect-video overflow-hidden rounded-2xl border border-black/10 bg-black/[0.02] transition-colors hover:border-black/20";
-const clsTag = "rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs text-black/70";
-const containerShell = "mx-auto max-w-[1360px] px-5 sm:px-6 lg:px-8";
-const sectionShell = `${containerShell} py-20 md:py-24`;
-const sectionStack = "space-y-8 md:space-y-10";
-const bodyCopy = "max-w-[60ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/72 md:text-lg";
-const sectionLabelClass =
-  "inline-flex items-center rounded-full border border-black/10 bg-white px-3 py-1 text-sm font-semibold tracking-[0.12em] text-black/45 md:text-base";
-const sectionTitleClass =
-  "whitespace-pre-line break-keep text-[32px] font-semibold leading-[1.24] tracking-tight text-[#0B0F0E] md:text-[46px] md:leading-[1.18] lg:text-[52px]";
+const shell = "mx-auto w-full max-w-[1320px] px-5 sm:px-6 lg:px-10";
+const labelClass =
+  "inline-flex items-center border border-black/15 px-3 py-1 text-[11px] font-semibold tracking-[0.12em] text-black/55";
+const sectionTitle =
+  "whitespace-pre-line break-keep text-[30px] font-semibold leading-[1.22] tracking-tight text-[#111715] md:text-[48px]";
+const focusRing =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d8978]";
 
 function isExternalLink(href: string) {
   return href.startsWith("http://") || href.startsWith("https://");
@@ -41,69 +27,70 @@ function ActionLink({
   className: string;
   children: ReactNode;
 }) {
+  const mergedClass = `${className} ${focusRing}`;
+
   if (isExternalLink(href)) {
     return (
-      <a href={href} target="_blank" rel="noreferrer" className={className}>
+      <a href={href} target="_blank" rel="noreferrer" className={mergedClass}>
         {children}
       </a>
     );
   }
 
   return (
-    <Link href={href} className={className}>
+    <Link href={href} className={mergedClass}>
       {children}
     </Link>
   );
 }
 
-function SectionLabel({
-  children,
-  className = ""
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return <div className={`${sectionLabelClass} ${className}`.trim()}>{children}</div>;
-}
-
 function SectionHeader({
   label,
   title,
-  lead
+  lead,
+  dark = false
 }: {
   label: string;
   title: string;
   lead?: string;
+  dark?: boolean;
 }) {
   return (
     <div className="space-y-5">
-      <div className="max-w-[64ch] space-y-4">
-        <SectionLabel>{label}</SectionLabel>
-        <h2 className={sectionTitleClass}>
-          {title}
-        </h2>
-        {lead ? <p className={bodyCopy}>{lead}</p> : null}
-      </div>
-      <div className="h-px w-full bg-black/10" />
+      <span
+        className={
+          dark
+            ? "inline-flex items-center border border-white/25 px-3 py-1 text-[11px] font-semibold tracking-[0.12em] text-white/70"
+            : labelClass
+        }
+      >
+        {label}
+      </span>
+      <h2 className={dark ? `${sectionTitle} text-white` : sectionTitle}>{title}</h2>
+      {lead ? (
+        <p
+          className={
+            dark
+              ? "max-w-[62ch] whitespace-pre-line break-keep text-base leading-[1.9] text-white/78 md:text-lg"
+              : "max-w-[62ch] whitespace-pre-line break-keep text-base leading-[1.9] text-black/70 md:text-lg"
+          }
+        >
+          {lead}
+        </p>
+      ) : null}
     </div>
   );
 }
 
-function MediaFrame({
-  image,
-  sizes = "(max-width: 768px) 100vw, 50vw",
-  overlayClass = "bg-black/10"
-}: {
-  image: { src: string; alt: string };
-  sizes?: string;
-  overlayClass?: string;
-}) {
-  return (
-    <div className={clsMedia}>
-      <Image src={image.src} alt={image.alt} fill className="object-cover" sizes={sizes} />
-      <div className={`absolute inset-0 ${overlayClass}`} />
-    </div>
-  );
+const formatInteger = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n));
+
+function formatViewsKorean(n: number) {
+  if (n >= 10000) {
+    const tenThousands = n / 10000;
+    const hasDecimal = tenThousands % 1 !== 0;
+    return `${tenThousands.toFixed(hasDecimal ? 1 : 0)}만`;
+  }
+  return formatInteger(n);
 }
 
 function isGoogleFormEmbedUrl(url: string) {
@@ -112,8 +99,6 @@ function isGoogleFormEmbedUrl(url: string) {
     url.includes("/viewform?embedded=true")
   );
 }
-
-const formatInteger = (n: number) => Math.round(n).toLocaleString("ko-KR");
 
 export default function Page() {
   const insightPosts = getSortedInsights().slice(0, 4);
@@ -126,13 +111,12 @@ export default function Page() {
   const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
   const [introTitle = "", ...introSubtitleLines] = content.heroValue.scrollGuide.split("\n");
   const introSubtitle = introSubtitleLines.join("\n");
-  const proofImage = content.studioProof.images[0] ?? {
-    src: "/images/showreel-cover-optimized.jpg",
-    alt: "Turnkeyhaus 실행 기반 대표 이미지"
-  };
+
+  const totalSubscribers = content.portfolio.items.reduce((sum, item) => sum + item.subscriberCurrent, 0);
+  const maxViews = Math.max(...content.portfolio.items.map((item) => item.maxVideoViews));
 
   return (
-    <main className="min-h-screen bg-white pb-24 text-[#0B0F0E] md:pb-0">
+    <main className="bg-[#f3f1ea] text-[#111715]">
       <IntroGate
         logoSrc="/logo.png"
         logoAlt="Turnkeyhaus"
@@ -140,199 +124,221 @@ export default function Page() {
         subtitle={introSubtitle}
       />
 
-      <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
-        <div className={`${containerShell} flex items-center justify-between py-4`}>
-          <Link href="#top" className="flex h-11 shrink-0 items-center">
+      <header className="sticky top-0 z-40 border-b border-black/15 bg-[#f3f1ea]/90 backdrop-blur-xl">
+        <div className={`${shell} flex items-center justify-between py-4`}>
+          <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
             <Image
               src="/logo.png"
               alt="Turnkeyhaus"
               width={176}
               height={48}
-              className="h-12 w-auto object-contain"
+              className="h-11 w-auto object-contain"
               priority
             />
           </Link>
 
-          <div className="hidden items-center gap-3 md:flex">
-            <nav className="flex items-center gap-1.5">
-              {content.nav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="inline-flex h-10 items-center whitespace-nowrap rounded-xl px-3.5 text-[15px] font-semibold tracking-[0.01em] text-black/72 transition-colors hover:bg-black/[0.03] hover:text-black"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+          <nav className="hidden items-center gap-1.5 lg:flex">
+            {content.nav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`inline-flex h-9 items-center px-3 text-[14px] font-semibold text-black/68 transition-colors hover:text-black ${focusRing}`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
 
-            <a
-              href="https://sclu.io/share/bulk/file/bf2w8ioROJvw"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex h-10 items-center whitespace-nowrap rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-4 text-sm font-semibold text-black transition-colors hover:bg-[#1db197]"
-            >
-              소개서 다운로드
-            </a>
-          </div>
+          <ActionLink
+            href="https://sclu.io/share/bulk/file/bf2w8ioROJvw"
+            className="inline-flex h-10 items-center border border-[#1d8978] bg-[#1d8978] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#146b5e]"
+          >
+            소개서 다운로드
+          </ActionLink>
         </div>
       </header>
 
-      <section id="top" className="relative overflow-hidden border-b border-black/10 bg-white">
-        <div className="relative aspect-[4/3] w-full md:aspect-[16/9]">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster="/images/showreel-cover-optimized.jpg"
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center md:object-[center_42%]"
-          >
-            <source src="/videos/hero-render-1080.mp4" type="video/mp4" />
-          </video>
-          <div className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(circle_at_75%_20%,rgba(33,193,162,0.17),transparent_58%)] md:block" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-white via-white/80 to-transparent" />
-        </div>
-      </section>
+      <section id="top" className="relative isolate min-h-[88svh] overflow-hidden border-b border-black/15">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        >
+          <source src="/videos/hero-render-1080.mp4" type="video/mp4" />
+        </video>
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(107deg,rgba(7,10,10,0.86)_0%,rgba(7,10,10,0.62)_45%,rgba(7,10,10,0.28)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_14%,rgba(29,137,120,0.3),transparent_55%)]" />
 
-      <section className="relative z-10 -mt-14 border-b border-black/10 bg-white/0 md:-mt-20">
-        <div className={`${containerShell} pb-12 md:pb-14`}>
-          <div className="rounded-[28px] border border-black/10 bg-white/95 p-6 shadow-[0_18px_48px_rgba(11,15,14,0.08)] backdrop-blur md:p-10">
-            <div className="grid gap-8 md:grid-cols-[1.25fr_0.75fr] md:items-end">
-              <div className="space-y-5">
-                <h1 className="max-w-[24ch] whitespace-pre-line break-keep text-[33px] font-semibold leading-[1.3] tracking-tight text-[#0B0F0E] md:text-[54px] md:leading-[1.25]">
-                  {content.heroValue.headline}
-                </h1>
-                <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[2.0] text-black/72 md:text-[21px] md:leading-[1.85]">
-                  {content.heroValue.body}
-                </p>
-              </div>
+        <div className={`${shell} relative flex min-h-[88svh] flex-col justify-end pb-16 pt-28 md:pb-20 md:pt-36`}>
+          <div className="fade-up max-w-[820px] space-y-6 text-white">
+            <p className="text-sm font-semibold tracking-[0.18em] text-white/72">TURNKEYHAUS</p>
+            <h1 className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.15] tracking-tight md:text-[68px] md:leading-[1.03]">
+              {content.heroValue.headline}
+            </h1>
+            <p className="max-w-[58ch] whitespace-pre-line break-keep text-base leading-[1.85] text-white/82 md:text-[20px] md:leading-[1.7]">
+              {content.heroValue.body}
+            </p>
 
-              <div className="space-y-4 md:justify-self-end">
-                <div className="flex flex-wrap items-center gap-3 md:justify-end">
-                  <ActionLink
-                    href={content.heroValue.primaryCta.href}
-                    className="inline-flex rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black shadow-[0_8px_16px_rgba(33,193,162,0.25)]"
-                  >
-                    {content.heroValue.primaryCta.label}
-                  </ActionLink>
-                  <ActionLink
-                    href={content.heroValue.secondaryCta.href}
-                    className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
-                  >
-                    {content.heroValue.secondaryCta.label}
-                  </ActionLink>
-                </div>
-              </div>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <ActionLink
+                href={content.heroValue.primaryCta.href}
+                className="inline-flex items-center border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-[#07211d] transition-colors hover:bg-[#36d6b7]"
+              >
+                {content.heroValue.primaryCta.label}
+              </ActionLink>
+              <ActionLink
+                href={content.heroValue.secondaryCta.href}
+                className="inline-flex items-center border border-white/40 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/18"
+              >
+                {content.heroValue.secondaryCta.label}
+              </ActionLink>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section className="border-b border-black/10 bg-white">
-        <div className={`${containerShell} py-8 md:py-10`}>
-          <StatsBar />
-          <ProofBadges />
-        </div>
-      </section>
-
-      <section id="problem" className="border-y border-black/10 bg-white">
-        <div className={`${containerShell} py-20 md:py-24`}>
-          <div className="space-y-12 md:space-y-16">
-            <div className="space-y-8 md:space-y-10">
-              <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-start">
-                <div className="space-y-6">
-                  <SectionLabel>{content.problem.label}</SectionLabel>
-                  <h2 className={`${sectionTitleClass} max-w-[14ch]`}>
-                    {content.problem.h2}
-                  </h2>
-                </div>
-
-                <div className="space-y-6 md:justify-self-end">
-                  <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/75 md:text-lg">
-                    {problemSupport}
-                  </p>
-
-                  <p className="max-w-[56ch] whitespace-pre-line break-keep text-base leading-[1.95] text-black/70 md:text-lg">
-                    {problemDetail}
-                  </p>
-
-                  <div className="max-w-[560px] overflow-hidden rounded-2xl border border-black/10 bg-black/[0.02] md:ml-auto">
-                    <Image
-                      src="/images/reality-illustration-optimized.jpg"
-                      alt="문제·현실 점검 보조 시각화"
-                      width={1400}
-                      height={900}
-                      className="h-auto w-full object-cover"
-                      sizes="(max-width: 768px) 100vw, 560px"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-[#21c1a2]/30 bg-[#21c1a2]/10 px-6 py-5">
-                <p className="text-base font-semibold leading-[1.8] text-black md:text-lg">
-                  {content.problem.emphasis}
-                </p>
-              </div>
+          <dl className="fade-up mt-12 grid gap-5 border-t border-white/25 pt-6 text-white sm:grid-cols-3">
+            <div className="space-y-1">
+              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">운영 사례</dt>
+              <dd className="text-[34px] font-semibold tracking-tight">{content.portfolio.items.length}개 채널</dd>
             </div>
+            <div className="space-y-1">
+              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">현재 구독자 합산</dt>
+              <dd className="text-[34px] font-semibold tracking-tight">{formatInteger(totalSubscribers)}명</dd>
+            </div>
+            <div className="space-y-1">
+              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">최고 조회수</dt>
+              <dd className="text-[34px] font-semibold tracking-tight">{formatViewsKorean(maxViews)}회</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
 
-            <StrategyModals />
+      <section id="problem" className="border-b border-black/15">
+        <div className={`${shell} grid gap-12 py-20 md:grid-cols-[0.9fr_1.1fr] md:py-24`}>
+          <div className="space-y-6 md:sticky md:top-28 md:self-start">
+            <span className={labelClass}>{content.problem.label}</span>
+            <h2 className={`${sectionTitle} max-w-[13ch]`}>{content.problem.h2}</h2>
+          </div>
 
-            <div className="border-t border-black/10 pt-10 md:pt-12">
-              <SignalInsights
-                label={content.signalInsights.label}
-                title={content.signalInsights.h2}
-                lead={content.signalInsights.lead}
-                items={content.signalInsights.items}
+          <div className="space-y-9">
+            <p className="whitespace-pre-line break-keep text-[18px] leading-[1.9] text-black/74">{problemSupport}</p>
+            <p className="whitespace-pre-line break-keep text-[17px] leading-[1.95] text-black/68">{problemDetail}</p>
+
+            <figure className="overflow-hidden border border-black/10">
+              <Image
+                src="/images/reality-illustration-optimized.jpg"
+                alt="채널 진단과 운영 구조를 정리한 시각 자료"
+                width={1600}
+                height={1030}
+                className="h-auto w-full object-cover"
+                sizes="(max-width: 1024px) 100vw, 60vw"
               />
+            </figure>
+
+            <p className="border-t border-black/18 pt-5 text-[19px] font-semibold leading-[1.75] text-[#111715]">
+              {content.problem.emphasis}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="approach" className="border-b border-black/15">
+        <div className={`${shell} py-20 md:py-24`}>
+          <SectionHeader
+            label={content.strategyFrame.label}
+            title={content.strategyFrame.h2}
+            lead={content.approach.lead}
+          />
+
+          <div className="mt-12 grid gap-14 lg:grid-cols-[1.05fr_0.95fr]">
+            <ol className="space-y-8 border-l border-black/20 pl-7">
+              {content.strategyFrame.steps.map((step, index) => (
+                <li key={step.title} className="relative space-y-2">
+                  <span className="absolute -left-[35px] top-1.5 h-4 w-4 rounded-full border border-[#1d8978] bg-[#f3f1ea]" />
+                  <p className="text-sm font-semibold tracking-[0.12em] text-[#1d8978]">0{index + 1}</p>
+                  <h3 className="text-[23px] font-semibold tracking-tight text-[#111715]">{step.title}</h3>
+                  <p className="max-w-[52ch] whitespace-pre-line break-keep text-base leading-[1.9] text-black/70">
+                    {step.detail}
+                  </p>
+                </li>
+              ))}
+            </ol>
+
+            <div className="space-y-8">
+              <div className="border-y border-black/15">
+                {content.signalInsights.items.map((item) => (
+                  <article
+                    key={item.title}
+                    className="grid gap-3 border-b border-black/10 py-5 last:border-b-0 md:grid-cols-[120px_1fr]"
+                  >
+                    <p className="text-[13px] font-semibold tracking-[0.12em] text-[#1d8978]">{item.eyebrow}</p>
+                    <div className="space-y-2">
+                      <h4 className="text-[22px] font-semibold tracking-tight text-[#111715]">{item.title}</h4>
+                      <p className="whitespace-pre-line break-keep text-sm leading-[1.85] text-black/70">
+                        {item.summary}
+                      </p>
+                      <p className="text-[13px] leading-[1.75] text-black/55">{item.note}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <p className="whitespace-pre-line break-keep text-base font-semibold leading-[1.9] text-[#111715]">
+                {content.approach.keyline}
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="professional" className="border-b border-black/10 bg-white">
-        <div className={`${sectionShell} ${sectionStack}`}>
+      <section id="professional" className="border-b border-black/15">
+        <div className={`${shell} py-20 md:py-24`}>
           <SectionHeader
             label={content.professionalTargets.label}
             title={content.professionalTargets.h2}
             lead={content.professionalTargets.lead}
           />
 
-          <div className="grid gap-5 md:grid-cols-3 md:items-start">
-            {content.professionalTargets.cards.map((card) => (
-              <article key={card.title} className={clsCard}>
-                <MediaFrame image={card.image} sizes="(max-width: 768px) 100vw, 33vw" overlayClass="bg-black/12" />
+          <div className="mt-14 space-y-14">
+            {content.professionalTargets.cards.map((card, index) => (
+              <article key={card.title} className="grid items-center gap-8 border-t border-black/12 pt-10 md:grid-cols-2 md:gap-12">
+                <figure className={index % 2 === 1 ? "md:order-2" : ""}>
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={card.image.src}
+                      alt={card.image.alt}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </div>
+                </figure>
 
-                <div className="space-y-4 p-6 md:space-y-5">
-                  <h3 className="text-lg font-semibold tracking-[-0.01em] text-[#0B0F0E]">{card.title}</h3>
+                <div className={`space-y-5 ${index % 2 === 1 ? "md:order-1" : ""}`}>
+                  <h3 className="text-[30px] font-semibold tracking-tight text-[#111715]">{card.title}</h3>
+                  <p className="text-base leading-[1.9] text-black/72">{card.oneLiner}</p>
 
-                  {(card.tags ?? []).length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {(card.tags ?? []).map((tag) => (
-                        <span key={tag} className={clsTag}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
+                  <div className="flex flex-wrap gap-2">
+                    {(card.tags ?? []).map((tag) => (
+                      <span key={tag} className="text-xs font-semibold tracking-[0.08em] text-black/56">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
 
-                  <p className="whitespace-pre-line text-base leading-[1.9] text-black/72 md:text-lg">{card.oneLiner}</p>
-
-                  <ul className="space-y-2.5 text-sm leading-[1.85] text-black/72">
+                  <ul className="space-y-2 border-t border-black/12 pt-4 text-sm leading-[1.85] text-black/70">
                     {card.bullets.map((bullet) => (
-                      <li key={bullet} className="list-inside list-disc">
-                        {bullet}
-                      </li>
+                      <li key={bullet}>- {bullet}</li>
                     ))}
                   </ul>
 
                   <ActionLink
                     href={card.href}
-                    className="inline-flex items-center gap-1.5 border-t border-black/8 pt-4 text-[17px] font-semibold tracking-[-0.01em] text-[#21c1a2] md:text-lg"
+                    className="inline-flex items-center border-b border-[#1d8978] pb-1 text-sm font-semibold text-[#1d8978] transition-colors hover:text-[#146b5e]"
                   >
-                    {card.ctaLabel} →
+                    {card.ctaLabel}
                   </ActionLink>
                 </div>
               </article>
@@ -341,53 +347,62 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="proof" className="border-b border-black/10 bg-white">
-        <div className={`${containerShell} space-y-8 py-20 md:grid md:grid-cols-[1fr_0.9fr] md:items-start md:gap-10 md:space-y-0 md:py-24`}>
-          <div className="space-y-6">
-            <SectionLabel>{content.studioProof.label}</SectionLabel>
-            <h2 className={sectionTitleClass}>
-              {content.studioProof.h2}
-            </h2>
-            <p className={bodyCopy}>{content.studioProof.crewLead}</p>
+      <section id="proof" className="border-b border-black/15 bg-[#111715]">
+        <div className={`${shell} grid gap-12 py-20 md:grid-cols-[1.05fr_0.95fr] md:items-start md:py-24`}>
+          <figure className="overflow-hidden border border-white/15">
+            <Image
+              src={content.studioProof.images[0]?.src ?? "/images/showreel-cover-optimized.jpg"}
+              alt={content.studioProof.images[0]?.alt ?? "Turnkeyhaus 운영 촬영 이미지"}
+              width={1680}
+              height={1080}
+              className="h-full w-full object-cover"
+              sizes="(max-width: 1024px) 100vw, 52vw"
+            />
+          </figure>
 
-            <ul className="space-y-3">
+          <div className="space-y-8 text-white">
+            <SectionHeader
+              dark
+              label={content.studioProof.label}
+              title={content.studioProof.h2}
+              lead={content.studioProof.crewLead}
+            />
+
+            <ul className="space-y-3 border-y border-white/20 py-5">
               {content.studioProof.operationSystem.map((item) => (
-                <li key={item} className="rounded-2xl border border-black/10 bg-black/[0.02] px-5 py-4 text-sm leading-[1.9] text-black/75">
-                  {item}
+                <li key={item} className="text-sm leading-[1.8] text-white/78">
+                  - {item}
                 </li>
               ))}
             </ul>
-          </div>
 
-          <div className="md:pt-2">
-            <div className="mx-auto w-full max-w-[680px] overflow-hidden rounded-[28px] md:ml-auto">
-              <Image
-                src={proofImage.src}
-                alt={proofImage.alt}
-                width={1600}
-                height={1067}
-                className="block h-auto w-full object-cover"
-                sizes="(max-width: 768px) 100vw, 680px"
-              />
+            <div className="grid gap-4 sm:grid-cols-2">
+              {content.studioProof.crewCards.map((crew) => (
+                <div key={crew.role} className="border-t border-white/18 pt-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-white/62">{crew.role}</p>
+                  <p className="mt-1 text-[17px] font-semibold text-white">{crew.headline}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ✅ 포트폴리오 섹션 배경 화이트로 통일 */}
-      <section id="portfolio" className="border-b border-black/10 bg-white">
-        <div className={`${sectionShell} ${sectionStack}`}>
-          <div className="max-w-[64ch] space-y-4">
-            <SectionLabel>{content.portfolio.label}</SectionLabel>
-            <h2 className={sectionTitleClass}>{content.portfolio.h2}</h2>
-            <p className={bodyCopy}>{content.portfolio.lead}</p>
-          </div>
+      <section id="portfolio" className="border-b border-black/15">
+        <div className={`${shell} py-20 md:py-24`}>
+          <SectionHeader
+            label={content.portfolio.label}
+            title={content.portfolio.h2}
+            lead={content.portfolio.lead}
+          />
 
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="mt-12">
             {content.portfolio.items.map((item) => (
-              <article key={item.title} className="group flex flex-col overflow-hidden rounded-[32px] border border-black/10 bg-white shadow-[0_12px_30px_rgba(11,15,14,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(11,15,14,0.08)]">
-                
-                <div className="relative aspect-video w-full overflow-hidden bg-black border-b border-black/5">
+              <article
+                key={item.title}
+                className="grid gap-8 border-t border-black/12 py-10 md:grid-cols-[1.05fr_0.95fr] md:gap-10"
+              >
+                <div className="relative aspect-video overflow-hidden border border-black/10 bg-black">
                   {item.youtubeId ? (
                     <iframe
                       src={`https://www.youtube.com/embed/${item.youtubeId}?rel=0&modestbranding=1`}
@@ -399,68 +414,46 @@ export default function Page() {
                   ) : (
                     <Image
                       src={item.imageSrc}
-                      alt={`${item.title} 썸네일`}
+                      alt={`${item.title} 대표 이미지`}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 1200px) 100vw, 50vw"
+                      sizes="(max-width: 1024px) 100vw, 55vw"
                     />
                   )}
                 </div>
 
-                <div className="flex flex-col flex-1 p-6 md:p-8">
-                  <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-                    <h3 className="text-[22px] md:text-[26px] font-bold tracking-tight text-[#0B0F0E] leading-[1.3] break-keep">{item.title}</h3>
-                    <span className="shrink-0 rounded-full bg-[#21c1a2]/10 border border-[#21c1a2]/20 px-3 py-1.5 text-[13px] font-bold text-[#21c1a2] mt-1">
-                      {item.result}
-                    </span>
-                  </div>
-
-                  <p className="whitespace-pre-line text-[16px] leading-[1.8] text-black/70 mb-8 flex-1 break-keep">{item.oneLiner}</p>
-
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="rounded-2xl border border-black/5 bg-[#FBFBFB] p-5">
-                      <p className="text-[12px] font-bold tracking-wider text-black/40 uppercase mb-1">Subscriber Growth</p>
-                      <p className="mt-1 text-[24px] md:text-[28px] font-bold tracking-tight text-[#0B0F0E] leading-none">
-                        <CountUp value={item.subscriberCurrent} />
-                        <span className="ml-1 text-[15px] font-medium text-black/50">명</span>
-                      </p>
-                      <p className="text-[13px] text-black/40 mt-2 font-medium">
-                        기존 {formatInteger(item.subscriberStart)}명
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-black/5 bg-[#FBFBFB] p-5">
-                      <p className="text-[12px] font-bold tracking-wider text-black/40 uppercase mb-1">Max Video Views</p>
-                      <p className="mt-1 text-[24px] md:text-[28px] font-bold tracking-tight text-[#21c1a2] leading-none">
-                        {item.maxVideoViews >= 10000 ? (
-                          <>
-                            <CountUp
-                              value={item.maxVideoViews / 10000}
-                              decimals={item.maxVideoViews % 10000 === 0 ? 0 : 1}
-                              suffix="만"
-                            />
-                            <span className="ml-1 text-[15px] font-medium text-[#21c1a2]/70">회</span>
-                          </>
-                        ) : (
-                          <>
-                            <CountUp value={item.maxVideoViews} />
-                            <span className="ml-1 text-[15px] font-medium text-[#21c1a2]/70">회</span>
-                          </>
-                        )}
-                      </p>
-                      <p className="text-[13px] text-[#21c1a2]/80 font-bold mt-2">
-                        압도적 노출 달성 🔥
-                      </p>
+                <div className="flex flex-col justify-between gap-6">
+                  <div className="space-y-3">
+                    <h3 className="text-[31px] font-semibold tracking-tight text-[#111715]">{item.title}</h3>
+                    <p className="text-base leading-[1.9] text-black/72">{item.oneLiner}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {item.tags.map((tag) => (
+                        <span key={tag} className="text-xs font-semibold tracking-[0.08em] text-black/56">
+                          #{tag}
+                        </span>
+                      ))}
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 pt-2 border-t border-black/5">
-                    {item.tags.map((tag) => (
-                      <span key={tag} className="rounded-lg bg-black/5 px-3 py-1.5 text-[13px] font-semibold text-black/60">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
+                  <dl className="divide-y divide-black/12 border-y border-black/12">
+                    <div className="flex items-center justify-between gap-4 py-3 text-sm">
+                      <dt className="text-black/60">구독자 변화</dt>
+                      <dd className="font-semibold text-[#111715]">
+                        {formatInteger(item.subscriberStart)}명 → {formatInteger(item.subscriberCurrent)}명
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 py-3 text-sm">
+                      <dt className="text-black/60">최고 조회수</dt>
+                      <dd className="font-semibold text-[#1d8978]">{formatViewsKorean(item.maxVideoViews)}회</dd>
+                    </div>
+                  </dl>
+
+                  <ActionLink
+                    href={item.href}
+                    className="inline-flex w-fit items-center border-b border-[#1d8978] pb-1 text-sm font-semibold text-[#1d8978] transition-colors hover:text-[#146b5e]"
+                  >
+                    실제 영상 보기
+                  </ActionLink>
                 </div>
               </article>
             ))}
@@ -468,48 +461,75 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="blog" className="border-b border-black/10 bg-white">
-        <div className={`${sectionShell} ${sectionStack}`}>
+      <section id="pricing" className="border-b border-black/15 bg-[#ece8dc]">
+        <div className={`${shell} py-20 md:py-24`}>
+          <SectionHeader
+            label={content.pricing.label}
+            title={content.pricing.h2}
+            lead="패키지는 월별 운영 범위와 목표 전환 난이도에 따라 조정됩니다."
+          />
+
+          <div className="mt-10 overflow-x-auto border-y border-black/15">
+            <div className="min-w-[940px]">
+              <div className="grid grid-cols-3">
+                {content.pricing.levels.map((level, idx) => (
+                  <article
+                    key={level.title}
+                    className={`px-6 py-8 ${idx < content.pricing.levels.length - 1 ? "border-r border-black/12" : ""}`}
+                  >
+                    <p className="text-xs font-semibold tracking-[0.12em] text-black/55">{level.priceBand}</p>
+                    <h3 className="mt-2 text-[28px] font-semibold tracking-tight text-[#111715]">{level.title}</h3>
+
+                    <ul className="mt-5 space-y-2 text-sm leading-[1.85] text-black/74">
+                      {level.bullets.map((bullet) => (
+                        <li key={bullet}>- {bullet}</li>
+                      ))}
+                    </ul>
+
+                    <p className="mt-5 border-t border-black/12 pt-4 text-sm leading-[1.8] text-black/62">{level.target}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-5 text-sm font-medium text-black/66">{content.pricing.emphasis}</p>
+        </div>
+      </section>
+
+      <section id="blog" className="border-b border-black/15">
+        <div className={`${shell} py-20 md:py-24`}>
           <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
 
           {insightPosts.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="mt-10 border-y border-black/15">
               {insightPosts.map((post) => (
                 <article
                   key={post.slug}
-                  className="rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_24px_rgba(11,15,14,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_34px_rgba(11,15,14,0.07)] md:p-6"
+                  className="grid gap-4 border-b border-black/10 py-6 last:border-b-0 md:grid-cols-[130px_1fr_auto] md:items-start md:gap-8"
                 >
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <span className="rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-xs font-medium text-black/65">
-                      {post.keywords[0] ?? "인사이트"}
-                    </span>
-                    <span className="text-xs text-black/50">{post.publishedAt}</span>
+                  <div className="text-sm font-medium text-black/55">{post.publishedAt}</div>
+                  <div className="space-y-2">
+                    <h3 className="text-[26px] font-semibold tracking-tight text-[#111715]">{post.title}</h3>
+                    <p className="text-sm leading-[1.85] text-black/68">{post.description}</p>
                   </div>
-
-                  <h3 className="text-lg font-semibold tracking-tight text-[#0B0F0E] md:text-xl">{post.title}</h3>
-                  <p className="mt-3 text-sm leading-[1.9] text-black/72 md:text-base">{post.description}</p>
-
                   <Link
                     href={`/insights/${post.slug}`}
-                    className="mt-4 inline-flex text-sm font-semibold text-[#21c1a2]"
+                    className={`inline-flex w-fit items-center border-b border-[#1d8978] pb-1 text-sm font-semibold text-[#1d8978] transition-colors hover:text-[#146b5e] ${focusRing}`}
                   >
-                    글 읽기 →
+                    읽기
                   </Link>
                 </article>
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-black/10 bg-white p-6 text-sm leading-[1.9] text-black/60 md:text-base">
-              인사이트 글이 아직 없습니다.{" "}
-              <code className="rounded bg-black/[0.04] px-2 py-1 text-xs">content/insights.ts</code>에 글을
-              추가하면 자동으로 반영됩니다.
-            </div>
+            <p className="mt-8 text-sm text-black/60">인사이트 글을 추가하면 이 영역에 자동으로 반영됩니다.</p>
           )}
 
-          <div>
+          <div className="mt-8">
             <Link
               href="/insights"
-              className="inline-flex rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black"
+              className={`inline-flex items-center border border-black/20 px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-black/5 ${focusRing}`}
             >
               {content.blog.ctaLabel}
             </Link>
@@ -517,74 +537,52 @@ export default function Page() {
         </div>
       </section>
 
-      <DiagnosticCalculator />
-
-      <section id="faq" className="border-b border-black/10 bg-white">
-        <div className={`${sectionShell} ${sectionStack}`}>
+      <section id="faq" className="border-b border-black/15">
+        <div className={`${shell} py-20 md:py-24`}>
           <SectionHeader label={content.faq.label} title={content.faq.h2} />
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="mt-10 border-y border-black/15">
             {content.faq.items.map((item) => (
-              <article key={item.q} className="h-full rounded-2xl border border-black/10 bg-white p-5 shadow-[0_8px_22px_rgba(11,15,14,0.03)] md:p-6">
-                <h3 className="text-base font-semibold text-[#0B0F0E] md:text-lg">{item.q}</h3>
-                <p className="mt-3 text-sm leading-[1.9] text-black/72 md:text-base">{item.a}</p>
-              </article>
+              <details key={item.q} className="group border-b border-black/10 py-4 last:border-b-0">
+                <summary className={`cursor-pointer list-none pr-8 text-[19px] font-semibold tracking-tight text-[#111715] ${focusRing}`}>
+                  {item.q}
+                  <span className="ml-2 text-black/35 transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-3 max-w-[78ch] whitespace-pre-line break-keep text-sm leading-[1.9] text-black/70 md:text-base">
+                  {item.a}
+                </p>
+              </details>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="contact" className="border-b border-black/10 bg-white">
-        <div className={`${containerShell} py-20 md:py-24`}>
-          <div className="mb-10 max-w-[52ch] space-y-6">
-            <SectionLabel>{content.contact.label}</SectionLabel>
-            <h2 className={sectionTitleClass}>
-              {content.contact.h2}
-            </h2>
-            <p className={bodyCopy}>{content.contact.lead}</p>
+      <section id="contact" className="border-b border-black/15 bg-[#ece8dc]">
+        <div className={`${shell} py-20 md:py-24`}>
+          <div className="mb-10 space-y-6">
+            <SectionHeader label={content.contact.label} title={content.contact.h2} lead={content.contact.lead} />
           </div>
 
-          <div className="grid gap-8 md:grid-cols-[1fr_1.1fr] md:items-start">
-            <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 shadow-[0_10px_26px_rgba(11,15,14,0.04)] md:p-8">
-              <div className="space-y-6">
-                <h3 className="text-2xl font-semibold tracking-tight text-[#0B0F0E]">채널 구조 진단</h3>
-                <p className="whitespace-pre-line text-base leading-[1.95] text-black/70">
-                  현재 상황과 목표를 남겨주시면
-                  {"\n"}
-                  채널 구조 관점으로 검토 후 회신드립니다.
+          <div className="grid gap-8 md:grid-cols-[0.88fr_1.12fr] md:items-start">
+            <div className="space-y-7 border-t border-black/18 pt-5">
+              <div className="space-y-3">
+                <h3 className="text-[29px] font-semibold tracking-tight text-[#111715]">진단 안내</h3>
+                <p className="text-base leading-[1.9] text-black/68">
+                  접수 후 1영업일 안에 연락드리며, 현재 구조에서 먼저 손봐야 할 우선순위를 정리해드립니다.
                 </p>
               </div>
 
-              <div className="space-y-3">
-                <div className="text-sm font-medium text-black/70">소요시간: 약 5–10분</div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs font-medium text-black/65">
-                    신규 유입
-                  </span>
-                  <span className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs font-medium text-black/65">
-                    리빌딩
-                  </span>
-                </div>
-              </div>
+              <ul className="space-y-2 text-sm leading-[1.85] text-black/72">
+                <li>- 포지셔닝/화법 점검</li>
+                <li>- 롱폼·숏폼 역할 재정의</li>
+                <li>- CTA 동선 보완 포인트</li>
+              </ul>
 
-              <div className="space-y-3 rounded-2xl border border-black/10 bg-[#fbfcfb] p-5">
-                <div className="text-sm font-semibold text-[#0B0F0E]">진단 산출물</div>
-                <ul className="space-y-2 text-sm leading-relaxed text-black/72">
-                  <li className="list-inside list-disc">채널 포지셔닝/톤 점검</li>
-                  <li className="list-inside list-disc">콘텐츠 역할(롱폼·숏폼) 재정의</li>
-                  <li className="list-inside list-disc">전환 동선(CTA) 개선 포인트</li>
-                </ul>
-              </div>
-
-              <p className="text-sm leading-[1.95] text-black/60 md:text-base">
-                제작 견적이 아니라 구조 진단이 먼저입니다.
-              </p>
-
-              <div className="flex flex-wrap gap-3 border-t border-black/10 pt-4">
+              <div className="flex flex-wrap gap-3 border-t border-black/12 pt-4">
                 {hasPhoneHref ? (
                   <a
                     href={phoneHref}
-                    className="inline-flex items-center justify-center rounded-xl border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:border-black/25 hover:bg-black/[0.02]"
+                    className={`inline-flex items-center border border-black/20 px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-black/5 ${focusRing}`}
                   >
                     {content.contact.quickCallLabel} {content.contact.phoneDisplay}
                   </a>
@@ -595,7 +593,7 @@ export default function Page() {
                     href={kakaoChatUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center justify-center rounded-xl border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#1db197]"
+                    className={`inline-flex items-center border border-[#1d8978] bg-[#1d8978] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#146b5e] ${focusRing}`}
                   >
                     {content.contact.kakaoCtaLabel}
                   </a>
@@ -603,10 +601,7 @@ export default function Page() {
               </div>
             </div>
 
-            <div
-              id="contact-form"
-              className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_12px_28px_rgba(11,15,14,0.05)]"
-            >
+            <div id="contact-form" className="overflow-hidden border border-black/12 bg-white">
               {hasFormEmbedUrl ? (
                 <iframe
                   src={formEmbedUrl}
@@ -619,12 +614,7 @@ export default function Page() {
                 <div className="grid h-[860px] place-items-center p-6 text-center text-sm leading-relaxed text-black/60 md:h-[920px]">
                   Google Form 임베드 URL이 아직 설정되지 않았습니다.
                   <br />
-                  README 안내대로 임베드 URL을 복사해
-                  <br />
-                  <code className="mt-2 rounded bg-black/[0.04] px-2 py-1 text-xs text-black/70">
-                    content.contact.googleFormEmbedUrl
-                  </code>
-                  에 입력해 주세요.
+                  README의 안내대로 임베드 URL을 입력해 주세요.
                 </div>
               )}
             </div>
@@ -634,10 +624,10 @@ export default function Page() {
 
       <ContactCTA />
 
-      <footer className="border-t border-black/10 bg-white">
-        <div className={`${containerShell} py-10 text-xs text-black/65`}>
+      <footer className="bg-[#111715] text-white/70">
+        <div className={`${shell} py-10 text-xs`}>
           <div className="space-y-1">
-            <div className="text-sm font-semibold text-[#0B0F0E]">{content.footer.companyName}</div>
+            <div className="text-sm font-semibold text-white">{content.footer.companyName}</div>
             {content.footer.lines.map((line) => (
               <div key={line.label}>
                 {line.label}: {line.value}

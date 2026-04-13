@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const questions = [
@@ -83,12 +83,11 @@ export default function DiagnosticCalculator() {
     if (step < questions.length - 1) {
       setTimeout(() => setStep(step + 1), 300);
     } else {
-      // 마지막 질문 선택 시 로딩 애니메이션 실행
       setIsCalculating(true);
       setTimeout(() => {
         setIsCalculating(false);
         setStep(step + 1);
-      }, 1800); // 1.8초 동안 분석하는 척
+      }, 600);
     }
   };
 
@@ -106,7 +105,7 @@ export default function DiagnosticCalculator() {
   const result = step >= questions.length && !isCalculating ? getRecommendation() : null;
 
   return (
-    <section className="py-24 bg-white border-y border-black/10">
+    <section id="pricing" className="py-24 bg-white border-y border-black/10">
       <div className="mx-auto max-w-[900px] px-5 sm:px-6">
         
         <div className="text-center mb-14 space-y-4">
@@ -188,7 +187,7 @@ export default function DiagnosticCalculator() {
                   <div className="absolute inset-0 rounded-full border-4 border-black/5" />
                   <div className="absolute inset-0 rounded-full border-4 border-[#21c1a2] border-t-transparent animate-spin" />
                 </div>
-                <h3 className="text-2xl font-bold text-[#0B0F0E] mb-3">데이터 분석 중...</h3>
+                <h3 className="text-2xl font-bold text-[#0B0F0E] mb-3">응답 정리 중…</h3>
                 <p className="text-black/50 font-medium text-center break-keep">
                   응답해주신 내용을 바탕으로<br />가장 효율적인 채널 구조를 설계하고 있습니다.
                 </p>

@@ -212,7 +212,7 @@ export const content: Content = {
     ogImagePath: "/og-image.jpg",
     title: "전문직 유튜브 브랜딩 대행 | Turnkeyhaus",
     description:
-      "세무사, 변호사, 의사 등 전문직을 위한 유튜브 채널 기획·제작·운영 대행. 전략 중심 브랜딩 시스템.",
+      "법률·의료·세무 전문직 채널의 기획, 촬영, 운영을 통합 지원합니다. 검색 유입과 상담 전환까지 함께 설계합니다.",
     keywords: [
       "전문직 유튜브 대행",
       "세무사 유튜브 제작",
@@ -221,7 +221,7 @@ export const content: Content = {
       "유튜브 브랜딩 대행"
     ],
     openGraphTitle: "전문직 유튜브 브랜딩 | Turnkeyhaus",
-    openGraphDescription: "전환 중심 전문직 유튜브 채널 운영 시스템",
+    openGraphDescription: "전문직 채널을 위한 기획·촬영·운영 통합 서비스",
     locale: "ko_KR"
   },
   nav: [
@@ -235,143 +235,143 @@ export const content: Content = {
     { label: "채널 진단", href: "#contact" }
   ],
   heroValue: {
-    headline: "전문분야 브랜딩 채널 \n상담 전환까지 설계합니다.",
-    body: "검색 유입부터 결정 전환까지\n고객 기준으로 운영 구조를 만듭니다.",
+    headline: "전문직 채널,\n촬영보다 운영 구조부터 만듭니다.",
+    body: "누가 어떤 질문으로 들어와 어떤 이유로 상담을 남기는지,\n채널 동선을 먼저 설계한 뒤 제작합니다.",
     scrollGuide:
-      "상담을 받지 않으셔도 괜찮습니다.\n끝까지 스크롤하시면 브랜딩 채널 운영에 유익한 기준을 얻어가실 수 있습니다.",
-    primaryCta: { label: "무료 전략 점검 받기", href: "#contact" },
-    secondaryCta: { label: "실제 성장 사례 보기", href: "#portfolio" }
+      "필요한 정보만 빠르게 보셔도 됩니다.\n아래에 실제 운영 방식과 사례를 공개했습니다.",
+    primaryCta: { label: "내 채널 구조 진단 요청", href: "#contact" },
+    secondaryCta: { label: "운영 사례 확인", href: "#portfolio" }
   },
   problem: {
     label: "[ 문제 · 현실 점검 ]",
-    h2: "대부분의 채널은\n성장이 쉽지 않습니다.",
+    h2: "영상은 올라가는데\n상담은 늘지 않는 이유",
     lead:
-      "콘텐츠를 꾸준히 올려도\n채널의 방향이 선명해지지 않는 경우가 많습니다.\n\n유튜브는 단기 제작이 아니라 운영 설계입니다.\n조회수보다 중요한 것은\n일관된 기준과 구조입니다.",
+      "대부분의 채널은 콘텐츠 품질보다\n채널 구조에서 먼저 막힙니다.\n\n타깃 질문이 분산되어 있고,\n롱폼·숏폼 역할이 섞여 있으며,\nCTA가 일관되지 않기 때문입니다.",
     items: [],
-    emphasis: "유튜브는 '업로드'가 아니라 '설계'의 영역입니다."
+    emphasis: "문제는 영상 수가 아니라, 고객이 이해하는 순서를 설계했는지입니다."
   },
   strategyFrame: {
     label: "[ 전략 설계 프레임 ]",
-    h2: "전략은 감각이 아니라\n단계로 설계됩니다.",
+    h2: "저희는 이 4단계를\n매달 반복합니다.",
     steps: [
       {
         title: "진단",
-        detail: "타겟 질문·검색 맥락·현재 채널 상태를 먼저 정리합니다."
+        detail: "최근 90일 지표와 유입 키워드를 확인해 막히는 구간을 먼저 찾습니다."
       },
       {
         title: "포지셔닝",
-        detail: "채널의 말투·톤·판단 기준을 고정해 일관성을 만듭니다."
+        detail: "채널 소개, 썸네일 문법, 화법을 업종에 맞게 한 문장으로 정리합니다."
       },
       {
         title: "편성",
-        detail: "롱폼·숏폼의 역할을 분리해 축적 가능한 편성 구조를 만듭니다."
+        detail: "롱폼은 설득, 숏폼은 발견 역할로 나눠 월간 편성을 구성합니다."
       },
       {
         title: "운영",
-        detail: "SEO·CTA·성과 분석을 결합해 전환 흐름을 안정화합니다."
+        detail: "업로드 후 제목·썸네일·CTA를 2주 단위로 보정합니다."
       }
     ]
   },
   signalInsights: {
     label: "[ 운영 신호 ]",
-    h2: "실제 성과는\n이 신호에서 먼저 움직입니다.",
+    h2: "상담 전환은\n이 지표에서 갈립니다.",
     lead:
-      "광고 의존도, 클릭률, 채널 세팅.\n이 세 가지가 먼저 정리되어야 상담 구조가 안정됩니다.\n\n문제는 양이 아니라 구조입니다.",
+      "조회수보다 먼저 봐야 할 건\n광고 의존도, 클릭률, 채널 세팅입니다.\n\n세 지표가 정리되면 상담 흐름이 안정됩니다.",
     items: [
       {
         eyebrow: "광고 의존도",
-        title: "광고비를 줄여도 버티는 구조",
-        summary: "보여주기용 콘텐츠가 아니라\n상담과 내원으로 이어지는 구조를 먼저 만듭니다.",
-        note: "광고 의존도는 낮추고, 상담 연결 흐름은 높이는 방향으로 설계합니다.",
+        title: "광고비 없이도 문의가 들어오는가",
+        summary: "콘텐츠 자체 유입이 쌓이면\n광고를 줄여도 상담량 변동이 완만해집니다.",
+        note: "광고 집행 전, 오가닉 유입 비중을 먼저 확인합니다.",
         variant: "dependency"
       },
       {
         eyebrow: "클릭률",
-        title: "초반 30초보다 먼저 CTR",
-        summary: "썸네일과 제목에서 클릭이 일어나지 않으면\n좋은 영상도 출발하지 못합니다.",
-        note: "초기 시청보다 먼저, 클릭을 만드는 첫 관문을 점검합니다.",
+        title: "제목·썸네일에서 클릭이 발생하는가",
+        summary: "클릭률이 낮으면 시청지속이 높아도\n추천 확장이 제한됩니다.",
+        note: "업로드 초기 2주 CTR 보정이 핵심입니다.",
         variant: "ctr"
       },
       {
         eyebrow: "채널 세팅",
-        title: "영상 퀄리티보다 채널 세팅",
-        summary: "개별 영상보다 중요한 건\n누가, 왜, 어떤 맥락으로 들어오는지에 대한 설계입니다.",
-        note: "타깃 질문과 유입 경로, 전환 동선을 먼저 고정합니다.",
+        title: "채널 첫 화면이 업종 질문을 설명하는가",
+        summary: "방문자가 10초 안에 어떤 전문가인지 이해해야\n다음 행동이 일어납니다.",
+        note: "홈·재생목록·소개 문구를 함께 정리합니다.",
         variant: "setup"
       }
     ]
   },
   approach: {
     label: "[ 방식 ]",
-    h2: "우리는 이렇게 운영합니다.",
-    lead: "전문직 채널일수록 프로세스가 성과를 좌우합니다.",
+    h2: "촬영 이전에,\n운영 기준부터 합의합니다.",
+    lead: "매월 같은 방식으로 점검하고 업데이트합니다.",
     steps: [
       {
-        title: "STEP 1 · 시장 구조 분석",
-        detail: "타깃 질문, 검색 맥락, 경쟁 채널 구성을 먼저 분석합니다."
+        title: "STEP 1 · 질문 지도 작성",
+        detail: "고객이 실제로 검색하는 질문을 우선순위로 묶어 콘텐츠 순서를 정합니다."
       },
       {
-        title: "STEP 2 · 전환 키워드 설계",
-        detail: "유입 키워드와 상담 키워드를 분리해 콘텐츠 흐름을 구성합니다."
+        title: "STEP 2 · 메시지 정렬",
+        detail: "전문 용어를 업종 고객 언어로 바꾸고, 채널 전반의 톤을 맞춥니다."
       },
       {
-        title: "STEP 3 · 대본/촬영 시스템",
-        detail: "촬영 전에 대본과 구성표를 고정해 현장 부담을 줄입니다."
+        title: "STEP 3 · 촬영 설계",
+        detail: "촬영 전 대본과 질문 리스트를 확정해 현장 시간을 줄입니다."
       },
       {
-        title: "STEP 4 · 데이터 기반 개선",
-        detail: "반응 데이터를 바탕으로 성공 포맷을 누적 자산으로 고정합니다."
+        title: "STEP 4 · 리포트 보정",
+        detail: "월간 데이터로 제목·썸네일·CTA를 교정해 다음 달 편성에 반영합니다."
       }
     ],
-    keyline: "촬영은 재료 생산입니다.\n운영은 신뢰를 축적하는 과정입니다."
+    keyline: "영상 한 편보다, 6개월 뒤에도 남는 채널 구조를 만듭니다."
   },
   professionalTargets: {
     label: "[ 전문직 적용 ]",
-    h2: "전문직은 자극이 아니라\n신뢰의 기준이 필요합니다.",
-    lead: "말투·구조·운영을 규칙으로 고정",
+    h2: "업종마다 필요한 톤과 구조가 다릅니다.",
+    lead: "세 분야에 맞는 운영 템플릿을 분리해 적용합니다.",
     cards: [
       {
         title: "변호사 · 로펌",
-        oneLiner: "시청이 아닌 '상담을 유도하는 콘텐츠'로",
+        oneLiner: "사건 검색 유입을 상담 문의로 연결하는 구조",
         tags: ["법률", "로펌", "상담"],
         bullets: ["의뢰 전 질문 시리즈 구조", "사건/유형 키워드 맵", "상담 전환 동선"],
         image: images.law,
         href: "#contact",
-        ctaLabel: "구조 진단 요청"
+        ctaLabel: "해당 업종 진단 요청"
       },
       {
         title: "병원 · 의료",
-        oneLiner: "잠재 고객의 '내원을 이끄는 콘텐츠'로",
+        oneLiner: "내원 전 불안을 줄이고 신뢰를 쌓는 구조",
         tags: ["병원", "의료", "브랜딩"],
         bullets: ["환자 질문 포맷 표준화", "비교·오해·주의 구조", "신뢰 축적 루틴"],
         image: images.med,
         href: "#contact",
-        ctaLabel: "구조 진단 요청"
+        ctaLabel: "해당 업종 진단 요청"
       },
       {
         title: "세무 · 회계 · 노무",
-        oneLiner: "규정과 사례를 '납득시키는 콘텐츠'로",
+        oneLiner: "규정 이슈를 빠르게 해석해 문의로 이어지는 구조",
         tags: ["세무", "회계", "노무"],
         bullets: ["시즌/이슈 캘린더 편성", "상황별 템플릿", "판단 기준 기반 문의 설계"],
         image: images.tax,
         href: "#contact",
-        ctaLabel: "구조 진단 요청"
+        ctaLabel: "해당 업종 진단 요청"
       }
     ]
   },
   studioProof: {
-    label: "[ 전략 실행 기반 ]",
-    h2: "컨설팅은 말이 아니라,\n운영 시스템으로 증명합니다.",
+    label: "[ 운영 기반 ]",
+    h2: "작업 과정을 매달 기록하고\n운영 리포트로 공유합니다.",
     operationTitle: "운영 시스템",
     operationSystem: [
-      "전담 PD 2인 운영 구조",
-      "Sony FX 시네마 라인 운용",
-      "3CAM 기반 인터뷰 설계",
-      "전국 촬영 대응 (출장비 별도 없음)"
+      "월간 기획 회의 및 편성표 공유",
+      "촬영 전 대본·질문 리스트 사전 확정",
+      "촬영 후 편집본/썸네일 A-B 점검",
+      "월간 성과 리뷰 리포트 제공"
     ],
     crewTitle: "전담 구조",
     crewLead:
-      "전문직 채널은 전담 구조로 운영됩니다.\n촬영은 일부이고, 기준과 설계가 중심입니다.",
+      "전문직 채널은 촬영 당일보다 사전 준비 시간이 더 중요합니다.\n그래서 역할을 분리해 운영합니다.",
     crewCards: [
       {
         role: "Account Lead",
@@ -418,12 +418,12 @@ export const content: Content = {
   },
   portfolio: {
     label: "[ 포트폴리오 ]",
-    h2: "실행의 결과는\n숫자로 증명됩니다.",
-    lead: "대표 채널 3개의 구독자 변화와 단일 영상 최고 조회수를 함께 확인하세요.",
+    h2: "최근 운영 채널 성과",
+    lead: "대표 사례 3건의 구독자 변화와 최고 조회수를 공개합니다.",
     items: [
       {
         title: "주치아 앞선tube",
-        oneLiner: "신규 런칭 · 원장 브랜딩 · 운영 설계",
+        oneLiner: "신규 런칭부터 월간 포맷 운영까지 진행",
         tags: ["치과", "런칭", "운영"],
         result: "구독자 0 → 541명",
         subscriberStart: 0,
@@ -435,7 +435,7 @@ export const content: Content = {
       },
       {
         title: "법 잘하는 변호사들 · 로맨즈",
-        oneLiner: "채널 리빌딩 · SEO/운영 설계 · 전환 구조",
+        oneLiner: "기존 채널 리빌딩과 SEO 기반 운영 구조 재정비",
         tags: ["로펌", "리빌딩", "브랜딩"],
         result: "구독자 500 → 5,970명",
         subscriberStart: 500,
@@ -447,7 +447,7 @@ export const content: Content = {
       },
       {
         title: "유안티비",
-        oneLiner: "채널 운영 설계 · 포맷 구조화 · 장기 자산화",
+        oneLiner: "장기 운영 기준 수립과 포맷 구조화 진행",
         tags: ["채널 운영", "구조화", "자산화"],
         result: "구독자 2.2천 → 11.7만",
         subscriberStart: 2200,
@@ -461,7 +461,7 @@ export const content: Content = {
   },
   pricing: {
     label: "[ 운영 레벨 ]",
-    h2: "유튜브는 건별 제작이 아니라\n운영 단위로 설계됩니다.",
+    h2: "예산은 영상 개수가 아니라\n운영 범위로 결정됩니다.",
     levels: [
       {
         title: "Structure Foundation",
@@ -497,7 +497,7 @@ export const content: Content = {
         target: "대상: 브랜드 단위 채널을 운영하는 전문직"
       }
     ],
-    emphasis: "상세 제안은 채널 구조 진단 이후에만 가능합니다."
+    emphasis: "정확한 범위는 1차 진단 후 제안서에서 확정됩니다."
   },
   faq: {
     label: "[ FAQ ]",
@@ -524,17 +524,17 @@ export const content: Content = {
   blog: {
     label: "[ 인사이트 ]",
     h2: "검색에서 발견되고,\n결정에서 선택되기까지",
-    lead: "전문직 유튜브 운영 경험을\n정리한 아카이브입니다.",
+    lead: "현장 운영에서 얻은 기준과 사례를\n꾸준히 기록하고 있습니다.",
     ctaLabel: "인사이트 전체 보기"
   },
   contact: {
     label: "[ 채널 구조 진단 ]",
-    h2: "단 한 번의 컨설팅으로\n브랜드의 성장을 예측하세요.",
-    lead: "현재 상황과 목표를 남겨주시면\n채널 구조 관점으로 빠르게 검토 후 회신드립니다.",
+    h2: "현재 채널 상태를 보내주시면\n운영 우선순위를 먼저 드립니다.",
+    lead: "브랜드/업종/목표를 남겨주시면\n1영업일 내 답변드립니다.",
     midCtaEyebrow: "채널 진단",
-    midCtaTitle: "지금 채널 상태, 10분만에 방향을 잡아드립니다.",
+    midCtaTitle: "지금 채널 상태를 점검하고 우선순위를 정리해 드립니다.",
     panelTitle: "상담 예약하기",
-    panelBody: "현재 상황과 목표를 남겨주시면\n채널 구조 관점으로 빠르게 검토 후 회신드립니다.",
+    panelBody: "현재 상황과 목표를 남겨주시면\n채널 구조 관점으로 검토 후 회신드립니다.",
     panelHint: "Google Form은 임베드 URL만 사용합니다. (forms.gle 공유 링크 직접 사용 금지)",
     googleFormEmbedUrl:
       "https://docs.google.com/forms/d/e/1FAIpQLScnyuTnc051RnX8yaGNlPW6TSOe9INyaV-Gp8lc8xqUSL6kQg/viewform?embedded=true",
@@ -543,7 +543,7 @@ export const content: Content = {
     phoneDisplay: "0507-1463-3664",
     phoneHref: "tel:050714633664",
     quickCallLabel: "전화 상담",
-    kakaoChatUrl: "http://pf.kakao.com/_dyNPn/chat",
+    kakaoChatUrl: "https://pf.kakao.com/_dyNPn/chat",
     kakaoCtaLabel: "카카오톡 상담",
     iframeTitle: "Turnkeyhaus 상담 폼"
   },

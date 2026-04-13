@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --bg: #ffffff;
-  --accent: #21c1a2;
-  --text: #0b0f0e;
-  --muted: #5f696d;
+  --bg: #f3f1ea;
+  --accent: #1d8978;
+  --text: #111715;
+  --muted: #5a625f;
   --line: rgba(11, 15, 14, 0.12);
   --line-strong: rgba(11, 15, 14, 0.24);
   --radius-system: 14px;
@@ -19,11 +19,14 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 14% 10%, rgba(29, 137, 120, 0.09), transparent 36%),
+    linear-gradient(180deg, #f5f3ed 0%, var(--bg) 42%, #ece8dc 100%);
   color: var(--text);
   line-height: 1.9;
   font-family: var(--font-a2z), "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   text-rendering: optimizeLegibility;
+  color-scheme: light;
 }
 
 h1,
@@ -83,6 +86,12 @@ a {
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: fadeUp 0.8s ease forwards;
 }
 
 .signal-gridline {
@@ -209,6 +218,18 @@ a {
   }
 }
 
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes signalRise {
   0%,
   100% {
@@ -295,6 +316,12 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   .signal-line,
   .signal-dot,
   .signal-node-ring,
