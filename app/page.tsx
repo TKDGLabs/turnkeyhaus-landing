@@ -314,9 +314,9 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="proof" className="border-b border-black/15 bg-[#111715]">
+      <section id="proof" className="border-b border-black/15 bg-white">
         <div className={`${shell} grid gap-12 py-20 md:grid-cols-[1.05fr_0.95fr] md:items-start md:py-24`}>
-          <figure className="overflow-hidden border border-white/15">
+          <figure className="overflow-hidden border border-black/10">
             <Image
               src={content.studioProof.images[0]?.src ?? "/images/showreel-cover-optimized.jpg"}
               alt={content.studioProof.images[0]?.alt ?? "Turnkeyhaus 운영 촬영 이미지"}
@@ -327,17 +327,16 @@ export default function Page() {
             />
           </figure>
 
-          <div className="space-y-8 text-white">
+          <div className="space-y-8 text-[#0B0F0E]">
             <SectionHeader
-              dark
               label={content.studioProof.label}
               title={content.studioProof.h2}
               lead={content.studioProof.crewLead}
             />
 
-            <ul className="space-y-3 border-y border-white/20 py-5">
+            <ul className="space-y-3 border-y border-black/12 py-5">
               {content.studioProof.operationSystem.map((item) => (
-                <li key={item} className="text-sm leading-[1.8] text-white/78">
+                <li key={item} className="text-sm leading-[1.8] text-black/72">
                   - {item}
                 </li>
               ))}
@@ -345,9 +344,9 @@ export default function Page() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               {content.studioProof.crewCards.map((crew) => (
-                <div key={crew.role} className="border-t border-white/18 pt-3">
-                  <p className="text-xs font-semibold tracking-[0.12em] text-white/62">{crew.role}</p>
-                  <p className="mt-1 text-[17px] font-semibold text-white">{crew.headline}</p>
+                <div key={crew.role} className="border-t border-black/12 pt-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-black/55">{crew.role}</p>
+                  <p className="mt-1 text-[17px] font-semibold text-[#0B0F0E]">{crew.headline}</p>
                 </div>
               ))}
             </div>
@@ -557,10 +556,10 @@ export default function Page() {
 
       <ContactCTA />
 
-      <footer className="bg-[#111715] text-white/70">
+      <footer className="border-t border-black/15 bg-white text-black/65">
         <div className={`${shell} py-10 text-xs`}>
           <div className="space-y-1">
-            <div className="text-sm font-semibold text-white">{content.footer.companyName}</div>
+            <div className="text-sm font-semibold text-[#0B0F0E]">{content.footer.companyName}</div>
             {content.footer.lines.map((line) => (
               <div key={line.label}>
                 {line.label}: {line.value}
