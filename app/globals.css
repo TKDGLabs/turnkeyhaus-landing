@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --bg: #f3f1ea;
-  --accent: #1d8978;
-  --text: #111715;
-  --muted: #5a625f;
+  --bg: #ffffff;
+  --accent: #21c1a2;
+  --text: #0b0f0e;
+  --muted: #5f696d;
   --line: rgba(11, 15, 14, 0.12);
   --line-strong: rgba(11, 15, 14, 0.24);
   --radius-system: 14px;
@@ -19,14 +19,11 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 14% 10%, rgba(29, 137, 120, 0.09), transparent 36%),
-    linear-gradient(180deg, #f5f3ed 0%, var(--bg) 42%, #ece8dc 100%);
+  background: var(--bg);
   color: var(--text);
   line-height: 1.9;
   font-family: var(--font-a2z), "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   text-rendering: optimizeLegibility;
-  color-scheme: light;
 }
 
 h1,

@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import IntroGate from "../components/IntroGate";
 import ContactCTA from "../components/ContactCTA";
+import StrategyChapterDeck from "../components/StrategyChapterDeck";
+import DiagnosticCalculator from "../components/DiagnosticCalculator";
 import { content } from "../content";
 import { getSortedInsights } from "../content/insights";
 
@@ -10,9 +12,9 @@ const shell = "mx-auto w-full max-w-[1320px] px-5 sm:px-6 lg:px-10";
 const labelClass =
   "inline-flex items-center border border-black/15 px-3 py-1 text-[11px] font-semibold tracking-[0.12em] text-black/55";
 const sectionTitle =
-  "whitespace-pre-line break-keep text-[30px] font-semibold leading-[1.22] tracking-tight text-[#111715] md:text-[48px]";
+  "whitespace-pre-line break-keep text-[30px] font-semibold leading-[1.22] tracking-tight text-[#0B0F0E] md:text-[48px]";
 const focusRing =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d8978]";
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
 function isExternalLink(href: string) {
   return href.startsWith("http://") || href.startsWith("https://");
@@ -116,7 +118,7 @@ export default function Page() {
   const maxViews = Math.max(...content.portfolio.items.map((item) => item.maxVideoViews));
 
   return (
-    <main className="bg-[#f3f1ea] text-[#111715]">
+    <main className="bg-white text-[#0B0F0E]">
       <IntroGate
         logoSrc="/logo.png"
         logoAlt="Turnkeyhaus"
@@ -124,7 +126,7 @@ export default function Page() {
         subtitle={introSubtitle}
       />
 
-      <header className="sticky top-0 z-40 border-b border-black/15 bg-[#f3f1ea]/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-black/15 bg-white/95 backdrop-blur-xl">
         <div className={`${shell} flex items-center justify-between py-4`}>
           <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
             <Image
@@ -151,7 +153,7 @@ export default function Page() {
 
           <ActionLink
             href="https://sclu.io/share/bulk/file/bf2w8ioROJvw"
-            className="inline-flex h-10 items-center border border-[#1d8978] bg-[#1d8978] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#146b5e]"
+            className="inline-flex h-10 items-center border border-[#21c1a2] bg-[#21c1a2] px-4 text-sm font-semibold text-black transition-colors hover:bg-[#1db197]"
           >
             소개서 다운로드
           </ActionLink>
@@ -165,7 +167,7 @@ export default function Page() {
           loop
           playsInline
           preload="auto"
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center md:object-[center_42%]"
         >
           <source src="/videos/hero-render-1080.mp4" type="video/mp4" />
         </video>
@@ -237,7 +239,7 @@ export default function Page() {
               />
             </figure>
 
-            <p className="border-t border-black/18 pt-5 text-[19px] font-semibold leading-[1.75] text-[#111715]">
+            <p className="border-t border-black/18 pt-5 text-[19px] font-semibold leading-[1.75] text-[#0B0F0E]">
               {content.problem.emphasis}
             </p>
           </div>
@@ -251,45 +253,10 @@ export default function Page() {
             title={content.strategyFrame.h2}
             lead={content.approach.lead}
           />
-
-          <div className="mt-12 grid gap-14 lg:grid-cols-[1.05fr_0.95fr]">
-            <ol className="space-y-8 border-l border-black/20 pl-7">
-              {content.strategyFrame.steps.map((step, index) => (
-                <li key={step.title} className="relative space-y-2">
-                  <span className="absolute -left-[35px] top-1.5 h-4 w-4 rounded-full border border-[#1d8978] bg-[#f3f1ea]" />
-                  <p className="text-sm font-semibold tracking-[0.12em] text-[#1d8978]">0{index + 1}</p>
-                  <h3 className="text-[23px] font-semibold tracking-tight text-[#111715]">{step.title}</h3>
-                  <p className="max-w-[52ch] whitespace-pre-line break-keep text-base leading-[1.9] text-black/70">
-                    {step.detail}
-                  </p>
-                </li>
-              ))}
-            </ol>
-
-            <div className="space-y-8">
-              <div className="border-y border-black/15">
-                {content.signalInsights.items.map((item) => (
-                  <article
-                    key={item.title}
-                    className="grid gap-3 border-b border-black/10 py-5 last:border-b-0 md:grid-cols-[120px_1fr]"
-                  >
-                    <p className="text-[13px] font-semibold tracking-[0.12em] text-[#1d8978]">{item.eyebrow}</p>
-                    <div className="space-y-2">
-                      <h4 className="text-[22px] font-semibold tracking-tight text-[#111715]">{item.title}</h4>
-                      <p className="whitespace-pre-line break-keep text-sm leading-[1.85] text-black/70">
-                        {item.summary}
-                      </p>
-                      <p className="text-[13px] leading-[1.75] text-black/55">{item.note}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-
-              <p className="whitespace-pre-line break-keep text-base font-semibold leading-[1.9] text-[#111715]">
-                {content.approach.keyline}
-              </p>
-            </div>
-          </div>
+          <StrategyChapterDeck />
+          <p className="mt-8 whitespace-pre-line break-keep text-base font-semibold leading-[1.9] text-[#0B0F0E]">
+            {content.approach.keyline}
+          </p>
         </div>
       </section>
 
@@ -317,7 +284,7 @@ export default function Page() {
                 </figure>
 
                 <div className={`space-y-5 ${index % 2 === 1 ? "md:order-1" : ""}`}>
-                  <h3 className="text-[30px] font-semibold tracking-tight text-[#111715]">{card.title}</h3>
+                  <h3 className="text-[30px] font-semibold tracking-tight text-[#0B0F0E]">{card.title}</h3>
                   <p className="text-base leading-[1.9] text-black/72">{card.oneLiner}</p>
 
                   <div className="flex flex-wrap gap-2">
@@ -336,7 +303,7 @@ export default function Page() {
 
                   <ActionLink
                     href={card.href}
-                    className="inline-flex items-center border-b border-[#1d8978] pb-1 text-sm font-semibold text-[#1d8978] transition-colors hover:text-[#146b5e]"
+                    className="inline-flex items-center border-b border-[#21c1a2] pb-1 text-sm font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197]"
                   >
                     {card.ctaLabel}
                   </ActionLink>
@@ -424,7 +391,7 @@ export default function Page() {
 
                 <div className="flex flex-col justify-between gap-6">
                   <div className="space-y-3">
-                    <h3 className="text-[31px] font-semibold tracking-tight text-[#111715]">{item.title}</h3>
+                    <h3 className="text-[31px] font-semibold tracking-tight text-[#0B0F0E]">{item.title}</h3>
                     <p className="text-base leading-[1.9] text-black/72">{item.oneLiner}</p>
                     <div className="flex flex-wrap gap-2">
                       {item.tags.map((tag) => (
@@ -438,19 +405,19 @@ export default function Page() {
                   <dl className="divide-y divide-black/12 border-y border-black/12">
                     <div className="flex items-center justify-between gap-4 py-3 text-sm">
                       <dt className="text-black/60">구독자 변화</dt>
-                      <dd className="font-semibold text-[#111715]">
+                      <dd className="font-semibold text-[#0B0F0E]">
                         {formatInteger(item.subscriberStart)}명 → {formatInteger(item.subscriberCurrent)}명
                       </dd>
                     </div>
                     <div className="flex items-center justify-between gap-4 py-3 text-sm">
                       <dt className="text-black/60">최고 조회수</dt>
-                      <dd className="font-semibold text-[#1d8978]">{formatViewsKorean(item.maxVideoViews)}회</dd>
+                      <dd className="font-semibold text-[#21c1a2]">{formatViewsKorean(item.maxVideoViews)}회</dd>
                     </div>
                   </dl>
 
                   <ActionLink
                     href={item.href}
-                    className="inline-flex w-fit items-center border-b border-[#1d8978] pb-1 text-sm font-semibold text-[#1d8978] transition-colors hover:text-[#146b5e]"
+                    className="inline-flex w-fit items-center border-b border-[#21c1a2] pb-1 text-sm font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197]"
                   >
                     실제 영상 보기
                   </ActionLink>
@@ -461,41 +428,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="pricing" className="border-b border-black/15 bg-[#ece8dc]">
-        <div className={`${shell} py-20 md:py-24`}>
-          <SectionHeader
-            label={content.pricing.label}
-            title={content.pricing.h2}
-            lead="패키지는 월별 운영 범위와 목표 전환 난이도에 따라 조정됩니다."
-          />
-
-          <div className="mt-10 overflow-x-auto border-y border-black/15">
-            <div className="min-w-[940px]">
-              <div className="grid grid-cols-3">
-                {content.pricing.levels.map((level, idx) => (
-                  <article
-                    key={level.title}
-                    className={`px-6 py-8 ${idx < content.pricing.levels.length - 1 ? "border-r border-black/12" : ""}`}
-                  >
-                    <p className="text-xs font-semibold tracking-[0.12em] text-black/55">{level.priceBand}</p>
-                    <h3 className="mt-2 text-[28px] font-semibold tracking-tight text-[#111715]">{level.title}</h3>
-
-                    <ul className="mt-5 space-y-2 text-sm leading-[1.85] text-black/74">
-                      {level.bullets.map((bullet) => (
-                        <li key={bullet}>- {bullet}</li>
-                      ))}
-                    </ul>
-
-                    <p className="mt-5 border-t border-black/12 pt-4 text-sm leading-[1.8] text-black/62">{level.target}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <p className="mt-5 text-sm font-medium text-black/66">{content.pricing.emphasis}</p>
-        </div>
-      </section>
+      <DiagnosticCalculator />
 
       <section id="blog" className="border-b border-black/15">
         <div className={`${shell} py-20 md:py-24`}>
@@ -510,12 +443,12 @@ export default function Page() {
                 >
                   <div className="text-sm font-medium text-black/55">{post.publishedAt}</div>
                   <div className="space-y-2">
-                    <h3 className="text-[26px] font-semibold tracking-tight text-[#111715]">{post.title}</h3>
+                    <h3 className="text-[26px] font-semibold tracking-tight text-[#0B0F0E]">{post.title}</h3>
                     <p className="text-sm leading-[1.85] text-black/68">{post.description}</p>
                   </div>
                   <Link
                     href={`/insights/${post.slug}`}
-                    className={`inline-flex w-fit items-center border-b border-[#1d8978] pb-1 text-sm font-semibold text-[#1d8978] transition-colors hover:text-[#146b5e] ${focusRing}`}
+                    className={`inline-flex w-fit items-center border-b border-[#21c1a2] pb-1 text-sm font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197] ${focusRing}`}
                   >
                     읽기
                   </Link>
@@ -544,7 +477,7 @@ export default function Page() {
           <div className="mt-10 border-y border-black/15">
             {content.faq.items.map((item) => (
               <details key={item.q} className="group border-b border-black/10 py-4 last:border-b-0">
-                <summary className={`cursor-pointer list-none pr-8 text-[19px] font-semibold tracking-tight text-[#111715] ${focusRing}`}>
+                <summary className={`cursor-pointer list-none pr-8 text-[19px] font-semibold tracking-tight text-[#0B0F0E] ${focusRing}`}>
                   {item.q}
                   <span className="ml-2 text-black/35 transition-transform group-open:rotate-45">+</span>
                 </summary>
@@ -557,7 +490,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="contact" className="border-b border-black/15 bg-[#ece8dc]">
+      <section id="contact" className="border-b border-black/15 bg-white">
         <div className={`${shell} py-20 md:py-24`}>
           <div className="mb-10 space-y-6">
             <SectionHeader label={content.contact.label} title={content.contact.h2} lead={content.contact.lead} />
@@ -566,7 +499,7 @@ export default function Page() {
           <div className="grid gap-8 md:grid-cols-[0.88fr_1.12fr] md:items-start">
             <div className="space-y-7 border-t border-black/18 pt-5">
               <div className="space-y-3">
-                <h3 className="text-[29px] font-semibold tracking-tight text-[#111715]">진단 안내</h3>
+                <h3 className="text-[29px] font-semibold tracking-tight text-[#0B0F0E]">진단 안내</h3>
                 <p className="text-base leading-[1.9] text-black/68">
                   접수 후 1영업일 안에 연락드리며, 현재 구조에서 먼저 손봐야 할 우선순위를 정리해드립니다.
                 </p>
@@ -593,7 +526,7 @@ export default function Page() {
                     href={kakaoChatUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className={`inline-flex items-center border border-[#1d8978] bg-[#1d8978] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#146b5e] ${focusRing}`}
+                    className={`inline-flex items-center border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-[#1db197] ${focusRing}`}
                   >
                     {content.contact.kakaoCtaLabel}
                   </a>
