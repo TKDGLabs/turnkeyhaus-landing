@@ -357,7 +357,7 @@ export const content: Content = {
     label: "[ 업종별 적용 ]",
     h2: "업종이 달라도\n핵심 운영 원리는 같습니다.",
     lead:
-      "고신뢰·고관여 업종은 물론, 정부 기관·민간사업체와 커머스·온라인 서비스까지\n업종별 톤과 구조에 맞춘 운영 템플릿을 분리 적용합니다.",
+      "고신뢰·고관여 업종은 물론, 정부 기관·공공단체와 커머스·온라인 서비스까지\n업종별 톤과 구조에 맞춘 운영 템플릿을 분리 적용합니다.",
     cards: [
       {
         title: "고신뢰 서비스형",
@@ -387,7 +387,7 @@ export const content: Content = {
         ctaLabel: "해당 업종 진단 요청"
       },
       {
-        title: "정부 기관·민간사업체형",
+        title: "정부 기관·공공단체형",
         oneLiner: "공공 신뢰와 사업 성과를 함께 전달해야 하는 조직형 채널 구조",
         tags: ["공공 커뮤니케이션", "사업 소개", "신뢰 설계"],
         bullets: [
@@ -398,11 +398,11 @@ export const content: Content = {
         ],
         image: {
           src: "/images/commerce-online-model.jpg",
-          alt: "정부 기관 및 민간사업체형 운영 협업 이미지"
+          alt: "정부 기관 및 공공단체형 운영 협업 이미지"
         },
         imageFallback: {
           eyebrow: "ORGANIZATION MODEL",
-          lines: ["정부 기관 및 민간사업체", "신뢰·이해도 균형 설계", "정책·사업·성과 구조화"]
+          lines: ["정부 기관 및 공공단체", "신뢰·이해도 균형 설계", "정책·사업·성과 구조화"]
         },
         href: "#contact",
         ctaLabel: "해당 모델 진단 요청"
@@ -612,7 +612,7 @@ export const content: Content = {
         ]
       },
       {
-        prompt: "공공기관/민간사업체인데 예산이 크지 않아도 단건 유튜브 외주가 가능할까요?",
+        prompt: "공공기관/공공단체인데 예산이 크지 않아도 단건 유튜브 외주가 가능할까요?",
         fit: "예산 제약 안에서 단건 제작 또는 라이트 운영이 필요한 경우",
         reasons: [
           "단건 제작과 운영형 견적을 분리 제안해 의사결정 부담 최소화",

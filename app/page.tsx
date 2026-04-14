@@ -134,7 +134,7 @@ export default function Page() {
       audience: [
         { "@type": "BusinessAudience", audienceType: "병원·의료 기관" },
         { "@type": "BusinessAudience", audienceType: "법무·세무·회계·노무 등 전문 서비스" },
-        { "@type": "BusinessAudience", audienceType: "정부 기관·민간사업체" },
+        { "@type": "BusinessAudience", audienceType: "정부 기관·공공단체" },
         { "@type": "BusinessAudience", audienceType: "커머스·온라인 서비스" }
       ],
       description: content.seo.description,
@@ -456,7 +456,7 @@ export default function Page() {
                   )}
                 </div>
 
-                <div className="flex flex-col justify-between gap-7 md:gap-8">
+                <div className="flex flex-col gap-7 md:gap-8">
                   <div className="space-y-4">
                     <h3 className="text-[33px] font-semibold leading-[1.18] tracking-[-0.02em] text-[#0B0F0E]">{item.title}</h3>
                     <p className="text-[13px] font-semibold tracking-[0.08em] text-black/56">
@@ -484,14 +484,6 @@ export default function Page() {
                     </div>
                   </dl>
 
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1">
-                    <ActionLink
-                      href={item.href}
-                      className="inline-flex w-fit items-center border-b border-[#21c1a2] pb-1 text-[15px] font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197]"
-                    >
-                      실제 영상 보기
-                    </ActionLink>
-                  </div>
                 </div>
               </article>
             ))}
