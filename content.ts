@@ -24,6 +24,7 @@ export type ProfessionalCard = {
 
 export type PortfolioItem = {
   title: string;
+  clientName: string;
   oneLiner: string;
   tags: string[];
   result: string;
@@ -99,9 +100,11 @@ export type Content = {
   heroValue: {
     headline: string;
     body: string;
-    scrollGuide: string;
     primaryCta: CtaLink;
     secondaryCta: CtaLink;
+  };
+  heroStats: {
+    totalVideoViews: number;
   };
   problem: {
     label: string;
@@ -243,10 +246,11 @@ export const content: Content = {
   heroValue: {
     headline: "브랜딩 채널은\n지속 가능한\n운영 구조부터.",
     body: "누가 어떤 질문으로 들어와 어떤 이유로 상담을 남기는지,\n채널 동선을 먼저 설계한 뒤 제작합니다.",
-    scrollGuide:
-      "필요한 정보만 빠르게 보셔도 됩니다.\n아래에 실제 운영 방식과 사례를 공개했습니다.",
     primaryCta: { label: "내 채널 구조 진단 요청", href: "#contact" },
     secondaryCta: { label: "운영 사례 확인", href: "#portfolio" }
+  },
+  heroStats: {
+    totalVideoViews: 20200000
   },
   problem: {
     label: "[ 문제 · 현실 점검 ]",
@@ -374,6 +378,10 @@ export const content: Content = {
           "공고·성과 리포트·FAQ를 월간 캘린더로 운영",
           "전화/이메일/폼 등 문의 채널별 CTA 분기"
         ],
+        image: {
+          src: "/images/gov-private-model.jpg",
+          alt: "정부 기관 및 민간사업체형 운영 이미지"
+        },
         imageFallback: {
           eyebrow: "ORGANIZATION MODEL",
           lines: ["정부 기관 및 민간사업체", "신뢰·이해도 균형 설계", "정책·사업·성과 구조화"]
@@ -391,6 +399,10 @@ export const content: Content = {
           "런칭/프로모션 시즌의 숏폼·롱폼 연동 운영",
           "랜딩/장바구니/문의 CTA의 월간 실험 루프"
         ],
+        image: {
+          src: "/images/commerce-online-model.jpg",
+          alt: "커머스 및 온라인 서비스형 운영 이미지"
+        },
         imageFallback: {
           eyebrow: "COMMERCE MODEL",
           lines: ["커머스 및 온라인 서비스", "탐색·비교·구매 동선 설계", "콘텐츠 기반 전환 누적"]
@@ -459,11 +471,12 @@ export const content: Content = {
   },
   portfolio: {
     label: "[ 포트폴리오 ]",
-    h2: "최근 운영 채널 성과",
-    lead: "대표 사례 3건의 구독자 변화와 최고 조회수,\n그리고 신규 운영 채널의 SEO 성과를 함께 공개합니다.",
+    h2: "최근 운영 대표 사례",
+    lead: "대표 사례 4건의 구독자 변화와 전체 운영 누적 성과,\n그리고 신규 운영 채널의 SEO 성과를 함께 공개합니다.",
     items: [
       {
         title: "주치아 앞선tube",
+        clientName: "더앞선치과병원",
         oneLiner: "신규 런칭부터 월간 포맷 운영까지 진행",
         tags: ["치과", "런칭", "운영"],
         result: "구독자 0 → 541명",
@@ -476,6 +489,7 @@ export const content: Content = {
       },
       {
         title: "법 잘하는 변호사들 · 로맨즈",
+        clientName: "법무법인 선율로",
         oneLiner: "기존 채널 리빌딩과 SEO 기반 운영 구조 재정비",
         tags: ["로펌", "리빌딩", "브랜딩"],
         result: "구독자 500 → 5,970명",
@@ -488,6 +502,7 @@ export const content: Content = {
       },
       {
         title: "유안티비",
+        clientName: "유안정형외과",
         oneLiner: "장기 운영 기준 수립과 포맷 구조화 진행",
         tags: ["채널 운영", "구조화", "자산화"],
         result: "구독자 2.2천 → 11.7만",
@@ -499,7 +514,8 @@ export const content: Content = {
         imageSrc: "/images/studio-2.jpg"
       },
       {
-        title: "eLife Magazine eSports",
+        title: "이라이프매거진",
+        clientName: "섀도우 코퍼레이션",
         oneLiner: "숏폼·광고 없이 SEO 기반 롱폼 4편만으로 누적 조회수 2,926회",
         tags: ["e스포츠", "SEO", "롱폼 4편", "무광고"],
         result: "0명에서 시작 (운영 초기)",
@@ -518,7 +534,7 @@ export const content: Content = {
     h2: "예산은 영상 개수가 아니라\n운영 범위로 결정됩니다.",
     levels: [
       {
-        title: "Structure Foundation",
+        title: "구조 세팅형",
         priceBand: "월 300만원대",
         bullets: [
           "월 1회 촬영",
@@ -529,7 +545,7 @@ export const content: Content = {
         target: "대상: 신규 채널 또는 운영 체계가 없는 경우"
       },
       {
-        title: "Structure Growth",
+        title: "구조 성장형",
         priceBand: "월 400만원대",
         bullets: [
           "월 1–2회 촬영",
@@ -540,7 +556,7 @@ export const content: Content = {
         target: "대상: 이미 채널이 있으나 구조가 정리되지 않은 경우"
       },
       {
-        title: "Structure Intensive",
+        title: "구조 확장형",
         priceBand: "월 500–600만원대",
         bullets: [
           "고난도 브랜딩 재설계",

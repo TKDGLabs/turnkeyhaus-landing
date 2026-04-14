@@ -9,7 +9,19 @@ type ChannelState = 'existing' | 'new' | 'rebuild';
 type GoalType = 'brand' | 'lead' | 'balanced';
 type MixType = 'long' | 'short' | 'balanced';
 type TermMonths = 3 | 6 | 9 | 12;
-type LineItemKey = 'shoot' | 'planning' | 'longform' | 'reedit' | 'shortform' | 'thumbnail';
+type ConsultLocation = 'seoul' | 'busan';
+type LineItemKey =
+  | 'shoot'
+  | 'planning'
+  | 'longform'
+  | 'reedit'
+  | 'shortform'
+  | 'thumbnail'
+  | 'consultSurvey'
+  | 'consultSession'
+  | 'consultReport'
+  | 'inhouseSetup'
+  | 'practicalTraining';
 
 type LineItem = {
   key: LineItemKey;
@@ -26,6 +38,9 @@ type Quantities = Record<LineItemKey, number>;
 type AddOns = {
   drone: boolean;
   motion: boolean;
+  consultingOnly: boolean;
+  inhouseSetup: boolean;
+  practicalTraining: boolean;
 };
 
 type FormState = {
@@ -34,6 +49,7 @@ type FormState = {
   goal?: GoalType;
   mix?: MixType;
   term?: TermMonths;
+  consultLocation?: ConsultLocation;
   addOns: AddOns;
 };
 
@@ -81,7 +97,7 @@ const steps: { key: StepKey; title: string; subtitle: string }[] = [
   {
     key: 'addons',
     title: '추가 옵션을 선택해 주세요',
-    subtitle: '드론 촬영/고급 모션 그래픽은 별도 협의 항목입니다.'
+    subtitle: '컨설팅 단독·인하우스 셋업/교육 상품과 별도 협의 항목을 선택할 수 있습니다.'
   }
 ];
 
@@ -100,7 +116,7 @@ const lineItems: LineItem[] = [
     label: '촬영 (PD 2인, 3CAM 기준)',
     unitPrice: 600000,
     unitLabel: '회차',
-    min: 1,
+    min: 0,
     max: 3,
     step: 1
   },
@@ -109,7 +125,7 @@ const lineItems: LineItem[] = [
     label: '콘텐츠 기획 및 연출',
     unitPrice: 200000,
     unitLabel: '편',
-    min: 4,
+    min: 2,
     max: 16,
     step: 1
   },
@@ -118,7 +134,7 @@ const lineItems: LineItem[] = [
     label: '롱폼 편집 (10분 이내)',
     unitPrice: 600000,
     unitLabel: '편',
-    min: 1,
+    min: 0,
     max: 8,
     step: 1
   },
@@ -127,7 +143,7 @@ const lineItems: LineItem[] = [
     label: '쇼츠 편집 (기존 영상 재편집)',
     unitPrice: 0,
     unitLabel: '편',
-    min: 4,
+    min: 0,
     max: 32,
     step: 2
   },
@@ -136,7 +152,7 @@ const lineItems: LineItem[] = [
     label: '숏폼 편집 (신규 촬영 후 편집)',
     unitPrice: 200000,
     unitLabel: '편',
-    min: 2,
+    min: 0,
     max: 24,
     step: 1
   },
@@ -145,8 +161,53 @@ const lineItems: LineItem[] = [
     label: '썸네일 디자인',
     unitPrice: 50000,
     unitLabel: '편',
-    min: 2,
+    min: 0,
     max: 24,
+    step: 1
+  },
+  {
+    key: 'consultSurvey',
+    label: '사전 설문/진단 분석',
+    unitPrice: 0,
+    unitLabel: '회',
+    min: 0,
+    max: 1,
+    step: 1
+  },
+  {
+    key: 'consultSession',
+    label: '오프라인 컨설팅 (2시간 이내)',
+    unitPrice: 150000,
+    unitLabel: '회',
+    min: 0,
+    max: 1,
+    step: 1
+  },
+  {
+    key: 'consultReport',
+    label: '온라인 보고서 제공',
+    unitPrice: 100000,
+    unitLabel: '건',
+    min: 0,
+    max: 5,
+    step: 1
+  },
+  {
+    key: 'inhouseSetup',
+    label: '인하우스 마케팅팀 셋업 및 채용 대행',
+    unitPrice: 500000,
+    unitLabel: '월',
+    min: 0,
+    max: 12,
+    step: 1
+  },
+  {
+    key: 'practicalTraining',
+    label: '영상 촬영/편집 실무 교육 (1개월·주1회·2시간·총8회)',
+    unitPrice: 1200000,
+    unitLabel: '패키지',
+    min: 0,
+    max: 1,
     step: 1
   }
 ];
@@ -157,13 +218,19 @@ const lineItemMap = Object.fromEntries(lineItems.map((item) => [item.key, item])
 >;
 
 const initialFormState: FormState = {
+  consultLocation: 'seoul',
   addOns: {
     drone: false,
-    motion: false
+    motion: false,
+    consultingOnly: false,
+    inhouseSetup: false,
+    practicalTraining: false
   }
 };
 
 const budgetOptions = [
+  { value: 2200000, label: '220만원', desc: '저예산 테스트 운영' },
+  { value: 2800000, label: '280만원', desc: '라이트 운영' },
   { value: 3300000, label: '330만원', desc: '필수 운영 중심' },
   { value: 4400000, label: '440만원', desc: '표준 운영 권장' },
   { value: 5500000, label: '550만원', desc: '확장 운영' },
@@ -187,7 +254,7 @@ const formatRate = (n: number) => Math.round(n * 1000) / 10;
 
 const clampBudget = (value: number) => {
   if (!Number.isFinite(value)) return 0;
-  return Math.min(12000000, Math.max(2000000, Math.round(value / 100000) * 100000));
+  return Math.min(12000000, Math.max(1500000, Math.round(value / 100000) * 100000));
 };
 
 const toSafeFileDate = () => {
@@ -199,7 +266,8 @@ const toSafeFileDate = () => {
 };
 
 function toBudgetBandLabel(monthlyBudget: number) {
-  if (monthlyBudget <= 2500000) return '월 200만 원 내외 (스타트업/테스트형)';
+  if (monthlyBudget <= 2000000) return '월 150만 ~ 200만 원 (테스트 운영형)';
+  if (monthlyBudget <= 3000000) return '월 200만 ~ 300만 원 (라이트 운영형)';
   if (monthlyBudget <= 5000000) return '월 300 ~ 500만 원 (성장기/브랜딩 강화형)';
   if (monthlyBudget <= 10000000) return '월 500 ~ 1,000만 원 (공격적 확장/시장 선점형)';
   return '월 1,000만 원 이상 (VIP/통합 마케팅형)';
@@ -223,11 +291,26 @@ function toMixLabel(mix?: MixType) {
   return '균형 믹스';
 }
 
+function toConsultLocationLabel(location?: ConsultLocation) {
+  return location === 'busan' ? '부산' : '서울';
+}
+
 function toAddOnLabel(addOns: AddOns) {
   const list: string[] = [];
+  if (addOns.consultingOnly) list.push('컨설팅 단독 상품');
+  if (addOns.inhouseSetup) list.push('인하우스 마케팅팀 셋업/채용 대행');
+  if (addOns.practicalTraining) list.push('영상 촬영/편집 실무 교육');
   if (addOns.drone) list.push('드론 촬영');
   if (addOns.motion) list.push('고급 모션 그래픽');
   return list.length > 0 ? list.join(', ') : '없음';
+}
+
+function getLineItemUnitPrice(form: FormState, key: LineItemKey) {
+  if (key === 'consultSession') {
+    return form.consultLocation === 'busan' ? 250000 : 150000;
+  }
+
+  return lineItemMap[key].unitPrice;
 }
 
 function getGoogleFormViewUrl() {
@@ -255,7 +338,11 @@ function buildConsultPrefillUrl(form: FormState, quote: QuoteResult) {
     `운영 목표: ${toGoalLabel(form.goal)}`,
     `콘텐츠 믹스: ${toMixLabel(form.mix)}`,
     `계약 기간: ${term}개월${anniversaryBenefit.active && term === 12 ? ' (12+1 혜택 문의)' : ''}`,
-    `별도 협의: ${toAddOnLabel(form.addOns)}`
+    `선택 옵션: ${toAddOnLabel(form.addOns)}`,
+    `컨설팅 지역: ${toConsultLocationLabel(form.consultLocation)}`,
+    form.addOns.consultingOnly
+      ? '컨설팅 단독 구성: 사전 설문(필수) + 오프라인 컨설팅(2시간) + 온라인 보고서(건별)'
+      : '월 운영대행 중심 구성'
   ].join('\n');
 
   url.searchParams.set('usp', 'pp_url');
@@ -275,23 +362,171 @@ function escapeHtml(value: string) {
     .replaceAll("'", '&#039;');
 }
 
+function getQuantityBounds(form: FormState, quantities: Quantities, key: LineItemKey) {
+  const item = lineItemMap[key];
+  let min = item.min;
+  let max = item.max;
+  const budget = form.monthlyBudget ?? 4400000;
+  const isLeanBudget = budget <= 3000000;
+  const isConsultingOnly = form.addOns.consultingOnly;
+  const term = form.term ?? 3;
+
+  const operationKeys: LineItemKey[] = ['shoot', 'planning', 'longform', 'reedit', 'shortform', 'thumbnail'];
+  const consultingFixedKeys: LineItemKey[] = ['consultSurvey', 'consultSession'];
+
+  if (isConsultingOnly && operationKeys.includes(key)) {
+    min = 0;
+    max = 0;
+    return { min, max, step: item.step };
+  }
+
+  if (consultingFixedKeys.includes(key)) {
+    const value = isConsultingOnly ? 1 : 0;
+    min = value;
+    max = value;
+    return { min, max, step: item.step };
+  }
+
+  if (key === 'consultReport') {
+    if (isConsultingOnly) {
+      min = 1;
+      max = 5;
+    } else {
+      min = 0;
+      max = 0;
+    }
+    return { min, max, step: item.step };
+  }
+
+  if (key === 'inhouseSetup') {
+    if (form.addOns.inhouseSetup) {
+      min = term;
+      max = term;
+    } else {
+      min = 0;
+      max = 0;
+    }
+    return { min, max, step: item.step };
+  }
+
+  if (key === 'practicalTraining') {
+    const enabled =
+      form.addOns.practicalTraining;
+    min = enabled ? 1 : 0;
+    max = enabled ? 1 : 0;
+    return { min, max, step: item.step };
+  }
+
+  if (key === 'thumbnail') {
+    if (quantities.longform <= 0) {
+      min = 0;
+      max = 0;
+    } else {
+      min = Math.max(min, quantities.longform);
+    }
+  }
+
+  if (key === 'shoot' && isLeanBudget) {
+    min = 0;
+    max = Math.min(max, 1);
+  }
+
+  if (key === 'planning' && isLeanBudget) {
+    min = Math.max(min, 2);
+  }
+
+  if (key === 'reedit') {
+    if (form.mix === 'short') {
+      min = Math.max(min, 4);
+    } else {
+      min = Math.max(min, 2);
+    }
+  }
+
+  if (key === 'shortform') {
+    if (form.mix === 'short') {
+      min = Math.max(min, isLeanBudget ? 2 : 4);
+    } else if (form.mix === 'balanced') {
+      min = Math.max(min, isLeanBudget ? 1 : 2);
+    }
+  }
+
+  if (key === 'longform') {
+    if (form.mix === 'short') {
+      min = 0;
+    } else if (form.mix === 'long') {
+      min = Math.max(min, isLeanBudget ? 1 : 2);
+    } else if (form.goal === 'brand' && !isLeanBudget) {
+      min = Math.max(min, 1);
+    }
+  }
+
+  return { min, max, step: item.step };
+}
+
+function applyDependentQuantityRules(form: FormState, quantities: Quantities): Quantities {
+  const next = { ...quantities };
+  const longformBounds = getQuantityBounds(form, next, 'longform');
+  next.longform = Math.min(longformBounds.max, Math.max(longformBounds.min, next.longform));
+
+  const thumbnailBounds = getQuantityBounds(form, next, 'thumbnail');
+  next.thumbnail = Math.min(thumbnailBounds.max, Math.max(thumbnailBounds.min, next.thumbnail));
+
+  const shootBounds = getQuantityBounds(form, next, 'shoot');
+  next.shoot = Math.min(shootBounds.max, Math.max(shootBounds.min, next.shoot));
+
+  const planningBounds = getQuantityBounds(form, next, 'planning');
+  next.planning = Math.min(planningBounds.max, Math.max(planningBounds.min, next.planning));
+
+  const shortformBounds = getQuantityBounds(form, next, 'shortform');
+  next.shortform = Math.min(shortformBounds.max, Math.max(shortformBounds.min, next.shortform));
+
+  const reeditBounds = getQuantityBounds(form, next, 'reedit');
+  next.reedit = Math.min(reeditBounds.max, Math.max(reeditBounds.min, next.reedit));
+
+  const consultSurveyBounds = getQuantityBounds(form, next, 'consultSurvey');
+  next.consultSurvey = Math.min(consultSurveyBounds.max, Math.max(consultSurveyBounds.min, next.consultSurvey));
+
+  const consultSessionBounds = getQuantityBounds(form, next, 'consultSession');
+  next.consultSession = Math.min(consultSessionBounds.max, Math.max(consultSessionBounds.min, next.consultSession));
+
+  const consultReportBounds = getQuantityBounds(form, next, 'consultReport');
+  next.consultReport = Math.min(consultReportBounds.max, Math.max(consultReportBounds.min, next.consultReport));
+
+  const inhouseSetupBounds = getQuantityBounds(form, next, 'inhouseSetup');
+  next.inhouseSetup = Math.min(inhouseSetupBounds.max, Math.max(inhouseSetupBounds.min, next.inhouseSetup));
+
+  const practicalTrainingBounds = getQuantityBounds(form, next, 'practicalTraining');
+  next.practicalTraining = Math.min(
+    practicalTrainingBounds.max,
+    Math.max(practicalTrainingBounds.min, next.practicalTraining)
+  );
+
+  return next;
+}
+
+function getVisibleLineItems(quote: QuoteResult) {
+  return lineItems.filter((item) => quote.quantities[item.key] > 0);
+}
+
 function downloadEstimateCsv(form: FormState, quote: QuoteResult) {
   const term = form.term ?? 3;
+  const visibleLineItems = getVisibleLineItems(quote);
   const rows = [
     ['항목', '단가', '수량', '구분', '합계'],
-    ...lineItems.map((item) => [
+    ...visibleLineItems.map((item) => [
       item.label,
-      item.unitPrice === 0 ? '0' : String(item.unitPrice),
+      String(getLineItemUnitPrice(form, item.key)),
       String(quote.quantities[item.key]),
       item.unitLabel,
-      item.unitPrice === 0 ? '패키지 포함' : String(quote.lineTotals[item.key])
+      getLineItemUnitPrice(form, item.key) === 0 ? '필수 절차' : String(quote.lineTotals[item.key])
     ]),
     [],
     ['채널 상태', toChannelLabel(form.channelState)],
     ['운영 목표', toGoalLabel(form.goal)],
     ['콘텐츠 믹스', toMixLabel(form.mix)],
     ['계약 기간', `${term}개월`],
-    ['별도 협의', toAddOnLabel(form.addOns)],
+    ['선택 옵션', toAddOnLabel(form.addOns)],
     ['공급가액', String(quote.subtotal)],
     ['할인율(%)', String(formatRate(quote.discountRate))],
     ['할인금액', String(quote.discountAmount)],
@@ -312,12 +547,14 @@ function downloadEstimateCsv(form: FormState, quote: QuoteResult) {
 
 function openEstimatePdfPrint(form: FormState, quote: QuoteResult) {
   const term = form.term ?? 3;
-  const tableRows = lineItems
+  const visibleLineItems = getVisibleLineItems(quote);
+  const tableRows = visibleLineItems
     .map((item) => {
-      const total = item.unitPrice === 0 ? '패키지 포함' : `${formatWon(quote.lineTotals[item.key])}원`;
+      const unitPrice = getLineItemUnitPrice(form, item.key);
+      const total = unitPrice === 0 ? '필수 절차' : `${formatWon(quote.lineTotals[item.key])}원`;
       return `<tr>
         <td>${escapeHtml(item.label)}</td>
-        <td style="text-align:right;">${item.unitPrice === 0 ? '0' : `${formatWon(item.unitPrice)}원`}</td>
+        <td style="text-align:right;">${unitPrice === 0 ? '0' : `${formatWon(unitPrice)}원`}</td>
         <td style="text-align:center;">${quote.quantities[item.key]}</td>
         <td style="text-align:center;">${escapeHtml(item.unitLabel)}</td>
         <td style="text-align:right;">${total}</td>
@@ -349,7 +586,9 @@ function openEstimatePdfPrint(form: FormState, quote: QuoteResult) {
       <p>채널 상태: ${escapeHtml(toChannelLabel(form.channelState))} · 운영 목표: ${escapeHtml(
     toGoalLabel(form.goal)
   )} · 콘텐츠 믹스: ${escapeHtml(toMixLabel(form.mix))}</p>
-      <p>계약 기간: ${term}개월 · 별도 협의: ${escapeHtml(toAddOnLabel(form.addOns))}</p>
+      <p>계약 기간: ${term}개월 · 선택 옵션: ${escapeHtml(toAddOnLabel(form.addOns))} · 컨설팅 지역: ${escapeHtml(
+    toConsultLocationLabel(form.consultLocation)
+  )}</p>
       ${anniversaryBenefit.active && term === 12 ? `<span class="badge">${escapeHtml(anniversaryBenefit.body)}</span>` : ''}
 
       <table>
@@ -382,18 +621,67 @@ function openEstimatePdfPrint(form: FormState, quote: QuoteResult) {
 const copyQuantities = (source: Quantities): Quantities => ({ ...source });
 
 function getInitialQuantities(form: FormState): Quantities {
-  const quantities: Quantities = {
-    shoot: 1,
-    planning: 6,
-    longform: 2,
-    reedit: 10,
-    shortform: 4,
-    thumbnail: 3
-  };
+  const budget = form.monthlyBudget ?? 4400000;
+  const quantities: Quantities =
+    budget <= 2600000
+      ? {
+          shoot: 0,
+          planning: 2,
+          longform: 0,
+          reedit: 6,
+          shortform: 3,
+          thumbnail: 0,
+          consultSurvey: 0,
+          consultSession: 0,
+          consultReport: 0,
+          inhouseSetup: 0,
+          practicalTraining: 0
+        }
+      : budget <= 3600000
+      ? {
+          shoot: 1,
+          planning: 4,
+          longform: 1,
+          reedit: 8,
+          shortform: 3,
+          thumbnail: 1,
+          consultSurvey: 0,
+          consultSession: 0,
+          consultReport: 0,
+          inhouseSetup: 0,
+          practicalTraining: 0
+        }
+      : budget <= 5000000
+      ? {
+          shoot: 1,
+          planning: 6,
+          longform: 2,
+          reedit: 10,
+          shortform: 4,
+          thumbnail: 2,
+          consultSurvey: 0,
+          consultSession: 0,
+          consultReport: 0,
+          inhouseSetup: 0,
+          practicalTraining: 0
+        }
+      : {
+          shoot: 2,
+          planning: 8,
+          longform: 3,
+          reedit: 12,
+          shortform: 6,
+          thumbnail: 3,
+          consultSurvey: 0,
+          consultSession: 0,
+          consultReport: 0,
+          inhouseSetup: 0,
+          practicalTraining: 0
+        };
 
   if (form.channelState === 'new') {
-    quantities.planning += 2;
-    quantities.thumbnail += 1;
+    quantities.planning += budget <= 3000000 ? 1 : 2;
+    quantities.thumbnail += budget <= 3000000 ? 0 : 1;
   }
 
   if (form.channelState === 'rebuild') {
@@ -402,23 +690,25 @@ function getInitialQuantities(form: FormState): Quantities {
   }
 
   if (form.goal === 'lead') {
-    quantities.longform += 1;
+    quantities.longform = Math.max(0, quantities.longform - 1);
     quantities.shortform += 2;
+    quantities.reedit += 2;
   }
 
   if (form.goal === 'brand') {
     quantities.longform += 1;
     quantities.thumbnail += 1;
+    quantities.shortform = Math.max(0, quantities.shortform - 1);
   }
 
   if (form.mix === 'long') {
     quantities.longform += 2;
-    quantities.shortform = Math.max(2, quantities.shortform - 2);
+    quantities.shortform = Math.max(0, quantities.shortform - 2);
     quantities.reedit = Math.max(4, quantities.reedit - 4);
   }
 
   if (form.mix === 'short') {
-    quantities.longform = Math.max(1, quantities.longform - 1);
+    quantities.longform = Math.max(0, quantities.longform - 2);
     quantities.shortform += 4;
     quantities.reedit += 4;
   }
@@ -428,10 +718,17 @@ function getInitialQuantities(form: FormState): Quantities {
     quantities.reedit += 2;
   }
 
-  return quantities;
+  return applyDependentQuantityRules(form, quantities);
 }
 
 function getDiscountRate(form: FormState) {
+  if (form.addOns.consultingOnly) {
+    return {
+      rate: 0,
+      notes: ['컨설팅 단독 상품은 회차형 고정 단가로 할인율이 적용되지 않습니다.']
+    };
+  }
+
   const term = form.term ?? 3;
   const budget = form.monthlyBudget ?? 4400000;
 
@@ -460,48 +757,81 @@ function getDiscountRate(form: FormState) {
   return { rate, notes };
 }
 
-function subtotalFor(quantities: Quantities) {
-  return lineItems.reduce((sum, item) => sum + item.unitPrice * quantities[item.key], 0);
+function subtotalFor(form: FormState, quantities: Quantities) {
+  return lineItems.reduce((sum, item) => sum + getLineItemUnitPrice(form, item.key) * quantities[item.key], 0);
 }
 
-function getAdjustmentOrders(mix: MixType | undefined) {
+function getAdjustmentOrders(form: FormState) {
+  if (form.addOns.consultingOnly) {
+    return {
+      addOrder: [] as LineItemKey[],
+      removeOrder: [] as LineItemKey[]
+    };
+  }
+
+  const mix = form.mix;
+  const goal = form.goal;
+  const budget = form.monthlyBudget ?? 4400000;
+  const isLeanBudget = budget <= 3000000;
+
   if (mix === 'short') {
     return {
-      addOrder: ['shortform', 'planning', 'thumbnail', 'longform', 'shoot'] as LineItemKey[],
-      removeOrder: ['thumbnail', 'planning', 'longform', 'shortform', 'shoot'] as LineItemKey[]
+      addOrder: ['shortform', 'reedit', 'planning', 'thumbnail', 'longform', 'shoot'] as LineItemKey[],
+      removeOrder: (isLeanBudget
+        ? ['thumbnail', 'longform', 'shoot', 'planning', 'shortform']
+        : ['thumbnail', 'planning', 'longform', 'shortform', 'shoot']) as LineItemKey[]
     };
   }
 
   if (mix === 'long') {
     return {
       addOrder: ['longform', 'planning', 'thumbnail', 'shortform', 'shoot'] as LineItemKey[],
-      removeOrder: ['thumbnail', 'planning', 'shortform', 'longform', 'shoot'] as LineItemKey[]
+      removeOrder: (isLeanBudget
+        ? ['thumbnail', 'shortform', 'shoot', 'planning', 'longform']
+        : ['thumbnail', 'planning', 'shortform', 'longform', 'shoot']) as LineItemKey[]
+    };
+  }
+
+  if (goal === 'lead') {
+    return {
+      addOrder: ['shortform', 'reedit', 'planning', 'longform', 'thumbnail', 'shoot'] as LineItemKey[],
+      removeOrder: (isLeanBudget
+        ? ['thumbnail', 'longform', 'shoot', 'planning', 'shortform']
+        : ['thumbnail', 'planning', 'longform', 'shortform', 'shoot']) as LineItemKey[]
     };
   }
 
   return {
-    addOrder: ['planning', 'longform', 'shortform', 'thumbnail', 'shoot'] as LineItemKey[],
-    removeOrder: ['thumbnail', 'planning', 'shortform', 'longform', 'shoot'] as LineItemKey[]
+    addOrder: ['planning', 'longform', 'shortform', 'reedit', 'thumbnail', 'shoot'] as LineItemKey[],
+    removeOrder: (isLeanBudget
+      ? ['thumbnail', 'shoot', 'longform', 'planning', 'shortform']
+      : ['thumbnail', 'planning', 'shortform', 'longform', 'shoot']) as LineItemKey[]
   };
 }
 
 function optimizeQuantities(form: FormState, base: Quantities, discountRate: number): Quantities {
   const budget = form.monthlyBudget ?? 4400000;
   const targetSubtotal = Math.round(budget / Math.max(0.01, 1 - discountRate));
-  const quantities = copyQuantities(base);
-  const { addOrder, removeOrder } = getAdjustmentOrders(form.mix);
+  let quantities = applyDependentQuantityRules(form, copyQuantities(base));
+  const { addOrder, removeOrder } = getAdjustmentOrders(form);
 
   let loopCount = 0;
-  while (subtotalFor(quantities) > targetSubtotal * 1.03 && loopCount < 240) {
+  while (subtotalFor(form, quantities) > targetSubtotal * 1.03 && loopCount < 240) {
     let changed = false;
 
     for (const key of removeOrder) {
       const item = lineItemMap[key];
       if (item.unitPrice === 0) continue;
+      const { min } = getQuantityBounds(form, quantities, key);
 
       const next = quantities[key] - item.step;
-      if (next >= item.min) {
-        quantities[key] = next;
+      if (next >= min) {
+        const candidate = applyDependentQuantityRules(form, {
+          ...quantities,
+          [key]: next
+        });
+        if (subtotalFor(form, candidate) === subtotalFor(form, quantities) && candidate[key] === quantities[key]) continue;
+        quantities = candidate;
         changed = true;
         break;
       }
@@ -512,14 +842,20 @@ function optimizeQuantities(form: FormState, base: Quantities, discountRate: num
   }
 
   loopCount = 0;
-  while (subtotalFor(quantities) < targetSubtotal * 0.97 && loopCount < 240) {
+  while (subtotalFor(form, quantities) < targetSubtotal * 0.97 && loopCount < 240) {
     let changed = false;
 
     for (const key of addOrder) {
       const item = lineItemMap[key];
+      const { max } = getQuantityBounds(form, quantities, key);
       const next = quantities[key] + item.step;
-      if (next <= item.max) {
-        quantities[key] = next;
+      if (next <= max) {
+        const candidate = applyDependentQuantityRules(form, {
+          ...quantities,
+          [key]: next
+        });
+        if (subtotalFor(form, candidate) === subtotalFor(form, quantities) && candidate[key] === quantities[key]) continue;
+        quantities = candidate;
         changed = true;
         break;
       }
@@ -537,14 +873,13 @@ function optimizeQuantities(form: FormState, base: Quantities, discountRate: num
     quantities.reedit = Math.max(8, Math.round(quantities.shortform * 1.5));
   }
 
-  quantities.thumbnail = Math.max(quantities.thumbnail, quantities.longform);
-
-  return quantities;
+  return applyDependentQuantityRules(form, quantities);
 }
 
 function calculateQuote(form: FormState, quantities: Quantities, rate: number, notes: string[]): QuoteResult {
+  const normalizedQuantities = applyDependentQuantityRules(form, quantities);
   const lineTotals = lineItems.reduce((acc, item) => {
-    acc[item.key] = item.unitPrice * quantities[item.key];
+    acc[item.key] = getLineItemUnitPrice(form, item.key) * normalizedQuantities[item.key];
     return acc;
   }, {} as Record<LineItemKey, number>);
 
@@ -558,7 +893,7 @@ function calculateQuote(form: FormState, quantities: Quantities, rate: number, n
 
   return {
     lineTotals,
-    quantities,
+    quantities: normalizedQuantities,
     subtotal,
     discountRate: rate,
     discountAmount,
@@ -616,13 +951,18 @@ export default function DiagnosticCalculator() {
   };
 
   const toggleAddOn = (key: keyof AddOns) => {
-    setForm((prev) => ({
-      ...prev,
-      addOns: {
-        ...prev.addOns,
-        [key]: !prev.addOns[key]
-      }
-    }));
+    setForm((prev) => {
+      const nextValue = !prev.addOns[key];
+      return {
+        ...prev,
+        consultLocation:
+          key === 'consultingOnly' && nextValue ? (prev.consultLocation ?? 'seoul') : prev.consultLocation,
+        addOns: {
+          ...prev.addOns,
+          [key]: nextValue
+        }
+      };
+    });
   };
 
   const goNext = () => {
@@ -656,13 +996,14 @@ export default function DiagnosticCalculator() {
       if (!prev) return prev;
 
       const item = lineItemMap[key];
+      const { min, max } = getQuantityBounds(form, prev.quantities, key);
       const next = prev.quantities[key] + item.step * direction;
-      if (next < item.min || next > item.max) return prev;
+      if (next < min || next > max) return prev;
 
-      const quantities = {
+      const quantities = applyDependentQuantityRules(form, {
         ...prev.quantities,
         [key]: next
-      };
+      });
 
       return calculateQuote(form, quantities, prev.discountRate, prev.discountNotes);
     });
@@ -715,7 +1056,7 @@ export default function DiagnosticCalculator() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-          <aside className="h-fit rounded-2xl border border-black/10 bg-white p-4 md:p-5">
+          <aside className="order-2 h-fit rounded-2xl border border-black/10 bg-white p-4 md:p-5 lg:order-1 lg:sticky lg:top-24">
             <div className="mb-4">
               <div className="flex items-end justify-between">
                 <p className="text-[13px] font-semibold tracking-[0.08em] text-black/55">진행 상태</p>
@@ -779,7 +1120,7 @@ export default function DiagnosticCalculator() {
             ) : null}
           </aside>
 
-          <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)] md:p-8">
+          <div className="order-1 rounded-2xl border border-black/10 bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)] md:p-8 lg:order-2">
             <AnimatePresence mode="wait">
               {quote ? (
                 <motion.div
@@ -792,10 +1133,14 @@ export default function DiagnosticCalculator() {
                     <div>
                       <p className="text-xs font-semibold tracking-[0.12em] text-black/45">맞춤 견적서</p>
                       <h3 className="mt-1 text-[30px] font-bold tracking-tight text-[#0B0F0E] md:text-[34px]">
-                        월 {formatWon(quote.budget)}원 예산 최적안
+                        {form.addOns.consultingOnly
+                          ? '컨설팅 단독 상품 견적안'
+                          : `월 ${formatWon(quote.budget)}원 예산 최적안`}
                       </h3>
                       <p className="mt-1 text-sm text-black/58">
-                        예산 활용도 {quote.utilization}% · 할인율 {formatRate(quote.discountRate)}% 적용
+                        {form.addOns.consultingOnly
+                          ? '사전 설문 + 오프라인 1회(2시간 이내) + 온라인 보고서 1회 구성'
+                          : `예산 활용도 ${quote.utilization}% · 할인율 ${formatRate(quote.discountRate)}% 적용`}
                       </p>
                     </div>
                     <p className="text-sm font-medium text-black/52">산출일: {new Date().toLocaleDateString()}</p>
@@ -820,39 +1165,53 @@ export default function DiagnosticCalculator() {
                         </tr>
                       </thead>
                       <tbody>
-                        {lineItems.map((item) => (
-                          <tr key={item.key} className="border-t border-black/8 text-sm text-black/72">
-                            <td className="px-4 py-4 font-medium text-[#0B0F0E]">{item.label}</td>
-                            <td className="px-4 py-4 text-right">
-                              {item.unitPrice === 0 ? '0' : formatWon(item.unitPrice)}
-                            </td>
-                            <td className="px-4 py-4">
-                              <div className="flex items-center justify-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => adjustQuantity(item.key, -1)}
-                                  className="inline-flex h-7 w-7 items-center justify-center rounded border border-black/15 text-black/70 leading-none transition-colors hover:bg-black/[0.04]"
-                                >
-                                  -
-                                </button>
-                                <span className="min-w-[34px] text-center font-semibold text-[#0B0F0E]">
-                                  {quote.quantities[item.key]}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => adjustQuantity(item.key, 1)}
-                                  className="inline-flex h-7 w-7 items-center justify-center rounded border border-black/15 text-black/70 leading-none transition-colors hover:bg-black/[0.04]"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </td>
-                            <td className="px-4 py-4 text-center text-black/55">{item.unitLabel}</td>
-                            <td className="px-4 py-4 text-right font-semibold text-[#0B0F0E]">
-                              {item.unitPrice === 0 ? '패키지 포함' : formatWon(quote.lineTotals[item.key])}
-                            </td>
-                          </tr>
-                        ))}
+                        {getVisibleLineItems(quote).map((item) => {
+                          const bounds = getQuantityBounds(form, quote.quantities, item.key);
+                          const canDecrement = quote.quantities[item.key] - item.step >= bounds.min;
+                          const canIncrement = quote.quantities[item.key] + item.step <= bounds.max;
+                          const unitPrice = getLineItemUnitPrice(form, item.key);
+
+                          return (
+                            <tr key={item.key} className="border-t border-black/8 text-sm text-black/72">
+                              <td className="px-4 py-4 font-medium text-[#0B0F0E]">
+                                {item.label}
+                                {item.key === 'thumbnail' && quote.quantities.longform === 0 ? (
+                                  <p className="mt-1 text-xs font-medium text-black/45">롱폼 1편 이상 선택 시 적용</p>
+                                ) : null}
+                              </td>
+                              <td className="px-4 py-4 text-right">
+                                {unitPrice === 0 ? '0' : formatWon(unitPrice)}
+                              </td>
+                              <td className="px-4 py-4">
+                                <div className="flex items-center justify-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => adjustQuantity(item.key, -1)}
+                                    disabled={!canDecrement}
+                                    className="inline-flex h-7 w-7 items-center justify-center rounded border border-black/15 text-black/70 leading-none transition-colors hover:bg-black/[0.04] disabled:cursor-not-allowed disabled:opacity-35"
+                                  >
+                                    -
+                                  </button>
+                                  <span className="min-w-[34px] text-center font-semibold text-[#0B0F0E]">
+                                    {quote.quantities[item.key]}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => adjustQuantity(item.key, 1)}
+                                    disabled={!canIncrement}
+                                    className="inline-flex h-7 w-7 items-center justify-center rounded border border-black/15 text-black/70 leading-none transition-colors hover:bg-black/[0.04] disabled:cursor-not-allowed disabled:opacity-35"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="px-4 py-4 text-center text-black/55">{item.unitLabel}</td>
+                              <td className="px-4 py-4 text-right font-semibold text-[#0B0F0E]">
+                                {unitPrice === 0 ? '필수 절차' : formatWon(quote.lineTotals[item.key])}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -1015,7 +1374,7 @@ export default function DiagnosticCalculator() {
 
                       <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
                         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                          <p className="text-sm font-semibold text-black/62">예산 직접 입력 (200만원 ~ 1,200만원)</p>
+                          <p className="text-sm font-semibold text-black/62">예산 직접 입력 (150만원 ~ 1,200만원)</p>
                           <label className="inline-flex items-center gap-2 text-sm">
                             <span className="text-black/50">공급가 기준</span>
                             <input
@@ -1032,7 +1391,7 @@ export default function DiagnosticCalculator() {
 
                         <input
                           type="range"
-                          min={2000000}
+                          min={1500000}
                           max={12000000}
                           step={100000}
                           value={form.monthlyBudget ?? 4400000}
@@ -1040,7 +1399,7 @@ export default function DiagnosticCalculator() {
                           className="mt-4 h-2 w-full cursor-pointer accent-[#21c1a2]"
                         />
                         <div className="mt-2 flex justify-between text-xs text-black/45">
-                          <span>200만원</span>
+                          <span>150만원</span>
                           <span>600만원</span>
                           <span>1,200만원</span>
                         </div>
@@ -1147,6 +1506,81 @@ export default function DiagnosticCalculator() {
                     <div className="space-y-4">
                       <button
                         type="button"
+                        onClick={() => toggleAddOn('consultingOnly')}
+                        className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
+                          form.addOns.consultingOnly
+                            ? 'border-[#21c1a2] bg-[#21c1a2]/10'
+                            : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
+                        }`}
+                      >
+                        <p className="text-[18px] font-semibold text-[#0B0F0E]">컨설팅 단독 상품</p>
+                        <p className="mt-1 text-sm text-black/60">
+                          사전 설문 + 1회 오프라인 컨설팅(2시간 이내) + 온라인 보고서 1회 제공
+                        </p>
+                      </button>
+
+                      {form.addOns.consultingOnly ? (
+                        <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
+                          <p className="text-[13px] font-semibold text-black/60">오프라인 컨설팅 지역</p>
+                          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                            {[
+                              { value: 'seoul' as ConsultLocation, label: '서울 (15만원)' },
+                              { value: 'busan' as ConsultLocation, label: '부산 (25만원)' }
+                            ].map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => updateForm('consultLocation', option.value)}
+                                className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+                                  (form.consultLocation ?? 'seoul') === option.value
+                                    ? 'border-[#21c1a2] bg-[#21c1a2]/10 text-[#0B0F0E]'
+                                    : 'border-black/12 text-black/60 hover:bg-black/[0.03]'
+                                }`}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleAddOn('inhouseSetup')}
+                          className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
+                            form.addOns.inhouseSetup
+                              ? 'border-[#21c1a2] bg-[#21c1a2]/10'
+                              : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
+                          }`}
+                        >
+                          <p className="text-[18px] font-semibold text-[#0B0F0E]">인하우스 팀 셋업/채용 대행</p>
+                          <p className="mt-1 text-sm text-black/60">
+                            월 50만원 · 면접 대행 + 팀 구성 + 장비/운영 솔루션 제공
+                          </p>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => toggleAddOn('practicalTraining')}
+                          className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
+                            form.addOns.practicalTraining
+                              ? 'border-[#21c1a2] bg-[#21c1a2]/10'
+                              : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
+                          }`}
+                        >
+                          <p className="text-[18px] font-semibold text-[#0B0F0E]">영상 촬영/편집 실무 교육</p>
+                          <p className="mt-1 text-sm text-black/60">
+                            1개월 과정 · 주 1회(2시간) · 총 8회 커리큘럼
+                          </p>
+                        </button>
+                      </div>
+
+                      <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
+                        <p className="text-[13px] font-semibold text-black/60">별도 협의 항목 (견적 미포함)</p>
+                        <div className="mt-3 space-y-3">
+                      <button
+                        type="button"
                         onClick={() => toggleAddOn('drone')}
                         className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
                           form.addOns.drone
@@ -1170,6 +1604,8 @@ export default function DiagnosticCalculator() {
                         <p className="text-[18px] font-semibold text-[#0B0F0E]">고급 모션 그래픽</p>
                         <p className="mt-1 text-sm text-black/60">난이도/러닝타임 기준으로 별도 협의 (견적 미포함)</p>
                       </button>
+                        </div>
+                      </div>
                     </div>
                   ) : null}
 

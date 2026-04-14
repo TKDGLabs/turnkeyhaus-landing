@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import IntroGate from "../components/IntroGate";
 import ContactCTA from "../components/ContactCTA";
 import StrategyChapterDeck from "../components/StrategyChapterDeck";
 import DiagnosticCalculator from "../components/DiagnosticCalculator";
@@ -111,21 +110,13 @@ export default function Page() {
   const hasPhoneHref = phoneHref.startsWith("tel:");
   const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
   const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
-  const [introTitle = "", ...introSubtitleLines] = content.heroValue.scrollGuide.split("\n");
-  const introSubtitle = introSubtitleLines.join("\n");
 
   const totalSubscribers = content.portfolio.items.reduce((sum, item) => sum + item.subscriberCurrent, 0);
-  const maxViews = Math.max(...content.portfolio.items.map((item) => item.maxVideoViews));
+  const totalVideoViews = content.heroStats.totalVideoViews;
+  const totalVideoViewsInMan = `${formatInteger(totalVideoViews / 10000)}만+`;
 
   return (
-    <main className="bg-white text-[#0B0F0E]">
-      <IntroGate
-        logoSrc="/logo.png"
-        logoAlt="Turnkeyhaus"
-        title={introTitle}
-        subtitle={introSubtitle}
-      />
-
+    <main className="bg-white pb-[88px] text-[#0B0F0E] md:pb-0">
       <header className="sticky top-0 z-40 border-b border-black/15 bg-white/95 backdrop-blur-xl">
         <div className={`${shell} flex items-center justify-between py-4`}>
           <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
@@ -158,23 +149,38 @@ export default function Page() {
             소개서 다운로드
           </ActionLink>
         </div>
+
+        <div className="border-t border-black/8 lg:hidden">
+          <nav className={`${shell} no-scrollbar flex items-center gap-2 overflow-x-auto py-2`}>
+            {content.nav.map((item) => (
+              <Link
+                key={`mobile-${item.href}`}
+                href={item.href}
+                className={`inline-flex h-8 shrink-0 items-center border border-black/10 px-3 text-xs font-semibold text-black/68 transition-colors hover:bg-black/[0.03] hover:text-black ${focusRing}`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </header>
 
-      <section id="top" className="relative isolate min-h-[88svh] overflow-hidden border-b border-black/15">
+      <section id="top" className="relative isolate min-h-[70svh] overflow-hidden border-b border-black/15 bg-[#0d1312] md:min-h-[80svh]">
         <video
           autoPlay
           muted
           loop
           playsInline
-          preload="auto"
-          className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center md:object-[center_42%]"
+          preload="metadata"
+          poster="/images/mobile-hero-cover-optimized.jpg"
+          className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-[center_36%] brightness-[1.1] contrast-[1.03] sm:object-[center_38%] lg:object-contain lg:object-center"
         >
           <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
         </video>
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(107deg,rgba(7,10,10,0.86)_0%,rgba(7,10,10,0.62)_45%,rgba(7,10,10,0.28)_100%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_14%,rgba(29,137,120,0.3),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(107deg,rgba(7,10,10,0.56)_0%,rgba(7,10,10,0.3)_46%,rgba(7,10,10,0.06)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_14%,rgba(29,137,120,0.12),transparent_60%)]" />
 
-        <div className={`${shell} relative flex min-h-[88svh] flex-col justify-end pb-16 pt-28 md:pb-20 md:pt-36`}>
+        <div className={`${shell} relative flex min-h-[70svh] flex-col justify-end pb-16 pt-28 md:min-h-[80svh] md:pb-20 md:pt-36`}>
           <div className="fade-up max-w-[820px] space-y-6 text-white">
             <p className="text-sm font-semibold tracking-[0.18em] text-white/72">TURNKEYHAUS</p>
             <h1 className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.26] tracking-tight md:text-[68px] md:leading-[1.16]">
@@ -202,7 +208,7 @@ export default function Page() {
 
           <dl className="fade-up mt-12 grid gap-5 border-t border-white/25 pt-6 text-white sm:grid-cols-3">
             <div className="space-y-1">
-              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">운영 사례</dt>
+              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">대표 사례</dt>
               <dd className="text-[34px] font-semibold tracking-tight">{content.portfolio.items.length}개 채널</dd>
             </div>
             <div className="space-y-1">
@@ -210,8 +216,8 @@ export default function Page() {
               <dd className="text-[34px] font-semibold tracking-tight">{formatInteger(totalSubscribers)}명</dd>
             </div>
             <div className="space-y-1">
-              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">최고 조회수</dt>
-              <dd className="text-[34px] font-semibold tracking-tight">{formatViewsKorean(maxViews)}회</dd>
+              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">전체 영상 누적 조회수</dt>
+              <dd className="text-[34px] font-semibold tracking-tight">약 {totalVideoViewsInMan}</dd>
             </div>
           </dl>
         </div>
@@ -385,7 +391,7 @@ export default function Page() {
             {content.portfolio.items.map((item) => (
               <article
                 key={item.title}
-                className="grid gap-8 border-t border-black/12 py-10 md:grid-cols-[1.05fr_0.95fr] md:gap-10"
+                className="grid gap-7 border-t border-black/14 py-11 md:grid-cols-[1.02fr_0.98fr] md:gap-12"
               >
                 <div className="relative aspect-video overflow-hidden border border-black/10 bg-black">
                   {item.youtubeId ? (
@@ -394,6 +400,8 @@ export default function Page() {
                       title={item.title}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
                       className="absolute inset-0 h-full w-full border-0"
                     />
                   ) : (
@@ -407,46 +415,52 @@ export default function Page() {
                   )}
                 </div>
 
-                <div className="flex flex-col justify-between gap-6">
-                  <div className="space-y-3">
-                    <h3 className="text-[31px] font-semibold tracking-tight text-[#0B0F0E]">{item.title}</h3>
-                    <p className="text-base leading-[1.9] text-black/72">{item.oneLiner}</p>
-                    {item.channelHref ? (
-                      <a
-                        href={item.channelHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`inline-flex items-center border-b border-black/25 pb-0.5 text-xs font-semibold tracking-[0.08em] text-black/62 transition-colors hover:text-black ${focusRing}`}
-                      >
-                        채널 보기
-                      </a>
-                    ) : null}
-                    <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col justify-between gap-7 md:gap-8">
+                  <div className="space-y-4">
+                    <h3 className="text-[33px] font-semibold leading-[1.18] tracking-[-0.02em] text-[#0B0F0E]">{item.title}</h3>
+                    <p className="text-[13px] font-semibold tracking-[0.08em] text-black/56">
+                      클라이언트: <span className="tracking-[0.02em] text-black/72">{item.clientName}</span>
+                    </p>
+                    <p className="max-w-[58ch] break-keep text-[17px] leading-[1.82] text-black/76">{item.oneLiner}</p>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-black/10 pt-3">
+                      <span className="text-[11px] font-semibold tracking-[0.12em] text-black/45">키워드</span>
                       {item.tags.map((tag) => (
-                        <span key={tag} className="text-xs font-semibold tracking-[0.08em] text-black/56">
+                        <span key={tag} className="text-[12px] font-semibold tracking-[0.04em] text-black/64">
                           #{tag}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  <dl className="divide-y divide-black/12 border-y border-black/12">
-                    <div className="flex items-center justify-between gap-4 py-3 text-sm">
-                      <dt className="text-black/60">구독자 변화</dt>
-                      <dd className="font-semibold text-[#0B0F0E]">{item.result}</dd>
+                  <dl className="divide-y divide-black/14 border-y border-black/14">
+                    <div className="grid grid-cols-[96px_1fr] items-center gap-4 py-3.5 text-[15px]">
+                      <dt className="font-medium text-black/58">구독자 변화</dt>
+                      <dd className="text-right font-semibold text-[#0B0F0E]">{item.result}</dd>
                     </div>
-                    <div className="flex items-center justify-between gap-4 py-3 text-sm">
-                      <dt className="text-black/60">최고 조회수</dt>
-                      <dd className="font-semibold text-[#21c1a2]">{formatViewsKorean(item.maxVideoViews)}회</dd>
+                    <div className="grid grid-cols-[96px_1fr] items-center gap-4 py-3.5 text-[15px]">
+                      <dt className="font-medium text-black/58">최고 조회수</dt>
+                      <dd className="text-right font-semibold text-[#21c1a2]">{formatViewsKorean(item.maxVideoViews)}회</dd>
                     </div>
                   </dl>
 
-                  <ActionLink
-                    href={item.href}
-                    className="inline-flex w-fit items-center border-b border-[#21c1a2] pb-1 text-sm font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197]"
-                  >
-                    실제 영상 보기
-                  </ActionLink>
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1">
+                    <ActionLink
+                      href={item.href}
+                      className="inline-flex w-fit items-center border-b border-[#21c1a2] pb-1 text-[15px] font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197]"
+                    >
+                      실제 영상 보기
+                    </ActionLink>
+                    {item.channelHref ? (
+                      <a
+                        href={item.channelHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`inline-flex items-center border-b border-black/25 pb-1 text-[15px] font-semibold text-black/62 transition-colors hover:text-black ${focusRing}`}
+                      >
+                        채널 보기
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
               </article>
             ))}
@@ -564,13 +578,13 @@ export default function Page() {
               {hasFormEmbedUrl ? (
                 <iframe
                   src={formEmbedUrl}
-                  className="h-[860px] w-full md:h-[920px]"
+                  className="h-[clamp(760px,80vh,980px)] w-full"
                   loading="lazy"
                   title={content.contact.iframeTitle}
                   referrerPolicy="strict-origin-when-cross-origin"
                 />
               ) : (
-                <div className="grid h-[860px] place-items-center p-6 text-center text-sm leading-relaxed text-black/60 md:h-[920px]">
+                <div className="grid h-[clamp(760px,80vh,980px)] place-items-center p-6 text-center text-sm leading-relaxed text-black/60">
                   Google Form 임베드 URL이 아직 설정되지 않았습니다.
                   <br />
                   README의 안내대로 임베드 URL을 입력해 주세요.
