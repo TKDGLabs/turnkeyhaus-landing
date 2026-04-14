@@ -205,19 +205,6 @@ export default function Page() {
           </ActionLink>
         </div>
 
-        <div className="border-t border-black/8 lg:hidden">
-          <nav className={`${shell} no-scrollbar flex items-center gap-2 overflow-x-auto py-2.5`}>
-            {content.nav.map((item) => (
-              <Link
-                key={`mobile-${item.href}`}
-                href={item.href}
-                className={`inline-flex h-8 shrink-0 items-center rounded-full bg-black/[0.05] px-3.5 text-[12px] font-semibold text-black/72 transition-colors hover:bg-black/[0.1] hover:text-black ${focusRing}`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
       </header>
 
       <section id="top" className="overflow-hidden bg-white">
