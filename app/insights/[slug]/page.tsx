@@ -42,7 +42,16 @@ export function generateMetadata({ params }: InsightParams): Metadata {
       title: post.title,
       description: post.description,
       url: `https://www.turnkey.haus/insights/${post.slug}`,
-      type: "article"
+      type: "article",
+      images: [
+        {
+          url: `${content.seo.siteUrl}${content.seo.ogImagePath}`,
+          width: 1200,
+          height: 630,
+          alt: post.title
+        }
+      ],
+      publishedTime: `${post.publishedAt}T00:00:00+09:00`
     }
   };
 }
@@ -52,8 +61,36 @@ export default function InsightDetailPage({ params }: InsightParams) {
 
   if (!post) return notFound();
 
+  const articleStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.description,
+    inLanguage: "ko-KR",
+    datePublished: post.publishedAt,
+    dateModified: post.publishedAt,
+    mainEntityOfPage: `${content.seo.siteUrl}/insights/${post.slug}`,
+    author: {
+      "@type": "Organization",
+      name: content.brand.name
+    },
+    publisher: {
+      "@type": "Organization",
+      name: content.brand.name,
+      logo: {
+        "@type": "ImageObject",
+        url: `${content.seo.siteUrl}/logo.png`
+      }
+    },
+    keywords: post.keywords.join(", ")
+  };
+
   return (
     <main className="min-h-screen bg-white text-[#0B0F0E]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleStructuredData) }}
+      />
       <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-5 py-5">
           <Link href="/" className="flex h-11 shrink-0 items-center">

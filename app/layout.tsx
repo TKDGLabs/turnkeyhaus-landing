@@ -67,6 +67,17 @@ export const metadata: Metadata = {
 const footerValue = (label: string) =>
   content.footer.lines.find((line) => line.label === label)?.value ?? "";
 
+const geoKeywords = [
+  "유튜브 채널 운영대행",
+  "브랜딩 콘텐츠 제작",
+  "유튜브 SEO",
+  "GEO",
+  "병원 마케팅",
+  "로펌 마케팅",
+  "정부 기관 콘텐츠 운영",
+  "커머스 콘텐츠 운영"
+];
+
 const structuredData = [
   {
     "@context": "https://schema.org",
@@ -77,6 +88,21 @@ const structuredData = [
     url: "https://www.turnkey.haus",
     description: "브랜딩 콘텐츠 제작 및 유튜브 채널 운영대행",
     logo: `${content.seo.siteUrl}/logo.png`,
+    founder: {
+      "@type": "Person",
+      name: footerValue("대표자")
+    },
+    areaServed: "KR",
+    knowsAbout: geoKeywords,
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Turnkeyhaus 운영 서비스",
+      itemListElement: [
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "브랜딩 콘텐츠 제작" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "유튜브 채널 운영대행" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "채널 구조 진단 및 전환 설계" } }
+      ]
+    },
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer support",
@@ -94,18 +120,16 @@ const structuredData = [
     "@type": "WebSite",
     name: content.brand.name,
     url: content.seo.siteUrl,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${content.seo.siteUrl}/?q={search_term_string}`,
-      "query-input": "required name=search_term_string"
-    }
+    inLanguage: "ko-KR"
   },
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: content.brand.name,
     url: content.seo.siteUrl,
-    description: content.seo.description
+    description: content.seo.description,
+    inLanguage: "ko-KR",
+    about: geoKeywords
   }
 ];
 

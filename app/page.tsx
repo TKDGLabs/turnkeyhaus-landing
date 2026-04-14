@@ -114,9 +114,64 @@ export default function Page() {
   const totalSubscribers = content.portfolio.items.reduce((sum, item) => sum + item.subscriberCurrent, 0);
   const totalVideoViews = content.heroStats.totalVideoViews;
   const totalVideoViewsInMan = `${formatInteger(totalVideoViews / 10000)}만+`;
+  const homepageStructuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: "브랜딩 콘텐츠 제작 및 유튜브 채널 운영대행",
+      serviceType: [
+        "브랜딩 콘텐츠 제작",
+        "유튜브 채널 운영대행",
+        "채널 구조 진단",
+        "SEO/GEO 기반 콘텐츠 운영"
+      ],
+      provider: {
+        "@type": "Organization",
+        name: content.brand.name,
+        url: content.seo.siteUrl
+      },
+      areaServed: "KR",
+      audience: [
+        { "@type": "BusinessAudience", audienceType: "병원·의료 기관" },
+        { "@type": "BusinessAudience", audienceType: "법무·세무·회계·노무 등 전문 서비스" },
+        { "@type": "BusinessAudience", audienceType: "정부 기관·민간사업체" },
+        { "@type": "BusinessAudience", audienceType: "커머스·온라인 서비스" }
+      ],
+      description: content.seo.description,
+      url: content.seo.siteUrl
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: content.faq.items.map((item) => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.a
+        }
+      }))
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "턴키하우스 추천 질의 시나리오",
+      itemListElement: content.aiRecommendation.items.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.prompt,
+        description: item.fit,
+        url: `${content.seo.siteUrl}/#fit`
+      }))
+    }
+  ];
 
   return (
     <main className="bg-white pb-[88px] text-[#0B0F0E] md:pb-0">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageStructuredData) }}
+      />
       <header className="sticky top-0 z-40 border-b border-black/15 bg-white/95 backdrop-blur-xl">
         <div className={`${shell} flex items-center justify-between py-4`}>
           <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
@@ -165,21 +220,21 @@ export default function Page() {
         </div>
       </header>
 
-      <section id="top" className="relative isolate min-h-[70svh] overflow-hidden border-b border-black/15 bg-[#0d1312] md:min-h-[80svh]">
+      <section id="top" className="relative isolate min-h-[60svh] overflow-hidden border-b border-black/15 bg-[#0d1312] md:min-h-[68svh]">
         <video
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-[center_36%] brightness-[1.1] contrast-[1.03] sm:object-[center_38%] lg:object-[center_40%]"
+          className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center brightness-[1.08] contrast-[1.02]"
         >
           <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
         </video>
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(107deg,rgba(7,10,10,0.56)_0%,rgba(7,10,10,0.3)_46%,rgba(7,10,10,0.06)_100%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_14%,rgba(29,137,120,0.12),transparent_60%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(107deg,rgba(7,10,10,0.48)_0%,rgba(7,10,10,0.22)_46%,rgba(7,10,10,0.04)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_14%,rgba(29,137,120,0.09),transparent_60%)]" />
 
-        <div className={`${shell} relative flex min-h-[70svh] flex-col justify-end pb-16 pt-28 md:min-h-[80svh] md:pb-20 md:pt-36`}>
+        <div className={`${shell} relative flex min-h-[60svh] flex-col justify-end pb-16 pt-28 md:min-h-[68svh] md:pb-20 md:pt-32`}>
           <div className="fade-up max-w-[820px] space-y-6 text-white">
             <p className="text-sm font-semibold tracking-[0.18em] text-white/72">TURNKEYHAUS</p>
             <h1 className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.26] tracking-tight md:text-[68px] md:leading-[1.16]">
@@ -468,6 +523,33 @@ export default function Page() {
       </section>
 
       <DiagnosticCalculator />
+
+      <section id="fit" className="border-b border-black/15 bg-[#fcfdfd]">
+        <div className={`${shell} py-20 md:py-24`}>
+          <SectionHeader
+            label={content.aiRecommendation.label}
+            title={content.aiRecommendation.h2}
+            lead={content.aiRecommendation.lead}
+          />
+
+          <div className="mt-10 border-y border-black/15">
+            {content.aiRecommendation.items.map((item) => (
+              <article key={item.prompt} className="border-b border-black/10 py-7 last:border-b-0">
+                <p className="text-xs font-semibold tracking-[0.1em] text-black/48">AI 검색 질의 예시</p>
+                <h3 className="mt-1 text-[24px] font-semibold tracking-tight text-[#0B0F0E]">{item.prompt}</h3>
+                <p className="mt-3 text-[16px] leading-[1.85] text-black/74">{item.fit}</p>
+                <ul className="mt-4 space-y-1.5 border-t border-black/12 pt-4 text-[15px] leading-[1.8] text-black/68">
+                  {item.reasons.map((reason) => (
+                    <li key={reason}>- {reason}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+
+          <p className="mt-7 text-[16px] font-semibold leading-[1.8] text-[#0B0F0E]">{content.aiRecommendation.note}</p>
+        </div>
+      </section>
 
       <section id="blog" className="border-b border-black/15">
         <div className={`${shell} py-20 md:py-24`}>

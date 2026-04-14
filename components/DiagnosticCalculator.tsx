@@ -9,7 +9,7 @@ type ChannelState = 'existing' | 'new' | 'rebuild';
 type GoalType = 'brand' | 'lead' | 'balanced';
 type MixType = 'long' | 'short' | 'balanced';
 type TermMonths = 3 | 6 | 9 | 12;
-type ConsultLocation = 'seoul' | 'busan';
+type ConsultLocation = 'capital' | 'other';
 type LineItemKey =
   | 'shoot'
   | 'planning'
@@ -97,7 +97,7 @@ const steps: { key: StepKey; title: string; subtitle: string }[] = [
   {
     key: 'addons',
     title: '추가 옵션을 선택해 주세요',
-    subtitle: '컨설팅 단독·인하우스 셋업/교육 상품과 별도 협의 항목을 선택할 수 있습니다.'
+    subtitle: '선택하지 않아도 바로 견적 생성이 가능합니다. 필요한 옵션만 추가해 주세요.'
   }
 ];
 
@@ -218,7 +218,7 @@ const lineItemMap = Object.fromEntries(lineItems.map((item) => [item.key, item])
 >;
 
 const initialFormState: FormState = {
-  consultLocation: 'seoul',
+  consultLocation: 'capital',
   addOns: {
     drone: false,
     motion: false,
@@ -292,7 +292,7 @@ function toMixLabel(mix?: MixType) {
 }
 
 function toConsultLocationLabel(location?: ConsultLocation) {
-  return location === 'busan' ? '부산' : '서울';
+  return location === 'other' ? '그 외 지역' : '서울·수도권';
 }
 
 function toAddOnLabel(addOns: AddOns) {
@@ -307,7 +307,7 @@ function toAddOnLabel(addOns: AddOns) {
 
 function getLineItemUnitPrice(form: FormState, key: LineItemKey) {
   if (key === 'consultSession') {
-    return form.consultLocation === 'busan' ? 250000 : 150000;
+    return form.consultLocation === 'other' ? 250000 : 150000;
   }
 
   return lineItemMap[key].unitPrice;
@@ -938,6 +938,7 @@ export default function DiagnosticCalculator() {
   const [stepIndex, setStepIndex] = useState(0);
   const [quote, setQuote] = useState<QuoteResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [expandAddOnOptions, setExpandAddOnOptions] = useState(false);
 
   const currentStep = steps[stepIndex];
   const canProceed = getStepCompletion(form, currentStep.key);
@@ -956,7 +957,7 @@ export default function DiagnosticCalculator() {
       return {
         ...prev,
         consultLocation:
-          key === 'consultingOnly' && nextValue ? (prev.consultLocation ?? 'seoul') : prev.consultLocation,
+          key === 'consultingOnly' && nextValue ? (prev.consultLocation ?? 'capital') : prev.consultLocation,
         addOns: {
           ...prev.addOns,
           [key]: nextValue
@@ -1031,6 +1032,23 @@ export default function DiagnosticCalculator() {
   const consultPrefillUrl = quote ? buildConsultPrefillUrl(form, quote) : content.contact.googleFormShareUrl.trim();
   const progressRatio = quote ? 1 : (stepIndex + 1) / steps.length;
   const progressPercent = Math.round(progressRatio * 100);
+  const selectedAddOnCount = Object.values(form.addOns).filter(Boolean).length;
+  const shouldShowAddOnOptions = expandAddOnOptions || selectedAddOnCount > 0;
+
+  const clearAddOns = () => {
+    setForm((prev) => ({
+      ...prev,
+      consultLocation: 'capital',
+      addOns: {
+        consultingOnly: false,
+        inhouseSetup: false,
+        practicalTraining: false,
+        drone: false,
+        motion: false
+      }
+    }));
+    setExpandAddOnOptions(false);
+  };
 
   return (
     <section id="pricing" className="border-y border-black/10 bg-white py-24">
@@ -1504,108 +1522,145 @@ export default function DiagnosticCalculator() {
 
                   {currentStep.key === 'addons' ? (
                     <div className="space-y-4">
-                      <button
-                        type="button"
-                        onClick={() => toggleAddOn('consultingOnly')}
-                        className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                          form.addOns.consultingOnly
-                            ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                            : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                        }`}
-                      >
-                        <p className="text-[18px] font-semibold text-[#0B0F0E]">컨설팅 단독 상품</p>
-                        <p className="mt-1 text-sm text-black/60">
-                          사전 설문 + 1회 오프라인 컨설팅(2시간 이내) + 온라인 보고서 1회 제공
+                      <div className="rounded-xl border border-[#21c1a2]/35 bg-[#e9fbf7] p-4">
+                        <p className="text-[16px] font-semibold text-[#0B0F0E]">운영대행 기본 견적 먼저 확인해 보세요</p>
+                        <p className="mt-1 text-sm text-black/62">
+                          옵션 없이도 바로 금액을 확인할 수 있고, 생성 후 수량/옵션은 다시 수정 가능합니다.
                         </p>
-                      </button>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {!shouldShowAddOnOptions ? (
+                            <button
+                              type="button"
+                              onClick={() => setExpandAddOnOptions(true)}
+                              className="rounded-lg border border-[#21c1a2]/45 bg-white px-3.5 py-2 text-sm font-semibold text-[#0f4e45] transition-colors hover:bg-[#f4fffc]"
+                            >
+                              추가 옵션 선택하기
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={clearAddOns}
+                              className="rounded-lg border border-black/15 bg-white px-3.5 py-2 text-sm font-semibold text-black/65 transition-colors hover:bg-black/[0.03]"
+                            >
+                              추가 옵션 없이 계산하기
+                            </button>
+                          )}
+                          <span className="inline-flex items-center rounded-lg border border-[#21c1a2]/30 bg-white px-3.5 py-2 text-sm font-semibold text-[#0f4e45]">
+                            선택된 추가 옵션 {selectedAddOnCount}개
+                          </span>
+                        </div>
+                      </div>
 
-                      {form.addOns.consultingOnly ? (
-                        <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
-                          <p className="text-[13px] font-semibold text-black/60">오프라인 컨설팅 지역</p>
-                          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                            {[
-                              { value: 'seoul' as ConsultLocation, label: '서울 (15만원)' },
-                              { value: 'busan' as ConsultLocation, label: '부산 (25만원)' }
-                            ].map((option) => (
+                      {shouldShowAddOnOptions ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => toggleAddOn('consultingOnly')}
+                            className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
+                              form.addOns.consultingOnly
+                                ? 'border-[#21c1a2] bg-[#21c1a2]/10'
+                                : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
+                            }`}
+                          >
+                            <p className="text-[18px] font-semibold text-[#0B0F0E]">컨설팅 단독 상품</p>
+                            <p className="mt-1 text-sm text-black/60">
+                              사전 설문 + 1회 오프라인 컨설팅(2시간 이내) + 온라인 보고서 1회 제공
+                            </p>
+                          </button>
+
+                          {form.addOns.consultingOnly ? (
+                            <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
+                              <p className="text-[13px] font-semibold text-black/60">오프라인 컨설팅 지역</p>
+                              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                                {[
+                                  { value: 'capital' as ConsultLocation, label: '서울·수도권 (15만원)' },
+                                  { value: 'other' as ConsultLocation, label: '그 외 지역 (25만원)' }
+                                ].map((option) => (
+                                  <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() => updateForm('consultLocation', option.value)}
+                                    className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+                                      (form.consultLocation ?? 'capital') === option.value
+                                        ? 'border-[#21c1a2] bg-[#21c1a2]/10 text-[#0B0F0E]'
+                                        : 'border-black/12 text-black/60 hover:bg-black/[0.03]'
+                                    }`}
+                                  >
+                                    {option.label}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ) : null}
+
+                          <div className="grid gap-3 md:grid-cols-2">
+                            <button
+                              type="button"
+                              onClick={() => toggleAddOn('inhouseSetup')}
+                              className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
+                                form.addOns.inhouseSetup
+                                  ? 'border-[#21c1a2] bg-[#21c1a2]/10'
+                                  : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
+                              }`}
+                            >
+                              <p className="text-[18px] font-semibold text-[#0B0F0E]">인하우스 팀 셋업/채용 대행</p>
+                              <p className="mt-1 text-sm text-black/60">
+                                월 50만원 · 면접 대행 + 팀 구성 + 장비/운영 솔루션 제공
+                              </p>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => toggleAddOn('practicalTraining')}
+                              className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
+                                form.addOns.practicalTraining
+                                  ? 'border-[#21c1a2] bg-[#21c1a2]/10'
+                                  : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
+                              }`}
+                            >
+                              <p className="text-[18px] font-semibold text-[#0B0F0E]">영상 촬영/편집 실무 교육</p>
+                              <p className="mt-1 text-sm text-black/60">
+                                1개월 과정(총 8회) · 패키지 80만원
+                              </p>
+                            </button>
+                          </div>
+
+                          <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
+                            <p className="text-[13px] font-semibold text-black/60">별도 협의 항목 (견적 미포함)</p>
+                            <div className="mt-3 space-y-3">
                               <button
-                                key={option.value}
                                 type="button"
-                                onClick={() => updateForm('consultLocation', option.value)}
-                                className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
-                                  (form.consultLocation ?? 'seoul') === option.value
-                                    ? 'border-[#21c1a2] bg-[#21c1a2]/10 text-[#0B0F0E]'
-                                    : 'border-black/12 text-black/60 hover:bg-black/[0.03]'
+                                onClick={() => toggleAddOn('drone')}
+                                className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
+                                  form.addOns.drone
+                                    ? 'border-[#21c1a2] bg-[#21c1a2]/10'
+                                    : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
                                 }`}
                               >
-                                {option.label}
+                                <p className="text-[18px] font-semibold text-[#0B0F0E]">드론 촬영</p>
+                                <p className="mt-1 text-sm text-black/60">
+                                  촬영지/허가/비행 안전 조건에 따라 별도 협의 (견적 미포함)
+                                </p>
                               </button>
-                            ))}
+
+                              <button
+                                type="button"
+                                onClick={() => toggleAddOn('motion')}
+                                className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
+                                  form.addOns.motion
+                                    ? 'border-[#21c1a2] bg-[#21c1a2]/10'
+                                    : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
+                                }`}
+                              >
+                                <p className="text-[18px] font-semibold text-[#0B0F0E]">고급 모션 그래픽</p>
+                                <p className="mt-1 text-sm text-black/60">
+                                  난이도/러닝타임 기준으로 별도 협의 (견적 미포함)
+                                </p>
+                              </button>
+                            </div>
                           </div>
-                        </div>
+                        </>
                       ) : null}
-
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <button
-                          type="button"
-                          onClick={() => toggleAddOn('inhouseSetup')}
-                          className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                            form.addOns.inhouseSetup
-                              ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                              : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                          }`}
-                        >
-                          <p className="text-[18px] font-semibold text-[#0B0F0E]">인하우스 팀 셋업/채용 대행</p>
-                          <p className="mt-1 text-sm text-black/60">
-                            월 50만원 · 면접 대행 + 팀 구성 + 장비/운영 솔루션 제공
-                          </p>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => toggleAddOn('practicalTraining')}
-                          className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                            form.addOns.practicalTraining
-                              ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                              : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                          }`}
-                        >
-                          <p className="text-[18px] font-semibold text-[#0B0F0E]">영상 촬영/편집 실무 교육</p>
-                          <p className="mt-1 text-sm text-black/60">
-                            1개월 과정(총 8회) · 패키지 80만원
-                          </p>
-                        </button>
-                      </div>
-
-                      <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
-                        <p className="text-[13px] font-semibold text-black/60">별도 협의 항목 (견적 미포함)</p>
-                        <div className="mt-3 space-y-3">
-                      <button
-                        type="button"
-                        onClick={() => toggleAddOn('drone')}
-                        className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                          form.addOns.drone
-                            ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                            : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                        }`}
-                      >
-                        <p className="text-[18px] font-semibold text-[#0B0F0E]">드론 촬영</p>
-                        <p className="mt-1 text-sm text-black/60">촬영지/허가/비행 안전 조건에 따라 별도 협의 (견적 미포함)</p>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => toggleAddOn('motion')}
-                        className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                          form.addOns.motion
-                            ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                            : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                        }`}
-                      >
-                        <p className="text-[18px] font-semibold text-[#0B0F0E]">고급 모션 그래픽</p>
-                        <p className="mt-1 text-sm text-black/60">난이도/러닝타임 기준으로 별도 협의 (견적 미포함)</p>
-                      </button>
-                        </div>
-                      </div>
                     </div>
                   ) : null}
 
@@ -1627,7 +1682,11 @@ export default function DiagnosticCalculator() {
                           disabled={isCalculating}
                           className="rounded-lg bg-[#0B0F0E] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          {isCalculating ? '계산 중…' : '견적 생성'}
+                          {isCalculating
+                            ? '계산 중…'
+                            : selectedAddOnCount > 0
+                            ? '선택 옵션 포함 견적 생성'
+                            : '기본 견적 바로 생성'}
                         </button>
                       ) : (
                         <button
