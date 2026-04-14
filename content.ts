@@ -263,7 +263,7 @@ export const content: Content = {
   ],
   heroValue: {
     headline: "브랜딩 채널은\n지속 가능한\n운영 구조부터.",
-    body: "누가 어떤 질문으로 들어와 어떤 이유로 상담을 남기는지,\n채널 동선을 먼저 설계한 뒤 제작합니다.",
+    body: "브랜드의 핵심 메시지와 톤을 먼저 설계하고,\n롱폼·숏폼·채널 자산을 일관된 기준으로 제작합니다.",
     primaryCta: { label: "내 채널 구조 진단 요청", href: "#contact" },
     secondaryCta: { label: "운영 사례 확인", href: "#portfolio" }
   },

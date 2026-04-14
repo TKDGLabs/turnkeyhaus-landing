@@ -220,25 +220,23 @@ export default function Page() {
         </div>
       </header>
 
-      <section id="top" className="overflow-hidden border-b border-black/10 bg-white">
-        <div className={`${shell} py-14 md:py-16`}>
-          <div className="overflow-hidden border border-black/10 bg-white">
-            <div className="relative aspect-[4/3] w-full md:aspect-[16/9]">
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
-              >
-                <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
-              </video>
-            </div>
-          </div>
+      <section id="top" className="overflow-hidden bg-white">
+        <div className="relative w-full aspect-video bg-white">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
+          >
+            <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
+          </video>
+        </div>
 
-          <div className="mt-10 max-w-[860px] space-y-6 text-[#0B0F0E] md:mt-12">
-            <p className="text-sm font-semibold tracking-[0.18em] text-black/55">TURNKEYHAUS</p>
+        <div className={`${shell} py-14 md:py-16`}>
+          <div className="max-w-[860px] space-y-6 text-[#0B0F0E]">
+            <p className="text-sm font-semibold tracking-[0.1em] text-black/55">턴키하우스 by TKDG</p>
             <h1 className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.26] tracking-tight md:text-[68px] md:leading-[1.16]">
               {content.heroValue.headline}
             </h1>
