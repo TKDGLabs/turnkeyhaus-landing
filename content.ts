@@ -379,8 +379,8 @@ export const content: Content = {
           "전화/이메일/폼 등 문의 채널별 CTA 분기"
         ],
         image: {
-          src: "/images/gov-private-model.jpg",
-          alt: "정부 기관 및 민간사업체형 운영 이미지"
+          src: "/images/commerce-online-model.jpg",
+          alt: "정부 기관 및 민간사업체형 운영 협업 이미지"
         },
         imageFallback: {
           eyebrow: "ORGANIZATION MODEL",
@@ -400,8 +400,8 @@ export const content: Content = {
           "랜딩/장바구니/문의 CTA의 월간 실험 루프"
         ],
         image: {
-          src: "/images/commerce-online-model.jpg",
-          alt: "커머스 및 온라인 서비스형 운영 이미지"
+          src: "/images/gov-private-model.jpg",
+          alt: "커머스 및 온라인 서비스형 전환 운영 이미지"
         },
         imageFallback: {
           eyebrow: "COMMERCE MODEL",

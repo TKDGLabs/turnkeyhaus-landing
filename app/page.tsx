@@ -171,9 +171,8 @@ export default function Page() {
           muted
           loop
           playsInline
-          preload="metadata"
-          poster="/images/mobile-hero-cover-optimized.jpg"
-          className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-[center_36%] brightness-[1.1] contrast-[1.03] sm:object-[center_38%] lg:object-contain lg:object-center"
+          preload="auto"
+          className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-[center_36%] brightness-[1.1] contrast-[1.03] sm:object-[center_38%] lg:object-[center_40%]"
         >
           <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
         </video>
@@ -312,15 +311,15 @@ export default function Page() {
                   <h3 className="text-[30px] font-semibold tracking-tight text-[#0B0F0E]">{card.title}</h3>
                   <p className="text-base leading-[1.9] text-black/72">{card.oneLiner}</p>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-x-3 gap-y-2">
                     {(card.tags ?? []).map((tag) => (
-                      <span key={tag} className="text-xs font-semibold tracking-[0.08em] text-black/56">
+                      <span key={tag} className="text-[13px] font-semibold tracking-[0.03em] text-black/72 md:text-[14px]">
                         #{tag}
                       </span>
                     ))}
                   </div>
 
-                  <ul className="space-y-2 border-t border-black/12 pt-4 text-sm leading-[1.85] text-black/70">
+                  <ul className="space-y-2 border-t border-black/12 pt-4 text-[15px] leading-[1.85] text-black/70">
                     {card.bullets.map((bullet) => (
                       <li key={bullet}>- {bullet}</li>
                     ))}
@@ -328,7 +327,7 @@ export default function Page() {
 
                   <ActionLink
                     href={card.href}
-                    className="inline-flex items-center border-b border-[#21c1a2] pb-1 text-sm font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197]"
+                    className="inline-flex items-center border-b border-[#21c1a2] pb-1 text-[15px] font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197]"
                   >
                     {card.ctaLabel}
                   </ActionLink>
@@ -423,9 +422,9 @@ export default function Page() {
                     </p>
                     <p className="max-w-[58ch] break-keep text-[17px] leading-[1.82] text-black/76">{item.oneLiner}</p>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-black/10 pt-3">
-                      <span className="text-[11px] font-semibold tracking-[0.12em] text-black/45">키워드</span>
+                      <span className="text-[12px] font-semibold tracking-[0.1em] text-black/52">키워드</span>
                       {item.tags.map((tag) => (
-                        <span key={tag} className="text-[12px] font-semibold tracking-[0.04em] text-black/64">
+                        <span key={tag} className="text-[13px] font-semibold tracking-[0.03em] text-black/72 md:text-[14px]">
                           #{tag}
                         </span>
                       ))}

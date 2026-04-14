@@ -75,9 +75,38 @@ export default function StrategyChapterDeck() {
 
   return (
     <div className="mt-12 space-y-6">
+      <div
+        className="flex gap-2 overflow-x-auto pb-1 md:hidden"
+        role="tablist"
+        aria-label="전략 챕터 모바일 탭"
+      >
+        {chapters.map((item, index) => {
+          const isActive = index === activeIndex;
+          return (
+            <button
+              key={`mobile-${item.chapter}`}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`chapter-panel-${index}`}
+              id={`chapter-tab-mobile-${index}`}
+              onClick={() => setActiveIndex(index)}
+              className={`shrink-0 border px-3 py-2 text-left transition-colors ${
+                isActive
+                  ? "border-[#21c1a2] bg-[#21c1a2]/10"
+                  : "border-black/10 bg-white hover:border-black/25 hover:bg-black/[0.02]"
+              }`}
+            >
+              <p className="text-[10px] font-semibold tracking-[0.12em] text-black/45">{item.chapter}</p>
+              <p className="mt-0.5 text-[13px] font-semibold leading-[1.35] text-[#0B0F0E]">{item.title}</p>
+            </button>
+          );
+        })}
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-[0.38fr_0.62fr] lg:items-stretch">
         <div
-          className="grid gap-2 border border-black/10 bg-white p-2"
+          className="hidden gap-2 border border-black/10 bg-white p-2 md:grid"
           role="tablist"
           aria-label="전략 챕터 미리보기"
         >
@@ -99,16 +128,16 @@ export default function StrategyChapterDeck() {
                     ? "border-[#21c1a2] bg-[#21c1a2]/10"
                     : "border-black/10 bg-white hover:border-black/25 hover:bg-black/[0.02]"
                 }`}
-              >
-                <p className="text-[11px] font-semibold tracking-[0.12em] text-black/45">{item.chapter}</p>
-                <h3 className="mt-1 text-[20px] font-semibold leading-[1.3] tracking-tight text-[#0B0F0E]">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm leading-[1.7] text-black/65">{item.summary}</p>
-              </button>
-            );
-          })}
-        </div>
+            >
+              <p className="text-[11px] font-semibold tracking-[0.12em] text-black/45">{item.chapter}</p>
+              <h3 className="mt-1 text-[20px] font-semibold leading-[1.3] tracking-tight text-[#0B0F0E]">
+                {item.title}
+              </h3>
+              <p className="mt-2 text-sm leading-[1.7] text-black/65 xl:block">{item.summary}</p>
+            </button>
+          );
+        })}
+      </div>
 
         <div
           id={`chapter-panel-${activeIndex}`}
@@ -116,6 +145,16 @@ export default function StrategyChapterDeck() {
           aria-labelledby={`chapter-tab-${activeIndex}`}
           className="relative overflow-hidden border border-black/10 bg-white"
         >
+          <div className="border-b border-black/10 bg-white px-4 py-3 md:hidden">
+            <p className="text-[10px] font-semibold tracking-[0.12em] text-black/45">
+              {active.chapter} · {activeIndex + 1}/{chapters.length}
+            </p>
+            <h3 className="mt-1 text-[20px] font-semibold leading-[1.3] tracking-tight text-[#0B0F0E]">
+              {active.title}
+            </h3>
+            <p className="mt-1 text-[14px] leading-[1.65] text-black/66">{active.summary}</p>
+          </div>
+
           <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-black/10 bg-black/[0.03]">
             {chapters.map((item, index) => {
               const isActive = index === activeIndex;
@@ -149,7 +188,7 @@ export default function StrategyChapterDeck() {
               ))}
             </ul>
 
-            <p className="border-t border-black/10 pt-3 text-sm font-medium text-black/65">
+            <p className="border-t border-black/10 pt-3 text-sm font-medium leading-[1.7] text-black/65">
               {content.strategyFrame.steps[activeIndex]?.title ?? "운영 단계"}: {content.strategyFrame.steps[activeIndex]?.detail}
             </p>
           </div>
