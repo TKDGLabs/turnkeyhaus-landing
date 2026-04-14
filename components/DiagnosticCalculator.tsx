@@ -1616,6 +1616,9 @@ export default function DiagnosticCalculator() {
                           {form.addOns.consultingOnly ? (
                             <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
                               <p className="text-[13px] font-semibold text-black/60">오프라인 컨설팅 지역</p>
+                              <p className="mt-1 text-xs leading-[1.6] text-black/52">
+                                계약 전 1회 컨설팅 비용 기준입니다. 계약 후 촬영 출장비는 지방 여부와 관계없이 별도 청구하지 않습니다.
+                              </p>
                               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                                 {[
                                   { value: 'capital' as ConsultLocation, label: '서울·수도권 (15만원)' },

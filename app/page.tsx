@@ -206,12 +206,12 @@ export default function Page() {
         </div>
 
         <div className="border-t border-black/8 lg:hidden">
-          <nav className={`${shell} no-scrollbar flex items-center gap-2 overflow-x-auto py-2`}>
+          <nav className={`${shell} no-scrollbar flex items-center gap-2 overflow-x-auto py-2.5`}>
             {content.nav.map((item) => (
               <Link
                 key={`mobile-${item.href}`}
                 href={item.href}
-                className={`inline-flex h-8 shrink-0 items-center border border-black/10 px-3 text-xs font-semibold text-black/68 transition-colors hover:bg-black/[0.03] hover:text-black ${focusRing}`}
+                className={`inline-flex h-8 shrink-0 items-center rounded-full bg-black/[0.05] px-3.5 text-[12px] font-semibold text-black/72 transition-colors hover:bg-black/[0.1] hover:text-black ${focusRing}`}
               >
                 {item.label}
               </Link>
@@ -234,7 +234,7 @@ export default function Page() {
           </video>
         </div>
 
-        <div className={`${shell} py-14 md:py-16`}>
+        <div className={`${shell} py-10 md:py-16`}>
           <div className="max-w-[860px] space-y-6 text-[#0B0F0E]">
             <p className="text-sm font-semibold tracking-[0.1em] text-black/55">턴키하우스 by TKDG</p>
             <h1 className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.26] tracking-tight md:text-[68px] md:leading-[1.16]">
@@ -260,7 +260,7 @@ export default function Page() {
             </div>
           </div>
 
-          <dl className="mt-12 grid gap-5 border-t border-black/15 pt-6 text-[#0B0F0E] sm:grid-cols-3">
+          <dl className="mt-8 grid gap-5 border-t border-black/15 pt-5 text-[#0B0F0E] sm:mt-12 sm:pt-6 sm:grid-cols-3">
             <div className="space-y-1">
               <dt className="text-xs font-semibold tracking-[0.14em] text-black/52">대표 사례</dt>
               <dd className="text-[34px] font-semibold tracking-tight">{content.portfolio.items.length}개 채널</dd>
@@ -278,7 +278,7 @@ export default function Page() {
       </section>
 
       <section id="problem" className="border-b border-black/15">
-        <div className={`${shell} grid gap-12 py-20 md:grid-cols-[0.9fr_1.1fr] md:py-24`}>
+        <div className={`${shell} grid gap-8 py-12 md:grid-cols-[0.9fr_1.1fr] md:gap-12 md:py-24`}>
           <div className="space-y-6 md:sticky md:top-28 md:self-start">
             <span className={labelClass}>{content.problem.label}</span>
             <h2 className={`${sectionTitle} max-w-[13ch]`}>{content.problem.h2}</h2>
@@ -504,16 +504,6 @@ export default function Page() {
                     >
                       실제 영상 보기
                     </ActionLink>
-                    {item.channelHref ? (
-                      <a
-                        href={item.channelHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`inline-flex items-center border-b border-black/25 pb-1 text-[15px] font-semibold text-black/62 transition-colors hover:text-black ${focusRing}`}
-                      >
-                        채널 보기
-                      </a>
-                    ) : null}
                   </div>
                 </div>
               </article>
