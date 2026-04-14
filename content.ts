@@ -13,7 +13,11 @@ export type ProfessionalCard = {
   oneLiner: string;
   tags?: string[];
   bullets: string[];
-  image: ImageAsset;
+  image?: ImageAsset;
+  imageFallback?: {
+    eyebrow: string;
+    lines: string[];
+  };
   href: string;
   ctaLabel: string;
 };
@@ -28,6 +32,7 @@ export type PortfolioItem = {
   maxVideoViews: number;
   href: string;
   youtubeId?: string;
+  channelHref?: string;
   imageSrc: string;
 };
 
@@ -192,9 +197,9 @@ export type Content = {
 const images = {
   studio1: { src: "/images/studio-1.jpg", alt: "Turnkeyhaus studio setup 1" },
   studio2: { src: "/images/studio-2.jpg", alt: "Turnkeyhaus studio setup 2" },
-  law: { src: "/images/pro-law.jpg", alt: "변호사·로펌 대표 이미지" },
-  med: { src: "/images/pro-med.jpg", alt: "병원·의료 대표 이미지" },
-  tax: { src: "/images/pro-tax.jpg", alt: "세무·회계·노무 대표 이미지" },
+  law: { src: "/images/pro-law.jpg", alt: "고신뢰 서비스 채널 사례 이미지" },
+  med: { src: "/images/pro-med.jpg", alt: "고관여 브랜딩 채널 사례 이미지" },
+  tax: { src: "/images/pro-tax.jpg", alt: "상담 전환형 채널 사례 이미지" },
   structure: { src: "/images/concept-brand.jpg", alt: "브랜드 구조 설계 이미지" },
   different: { src: "/images/concept-different.jpg", alt: "차별화 개념 이미지" }
 } as const;
@@ -210,24 +215,25 @@ export const content: Content = {
     siteUrl: "https://www.turnkey.haus",
     canonical: "https://www.turnkey.haus",
     ogImagePath: "/og-image.jpg",
-    title: "전문직 유튜브 브랜딩 대행 | Turnkeyhaus",
+    title: "브랜딩 콘텐츠 제작·유튜브 채널 운영대행 | Turnkeyhaus",
     description:
-      "법률·의료·세무 전문직 채널의 기획, 촬영, 운영을 통합 지원합니다. 검색 유입과 상담 전환까지 함께 설계합니다.",
+      "브랜딩 콘텐츠 제작부터 유튜브 채널 운영대행까지 통합 지원합니다. 고신뢰·고관여 업종을 포함해 검색 유입과 전환 구조를 함께 설계합니다.",
     keywords: [
-      "전문직 유튜브 대행",
-      "세무사 유튜브 제작",
-      "변호사 유튜브 제작",
-      "의사 유튜브 마케팅",
-      "유튜브 브랜딩 대행"
+      "유튜브 채널 운영대행",
+      "브랜딩 콘텐츠 제작",
+      "유튜브 브랜딩",
+      "콘텐츠 운영대행",
+      "고신뢰 업종 마케팅"
     ],
-    openGraphTitle: "전문직 유튜브 브랜딩 | Turnkeyhaus",
-    openGraphDescription: "전문직 채널을 위한 기획·촬영·운영 통합 서비스",
+    openGraphTitle: "브랜딩 콘텐츠 제작·채널 운영대행 | Turnkeyhaus",
+    openGraphDescription:
+      "브랜딩 콘텐츠 제작부터 채널 운영대행까지 통합 지원. 고신뢰·고관여 업종을 포함한 전환형 운영 구조를 설계합니다.",
     locale: "ko_KR"
   },
   nav: [
     { label: "문제", href: "#problem" },
     { label: "방식", href: "#approach" },
-    { label: "전문직 적용", href: "#professional" },
+    { label: "업종별 적용", href: "#professional" },
     { label: "실행 증거", href: "#proof" },
     { label: "포트폴리오", href: "#portfolio" },
     { label: "인사이트", href: "/insights" },
@@ -235,7 +241,7 @@ export const content: Content = {
     { label: "채널 진단", href: "#contact" }
   ],
   heroValue: {
-    headline: "전문직 채널,\n촬영보다 운영 구조부터 만듭니다.",
+    headline: "브랜딩 채널은\n지속 가능한\n운영 구조부터.",
     body: "누가 어떤 질문으로 들어와 어떤 이유로 상담을 남기는지,\n채널 동선을 먼저 설계한 뒤 제작합니다.",
     scrollGuide:
       "필요한 정보만 빠르게 보셔도 됩니다.\n아래에 실제 운영 방식과 사례를 공개했습니다.",
@@ -295,7 +301,7 @@ export const content: Content = {
       {
         eyebrow: "채널 세팅",
         title: "채널 첫 화면이 업종 질문을 설명하는가",
-        summary: "방문자가 10초 안에 어떤 전문가인지 이해해야\n다음 행동이 일어납니다.",
+        summary: "방문자가 10초 안에 어떤 브랜드/팀인지 이해해야\n다음 행동이 일어납니다.",
         note: "홈·재생목록·소개 문구를 함께 정리합니다.",
         variant: "setup"
       }
@@ -326,36 +332,71 @@ export const content: Content = {
     keyline: "영상 한 편보다, 6개월 뒤에도 남는 채널 구조를 만듭니다."
   },
   professionalTargets: {
-    label: "[ 전문직 적용 ]",
-    h2: "업종마다 필요한 톤과 구조가 다릅니다.",
-    lead: "세 분야에 맞는 운영 템플릿을 분리해 적용합니다.",
+    label: "[ 업종별 적용 ]",
+    h2: "업종이 달라도\n핵심 운영 원리는 같습니다.",
+    lead:
+      "고신뢰·고관여 업종은 물론, 정부 기관·민간사업체와 커머스·온라인 서비스까지\n업종별 톤과 구조에 맞춘 운영 템플릿을 분리 적용합니다.",
     cards: [
       {
-        title: "변호사 · 로펌",
-        oneLiner: "사건 검색 유입을 상담 문의로 연결하는 구조",
-        tags: ["법률", "로펌", "상담"],
-        bullets: ["의뢰 전 질문 시리즈 구조", "사건/유형 키워드 맵", "상담 전환 동선"],
+        title: "고신뢰 서비스형",
+        oneLiner: "판단이 필요한 서비스를 신뢰와 상담으로 연결하는 구조",
+        tags: ["고신뢰", "리드 전환", "상담"],
+        bullets: ["의사결정 전 질문 시리즈 구성", "핵심 키워드 맵 설계", "상담 전환 동선 최적화"],
         image: images.law,
         href: "#contact",
-        ctaLabel: "해당 업종 진단 요청"
+        ctaLabel: "해당 모델 진단 요청"
       },
       {
-        title: "병원 · 의료",
-        oneLiner: "내원 전 불안을 줄이고 신뢰를 쌓는 구조",
-        tags: ["병원", "의료", "브랜딩"],
-        bullets: ["환자 질문 포맷 표준화", "비교·오해·주의 구조", "신뢰 축적 루틴"],
+        title: "고관여 브랜딩형",
+        oneLiner: "비교·검토가 긴 서비스에서 신뢰를 누적하는 구조",
+        tags: ["고관여", "브랜딩", "신뢰"],
+        bullets: ["고객 질문 포맷 표준화", "비교·오해·주의 포인트 정리", "신뢰 축적 루틴 운영"],
         image: images.med,
         href: "#contact",
-        ctaLabel: "해당 업종 진단 요청"
+        ctaLabel: "해당 모델 진단 요청"
       },
       {
-        title: "세무 · 회계 · 노무",
+        title: "정보 아카이브형",
         oneLiner: "규정 이슈를 빠르게 해석해 문의로 이어지는 구조",
         tags: ["세무", "회계", "노무"],
         bullets: ["시즌/이슈 캘린더 편성", "상황별 템플릿", "판단 기준 기반 문의 설계"],
         image: images.tax,
         href: "#contact",
         ctaLabel: "해당 업종 진단 요청"
+      },
+      {
+        title: "정부 기관·민간사업체형",
+        oneLiner: "공공 신뢰와 사업 성과를 함께 전달해야 하는 조직형 채널 구조",
+        tags: ["공공 커뮤니케이션", "사업 소개", "신뢰 설계"],
+        bullets: [
+          "정책/사업 소개와 실제 성과 사례를 분리 편성",
+          "공식 문서 톤과 시청자 이해 톤을 이중 설계",
+          "공고·성과 리포트·FAQ를 월간 캘린더로 운영",
+          "전화/이메일/폼 등 문의 채널별 CTA 분기"
+        ],
+        imageFallback: {
+          eyebrow: "ORGANIZATION MODEL",
+          lines: ["정부 기관 및 민간사업체", "신뢰·이해도 균형 설계", "정책·사업·성과 구조화"]
+        },
+        href: "#contact",
+        ctaLabel: "해당 모델 진단 요청"
+      },
+      {
+        title: "커머스·온라인 서비스형",
+        oneLiner: "탐색-비교-구매까지 끊기지 않게 연결하는 전환형 채널 구조",
+        tags: ["커머스", "전환 최적화", "리텐션"],
+        bullets: [
+          "카테고리별 문제-해결형 롱폼 시리즈 설계",
+          "상품 USP와 후기/증빙 소재의 반복 포맷 구축",
+          "런칭/프로모션 시즌의 숏폼·롱폼 연동 운영",
+          "랜딩/장바구니/문의 CTA의 월간 실험 루프"
+        ],
+        imageFallback: {
+          eyebrow: "COMMERCE MODEL",
+          lines: ["커머스 및 온라인 서비스", "탐색·비교·구매 동선 설계", "콘텐츠 기반 전환 누적"]
+        },
+        href: "#contact",
+        ctaLabel: "해당 모델 진단 요청"
       }
     ]
   },
@@ -371,11 +412,11 @@ export const content: Content = {
     ],
     crewTitle: "전담 구조",
     crewLead:
-      "전문직 채널은 촬영 당일보다 사전 준비 시간이 더 중요합니다.\n그래서 역할을 분리해 운영합니다.",
+      "업종이 달라도 촬영 당일보다 사전 준비 시간이 더 중요합니다.\n그래서 역할을 분리해 운영합니다.",
     crewCards: [
       {
         role: "Account Lead",
-        headline: "전문직 브랜딩 설계",
+        headline: "브랜드 운영 구조 설계",
         bullets: [
           "업종별 포지셔닝 기준 수립",
           "메시지 톤 및 채널 판단 기준 고정",
@@ -384,7 +425,7 @@ export const content: Content = {
       },
       {
         role: "Marketing Producer",
-        headline: "SEO 기반 운영 설계",
+        headline: "SEO·발견성 운영 설계",
         bullets: [
           "검색 키워드 맵 설계",
           "월간 성과 리포트 운영",
@@ -413,13 +454,13 @@ export const content: Content = {
     crewNote: "",
     closing: "",
     images: [
-      { src: "/images/showreel-cover-optimized.jpg", alt: "Turnkeyhaus 실행 기반 대표 이미지" }
+      { src: "/images/business-analyst-presenting-data-dashboard.png", alt: "운영 리포트 기반 데이터 분석 시각 이미지" }
     ]
   },
   portfolio: {
     label: "[ 포트폴리오 ]",
     h2: "최근 운영 채널 성과",
-    lead: "대표 사례 3건의 구독자 변화와 최고 조회수를 공개합니다.",
+    lead: "대표 사례 3건의 구독자 변화와 최고 조회수,\n그리고 신규 운영 채널의 SEO 성과를 함께 공개합니다.",
     items: [
       {
         title: "주치아 앞선tube",
@@ -456,6 +497,19 @@ export const content: Content = {
         href: "https://youtu.be/Fii93LBGjSY",
         youtubeId: "Fii93LBGjSY",
         imageSrc: "/images/studio-2.jpg"
+      },
+      {
+        title: "eLife Magazine eSports",
+        oneLiner: "숏폼·광고 없이 SEO 기반 롱폼 4편만으로 누적 조회수 2,926회",
+        tags: ["e스포츠", "SEO", "롱폼 4편", "무광고"],
+        result: "0명에서 시작 (운영 초기)",
+        subscriberStart: 0,
+        subscriberCurrent: 0,
+        maxVideoViews: 2926,
+        href: "https://youtu.be/zniK_ohy_xc?si=badXrseWOni5Kl0k",
+        youtubeId: "zniK_ohy_xc",
+        channelHref: "https://www.youtube.com/@elifemagazine_esports",
+        imageSrc: "/images/studio-1.jpg"
       }
     ]
   },
@@ -494,7 +548,7 @@ export const content: Content = {
           "팀 단위 채널 관리",
           "장기 성장 설계"
         ],
-        target: "대상: 브랜드 단위 채널을 운영하는 전문직"
+        target: "대상: 브랜드 단위 채널을 장기 운영하는 고관여 업종/서비스"
       }
     ],
     emphasis: "정확한 범위는 1차 진단 후 제안서에서 확정됩니다."
@@ -530,7 +584,7 @@ export const content: Content = {
   contact: {
     label: "[ 채널 구조 진단 ]",
     h2: "현재 채널 상태를 보내주시면\n운영 우선순위를 먼저 드립니다.",
-    lead: "브랜드/업종/목표를 남겨주시면\n1영업일 내 답변드립니다.",
+    lead: "브랜드/업종/목표를 남겨주시면\n3~4영업일 내 답변드립니다.",
     midCtaEyebrow: "채널 진단",
     midCtaTitle: "지금 채널 상태를 점검하고 우선순위를 정리해 드립니다.",
     panelTitle: "상담 예약하기",

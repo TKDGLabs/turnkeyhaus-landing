@@ -75,7 +75,7 @@ const structuredData = [
     legalName: content.footer.companyName,
     alternateName: "TKDG Labs",
     url: "https://www.turnkey.haus",
-    description: "전문직을 위한 유튜브 브랜딩 및 채널 운영 대행",
+    description: "브랜딩 콘텐츠 제작 및 유튜브 채널 운영대행",
     logo: `${content.seo.siteUrl}/logo.png`,
     contactPoint: {
       "@type": "ContactPoint",

@@ -5,14 +5,14 @@ import { content } from "@/content";
 import { getSortedInsights } from "@/content/insights";
 
 export const metadata: Metadata = {
-  title: "인사이트 | 전문직 유튜브 브랜딩 칼럼 - TKDG Labs",
-  description: "전문직(세무사·변호사·의사)을 위한 유튜브 브랜딩/운영 인사이트 칼럼 모음.",
+  title: "인사이트 | 브랜딩 콘텐츠·유튜브 운영 인사이트 - TKDG Labs",
+  description: "고신뢰·고관여 업종을 포함한 브랜딩 콘텐츠 제작과 유튜브 채널 운영 인사이트 모음.",
   alternates: {
     canonical: `${content.seo.siteUrl}/insights`
   },
   openGraph: {
-    title: "인사이트 | 전문직 유튜브 브랜딩 칼럼 - TKDG Labs",
-    description: "전문직(세무사·변호사·의사)을 위한 유튜브 브랜딩/운영 인사이트 칼럼 모음.",
+    title: "인사이트 | 브랜딩 콘텐츠·유튜브 운영 인사이트 - TKDG Labs",
+    description: "고신뢰·고관여 업종을 포함한 브랜딩 콘텐츠 제작과 유튜브 채널 운영 인사이트 모음.",
     url: `${content.seo.siteUrl}/insights`,
     siteName: content.brand.name,
     type: "website"
@@ -57,7 +57,7 @@ export default function InsightsPage() {
       <section className="mx-auto max-w-5xl px-6 py-12">
         <h1 className="text-3xl font-semibold tracking-tight">인사이트</h1>
         <p className="mt-3 text-black/60">
-          전문직 유튜브 운영에서 실제로 반복되는 문제와 해결 구조를 기록합니다.
+          브랜딩 콘텐츠 제작과 채널 운영에서 반복되는 문제를 구조 관점으로 정리합니다.
         </p>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">

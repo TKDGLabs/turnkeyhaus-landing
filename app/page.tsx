@@ -169,7 +169,7 @@ export default function Page() {
           preload="auto"
           className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center md:object-[center_42%]"
         >
-          <source src="/videos/hero-render-1080.mp4" type="video/mp4" />
+          <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
         </video>
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(107deg,rgba(7,10,10,0.86)_0%,rgba(7,10,10,0.62)_45%,rgba(7,10,10,0.28)_100%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_14%,rgba(29,137,120,0.3),transparent_55%)]" />
@@ -177,7 +177,7 @@ export default function Page() {
         <div className={`${shell} relative flex min-h-[88svh] flex-col justify-end pb-16 pt-28 md:pb-20 md:pt-36`}>
           <div className="fade-up max-w-[820px] space-y-6 text-white">
             <p className="text-sm font-semibold tracking-[0.18em] text-white/72">TURNKEYHAUS</p>
-            <h1 className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.15] tracking-tight md:text-[68px] md:leading-[1.03]">
+            <h1 className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.26] tracking-tight md:text-[68px] md:leading-[1.16]">
               {content.heroValue.headline}
             </h1>
             <p className="max-w-[58ch] whitespace-pre-line break-keep text-base leading-[1.85] text-white/82 md:text-[20px] md:leading-[1.7]">
@@ -273,13 +273,32 @@ export default function Page() {
               <article key={card.title} className="grid items-center gap-8 border-t border-black/12 pt-10 md:grid-cols-2 md:gap-12">
                 <figure className={index % 2 === 1 ? "md:order-2" : ""}>
                   <div className="relative aspect-[4/3] overflow-hidden">
-                    <Image
-                      src={card.image.src}
-                      alt={card.image.alt}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                    />
+                    {card.image ? (
+                      <Image
+                        src={card.image.src}
+                        alt={card.image.alt}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
+                    ) : (
+                      <div className="relative h-full w-full border border-black/10 bg-[linear-gradient(145deg,#f3fffb_0%,#e9f9f4_52%,#f7fbfa_100%)] p-6 md:p-8">
+                        <div className="pointer-events-none absolute -right-10 -top-8 h-36 w-36 rounded-full bg-[#21c1a2]/20 blur-2xl" />
+                        <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-[#0B0F0E]/8 blur-2xl" />
+                        <div className="relative flex h-full flex-col justify-between">
+                          <p className="text-[11px] font-semibold tracking-[0.14em] text-black/48">
+                            {card.imageFallback?.eyebrow ?? "MODEL PREVIEW"}
+                          </p>
+                          <div className="space-y-2">
+                            {(card.imageFallback?.lines ?? ["이미지 자료 준비 중"]).map((line) => (
+                              <p key={line} className="text-[18px] font-semibold leading-[1.45] tracking-tight text-[#0B0F0E] md:text-[22px]">
+                                {line}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </figure>
 
@@ -319,9 +338,9 @@ export default function Page() {
           <figure className="overflow-hidden border border-black/10">
             <Image
               src={content.studioProof.images[0]?.src ?? "/images/showreel-cover-optimized.jpg"}
-              alt={content.studioProof.images[0]?.alt ?? "Turnkeyhaus 운영 촬영 이미지"}
-              width={1680}
-              height={1080}
+              alt={content.studioProof.images[0]?.alt ?? "Turnkeyhaus 운영 리포트 시각 자료"}
+              width={1400}
+              height={840}
               className="h-full w-full object-cover"
               sizes="(max-width: 1024px) 100vw, 52vw"
             />
@@ -392,6 +411,16 @@ export default function Page() {
                   <div className="space-y-3">
                     <h3 className="text-[31px] font-semibold tracking-tight text-[#0B0F0E]">{item.title}</h3>
                     <p className="text-base leading-[1.9] text-black/72">{item.oneLiner}</p>
+                    {item.channelHref ? (
+                      <a
+                        href={item.channelHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`inline-flex items-center border-b border-black/25 pb-0.5 text-xs font-semibold tracking-[0.08em] text-black/62 transition-colors hover:text-black ${focusRing}`}
+                      >
+                        채널 보기
+                      </a>
+                    ) : null}
                     <div className="flex flex-wrap gap-2">
                       {item.tags.map((tag) => (
                         <span key={tag} className="text-xs font-semibold tracking-[0.08em] text-black/56">
@@ -404,9 +433,7 @@ export default function Page() {
                   <dl className="divide-y divide-black/12 border-y border-black/12">
                     <div className="flex items-center justify-between gap-4 py-3 text-sm">
                       <dt className="text-black/60">구독자 변화</dt>
-                      <dd className="font-semibold text-[#0B0F0E]">
-                        {formatInteger(item.subscriberStart)}명 → {formatInteger(item.subscriberCurrent)}명
-                      </dd>
+                      <dd className="font-semibold text-[#0B0F0E]">{item.result}</dd>
                     </div>
                     <div className="flex items-center justify-between gap-4 py-3 text-sm">
                       <dt className="text-black/60">최고 조회수</dt>
@@ -500,7 +527,7 @@ export default function Page() {
               <div className="space-y-3">
                 <h3 className="text-[29px] font-semibold tracking-tight text-[#0B0F0E]">진단 안내</h3>
                 <p className="text-base leading-[1.9] text-black/68">
-                  접수 후 1영업일 안에 연락드리며, 현재 구조에서 먼저 손봐야 할 우선순위를 정리해드립니다.
+                  접수 후 3~4영업일 안에 연락드리며, 현재 구조에서 먼저 손봐야 할 우선순위를 정리해드립니다.
                 </p>
               </div>
 

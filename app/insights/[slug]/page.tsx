@@ -124,7 +124,7 @@ export default function InsightDetailPage({ params }: InsightParams) {
           </div>
 
           <footer className="mt-12 rounded-2xl border border-black/10 bg-black/[0.02] p-6">
-            <div className="text-sm text-black/60">전문직 유튜브 운영 상담</div>
+            <div className="text-sm text-black/60">브랜딩 콘텐츠·채널 운영 상담</div>
             <div className="mt-2 text-lg font-semibold">채널 구조/대본/전환 설계까지 함께 잡습니다.</div>
             <a
               href="/#contact"
