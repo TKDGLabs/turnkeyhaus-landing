@@ -85,6 +85,15 @@ const steps: { key: StepKey; title: string; subtitle: string }[] = [
   }
 ];
 
+const stepDisplayLabels: Record<StepKey, string> = {
+  channel: '채널 현황',
+  budget: '월 예산',
+  goal: '운영 목표',
+  mix: '콘텐츠 믹스',
+  term: '계약 기간',
+  addons: '추가 옵션'
+};
+
 const lineItems: LineItem[] = [
   {
     key: 'shoot',
@@ -679,6 +688,8 @@ export default function DiagnosticCalculator() {
   };
 
   const consultPrefillUrl = quote ? buildConsultPrefillUrl(form, quote) : content.contact.googleFormShareUrl.trim();
+  const progressRatio = quote ? 1 : (stepIndex + 1) / steps.length;
+  const progressPercent = Math.round(progressRatio * 100);
 
   return (
     <section id="pricing" className="border-y border-black/10 bg-white py-24">
@@ -688,13 +699,13 @@ export default function DiagnosticCalculator() {
             [ 운영 견적 플래너 ]
           </div>
           <h2 className="whitespace-pre-line text-[32px] font-bold leading-[1.28] tracking-tight text-[#0B0F0E] md:text-[44px]">
-            월 예산 안에서 최대 효율을 찾는
+            내 월 예산으로 바로 확인하는
             {'\n'}
             유튜브 채널 운영 견적
           </h2>
           <p className="mx-auto max-w-[70ch] text-[16px] leading-[1.85] text-black/60 md:text-[17px]">
-            단가는 고정하고, 수량/믹스/계약기간 조합으로 효율을 최적화합니다. 드론 촬영, 고급 모션 그래픽은
-            별도 협의 항목으로 분리해 견적의 현실성을 높였습니다.
+            월 예산과 운영 목표를 선택하면 실행 가능한 제작 조합과 예상 금액을 자동 산출합니다. 상담 신청 시
+            선택한 견적 내용이 함께 전달되어 빠르게 맞춤 제안을 받을 수 있습니다.
           </p>
           {anniversaryBenefit.active ? (
             <div className="mx-auto inline-flex max-w-[760px] items-center rounded-xl border border-[#21c1a2]/35 bg-[#e9fbf7] px-4 py-2.5 text-[14px] font-semibold text-[#0b3d35]">
@@ -704,9 +715,23 @@ export default function DiagnosticCalculator() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-          <aside className="h-fit rounded-2xl border border-black/10 bg-white p-4">
-            <p className="mb-3 text-sm font-semibold text-black/55">진행 단계</p>
-            <ol className="space-y-2">
+          <aside className="h-fit rounded-2xl border border-black/10 bg-white p-4 md:p-5">
+            <div className="mb-4">
+              <div className="flex items-end justify-between">
+                <p className="text-[13px] font-semibold tracking-[0.08em] text-black/55">진행 상태</p>
+                <p className="text-sm font-bold text-[#0B0F0E]">
+                  {quote ? '완료' : `${stepIndex + 1}/${steps.length}`}
+                </p>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/10">
+                <div
+                  className="h-full rounded-full bg-[#0B0F0E] transition-all duration-300"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+
+            <ol className="space-y-2.5">
               {steps.map((step, index) => {
                 const isDone = quote ? true : index < stepIndex;
                 const isActive = !quote && index === stepIndex;
@@ -715,35 +740,37 @@ export default function DiagnosticCalculator() {
                 return (
                   <li
                     key={step.key}
-                    className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
+                    className={`flex items-center gap-2.5 rounded-lg border px-3 py-2.5 transition-colors ${
                       isActive
-                        ? 'border-[#21c1a2] bg-[#21c1a2]/10 text-[#0B0F0E]'
+                        ? 'border-[#0B0F0E] bg-[#0B0F0E] text-white shadow-[0_2px_10px_rgba(11,15,14,0.18)]'
                         : isDone
-                        ? 'border-black/12 bg-black/[0.02] text-black/70'
+                        ? 'border-black/15 bg-[#F3F5F6] text-[#0B0F0E]'
                         : isLocked
-                        ? 'border-black/8 bg-white text-black/35'
+                        ? 'border-black/10 bg-white text-black/40'
                         : 'border-black/10 bg-white text-black/55'
                     }`}
                   >
                     <span
-                      className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${
+                      className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
                         isActive
-                          ? 'bg-[#21c1a2] text-[#06372f]'
+                          ? 'bg-white text-[#0B0F0E]'
                           : isDone
-                          ? 'bg-black/70 text-white'
+                          ? 'bg-[#0B0F0E] text-white'
                           : 'bg-black/10 text-black/50'
                       }`}
                     >
                       {index + 1}
                     </span>
-                    <span>{step.title.replace(' 선택해 주세요', '')}</span>
+                    <span className={`text-[14px] font-semibold leading-[1.3] ${isActive ? 'text-white' : 'text-current'}`}>
+                      {stepDisplayLabels[step.key]}
+                    </span>
                   </li>
                 );
               })}
             </ol>
 
             {form.monthlyBudget ? (
-              <div className="mt-4 rounded-xl border border-black/10 bg-[#FAFAFA] p-3">
+              <div className="mt-4 rounded-xl border border-black/12 bg-[#FAFAFA] p-3">
                 <p className="text-xs font-semibold text-black/50">선택 예산 (공급가 기준)</p>
                 <p className="mt-1 text-[22px] font-bold tracking-tight text-[#0B0F0E]">
                   {formatWon(form.monthlyBudget)}원
@@ -804,7 +831,7 @@ export default function DiagnosticCalculator() {
                                 <button
                                   type="button"
                                   onClick={() => adjustQuantity(item.key, -1)}
-                                  className="h-7 w-7 rounded border border-black/15 text-black/70 transition-colors hover:bg-black/[0.04]"
+                                  className="inline-flex h-7 w-7 items-center justify-center rounded border border-black/15 text-black/70 leading-none transition-colors hover:bg-black/[0.04]"
                                 >
                                   -
                                 </button>
@@ -814,7 +841,7 @@ export default function DiagnosticCalculator() {
                                 <button
                                   type="button"
                                   onClick={() => adjustQuantity(item.key, 1)}
-                                  className="h-7 w-7 rounded border border-black/15 text-black/70 transition-colors hover:bg-black/[0.04]"
+                                  className="inline-flex h-7 w-7 items-center justify-center rounded border border-black/15 text-black/70 leading-none transition-colors hover:bg-black/[0.04]"
                                 >
                                   +
                                 </button>
@@ -878,43 +905,48 @@ export default function DiagnosticCalculator() {
                     </div>
                   ) : null}
 
-                  <div className="flex flex-col gap-3 sm:flex-row">
-                    <button
-                      type="button"
-                      onClick={handleDownloadExcel}
-                      className="flex-1 rounded-xl border border-black/12 py-4 text-[15px] font-bold text-black/65 transition-colors hover:bg-black/[0.03]"
-                    >
-                      Excel 내보내기
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleDownloadPdf}
-                      className="flex-1 rounded-xl border border-black/12 py-4 text-[15px] font-bold text-black/65 transition-colors hover:bg-black/[0.03]"
-                    >
-                      PDF 저장
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setQuote(null)}
-                      className="flex-1 rounded-xl border border-black/12 py-4 text-[15px] font-bold text-black/60 transition-colors hover:bg-black/[0.03]"
-                    >
-                      단계 다시 수정하기
-                    </button>
-                    <button
-                      type="button"
-                      onClick={resetAll}
-                      className="flex-1 rounded-xl border border-black/12 py-4 text-[15px] font-bold text-black/60 transition-colors hover:bg-black/[0.03]"
-                    >
-                      처음부터 다시하기
-                    </button>
+                  <div className="space-y-3">
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                      <button
+                        type="button"
+                        onClick={handleDownloadExcel}
+                        className="rounded-xl border border-black/12 py-3.5 text-[14px] font-bold text-black/65 transition-colors hover:bg-black/[0.03]"
+                      >
+                        Excel 내보내기
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDownloadPdf}
+                        className="rounded-xl border border-black/12 py-3.5 text-[14px] font-bold text-black/65 transition-colors hover:bg-black/[0.03]"
+                      >
+                        PDF 저장
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setQuote(null)}
+                        className="rounded-xl border border-black/12 py-3.5 text-[14px] font-bold text-black/60 transition-colors hover:bg-black/[0.03]"
+                      >
+                        단계 다시 수정하기
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetAll}
+                        className="rounded-xl border border-black/12 py-3.5 text-[14px] font-bold text-black/60 transition-colors hover:bg-black/[0.03]"
+                      >
+                        처음부터 다시하기
+                      </button>
+                    </div>
                     <a
                       href={consultPrefillUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex-[1.3] flex items-center justify-center rounded-xl bg-[#0B0F0E] py-4 text-[16px] font-bold text-white transition-colors hover:bg-zinc-800"
+                      className="inline-flex w-full items-center justify-center rounded-xl bg-[#0B0F0E] px-5 py-4 text-[17px] font-bold text-white transition-colors hover:bg-zinc-800"
                     >
                       이 견적으로 상담 신청하기
                     </a>
+                    <p className="text-center text-xs font-medium text-black/46">
+                      예산·믹스·예상 금액이 상담 폼에 자동 첨부됩니다.
+                    </p>
                   </div>
                 </motion.div>
               ) : (
