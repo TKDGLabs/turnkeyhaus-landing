@@ -204,7 +204,7 @@ const lineItems: LineItem[] = [
   {
     key: 'practicalTraining',
     label: '영상 촬영/편집 실무 교육 (1개월·주1회·2시간·총8회)',
-    unitPrice: 1200000,
+    unitPrice: 800000,
     unitLabel: '패키지',
     min: 0,
     max: 1,
@@ -1571,7 +1571,7 @@ export default function DiagnosticCalculator() {
                         >
                           <p className="text-[18px] font-semibold text-[#0B0F0E]">영상 촬영/편집 실무 교육</p>
                           <p className="mt-1 text-sm text-black/60">
-                            1개월 과정 · 주 1회(2시간) · 총 8회 커리큘럼
+                            1개월 과정(총 8회) · 패키지 80만원
                           </p>
                         </button>
                       </div>
