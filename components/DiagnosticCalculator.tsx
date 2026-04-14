@@ -92,7 +92,7 @@ const steps: { key: StepKey; title: string; subtitle: string }[] = [
   {
     key: 'term',
     title: '계약 기간을 선택해 주세요',
-    subtitle: '장기 운영일수록 운영 효율 할인율이 적용됩니다.'
+    subtitle: '장기 운영일수록 안정 운영 혜택이 적용됩니다.'
   },
   {
     key: 'addons',
@@ -251,6 +251,11 @@ const formEntries = {
 
 const formatWon = (n: number) => n.toLocaleString('ko-KR');
 const formatRate = (n: number) => Math.round(n * 1000) / 10;
+const formatPercentLabel = (n: number) => {
+  const percent = n * 100;
+  if (Number.isInteger(percent)) return `${percent}%`;
+  return `${Math.round(percent * 10) / 10}%`;
+};
 
 const clampBudget = (value: number) => {
   if (!Number.isFinite(value)) return 0;
@@ -330,9 +335,9 @@ function buildConsultPrefillUrl(form: FormState, quote: QuoteResult) {
   const summary = [
     '[자동 입력] 견적 기반 상담 요청',
     `월 예산(공급가): ${formatWon(quote.budget)}원`,
-    `예산 활용도: ${quote.utilization}%`,
+    `예산 적합도: ${quote.utilization}%`,
     `공급가액: ${formatWon(quote.subtotal)}원`,
-    `할인율: ${formatRate(quote.discountRate)}%`,
+    `총 혜택: ${formatRate(quote.discountRate)}%`,
     `최종 금액(VAT 포함): ${formatWon(quote.total)}원`,
     `채널 상태: ${toChannelLabel(form.channelState)}`,
     `운영 목표: ${toGoalLabel(form.goal)}`,
@@ -519,7 +524,7 @@ function downloadEstimateCsv(form: FormState, quote: QuoteResult) {
       String(getLineItemUnitPrice(form, item.key)),
       String(quote.quantities[item.key]),
       item.unitLabel,
-      getLineItemUnitPrice(form, item.key) === 0 ? '필수 절차' : String(quote.lineTotals[item.key])
+      getLineItemUnitPrice(form, item.key) === 0 ? '기본 제공' : String(quote.lineTotals[item.key])
     ]),
     [],
     ['채널 상태', toChannelLabel(form.channelState)],
@@ -528,7 +533,7 @@ function downloadEstimateCsv(form: FormState, quote: QuoteResult) {
     ['계약 기간', `${term}개월`],
     ['선택 옵션', toAddOnLabel(form.addOns)],
     ['공급가액', String(quote.subtotal)],
-    ['할인율(%)', String(formatRate(quote.discountRate))],
+    ['총 혜택(%)', String(formatRate(quote.discountRate))],
     ['할인금액', String(quote.discountAmount)],
     ['할인 반영 공급가', String(quote.taxable)],
     ['부가세(10%)', String(quote.vat)],
@@ -551,7 +556,7 @@ function openEstimatePdfPrint(form: FormState, quote: QuoteResult) {
   const tableRows = visibleLineItems
     .map((item) => {
       const unitPrice = getLineItemUnitPrice(form, item.key);
-      const total = unitPrice === 0 ? '필수 절차' : `${formatWon(quote.lineTotals[item.key])}원`;
+      const total = unitPrice === 0 ? '기본 제공' : `${formatWon(quote.lineTotals[item.key])}원`;
       return `<tr>
         <td>${escapeHtml(item.label)}</td>
         <td style="text-align:right;">${unitPrice === 0 ? '0' : `${formatWon(unitPrice)}원`}</td>
@@ -611,7 +616,7 @@ function openEstimatePdfPrint(form: FormState, quote: QuoteResult) {
     </body>
   </html>`;
 
-  const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=960,height=720');
+  const printWindow = window.open('', '_blank', 'width=960,height=720');
   if (!printWindow) return;
   printWindow.document.open();
   printWindow.document.write(html);
@@ -725,7 +730,7 @@ function getDiscountRate(form: FormState) {
   if (form.addOns.consultingOnly) {
     return {
       rate: 0,
-      notes: ['컨설팅 단독 상품은 회차형 고정 단가로 할인율이 적용되지 않습니다.']
+      notes: ['컨설팅 단독 상품은 고정 단가 상품으로, 별도 할인 없이 명확한 금액으로 안내합니다.']
     };
   }
 
@@ -749,16 +754,22 @@ function getDiscountRate(form: FormState) {
   const rate = Math.min(raw, 0.12);
 
   const notes: string[] = [];
-  if (termRate > 0) notes.push(`계약 기간 할인 ${Math.round(termRate * 100)}% 적용`);
-  if (budgetRate > 0) notes.push(`예산 효율 보너스 ${Math.round(budgetRate * 1000) / 10}% 적용`);
-  if (goalRate > 0) notes.push(`운영 목표 정합 할인 ${Math.round(goalRate * 1000) / 10}% 적용`);
-  notes.push('단가 보호 가드: 총 할인율 상한 12% 적용');
+  if (termRate > 0) notes.push(`계약 기간 혜택 ${formatPercentLabel(termRate)} 적용`);
+  if (budgetRate > 0) notes.push(`예산 구간 혜택 ${formatPercentLabel(budgetRate)} 적용`);
+  if (goalRate > 0) notes.push(`운영 목표 맞춤 혜택 ${formatPercentLabel(goalRate)} 적용`);
+  notes.push('운영 품질 유지를 위해 최대 혜택은 12%까지만 적용됩니다.');
 
   return { rate, notes };
 }
 
 function subtotalFor(form: FormState, quantities: Quantities) {
   return lineItems.reduce((sum, item) => sum + getLineItemUnitPrice(form, item.key) * quantities[item.key], 0);
+}
+
+function taxableFor(form: FormState, quantities: Quantities, discountRate: number) {
+  const subtotal = subtotalFor(form, quantities);
+  const discountAmount = Math.min(Math.round(subtotal * discountRate), Math.round(subtotal * 0.12));
+  return Math.max(0, subtotal - discountAmount);
 }
 
 function getAdjustmentOrders(form: FormState) {
@@ -873,6 +884,39 @@ function optimizeQuantities(form: FormState, base: Quantities, discountRate: num
     quantities.reedit = Math.max(8, Math.round(quantities.shortform * 1.5));
   }
 
+  quantities = applyDependentQuantityRules(form, quantities);
+
+  if (!form.addOns.consultingOnly) {
+    let guard = 0;
+    while (taxableFor(form, quantities, discountRate) > budget && guard < 240) {
+      let changed = false;
+
+      for (const key of removeOrder) {
+        const item = lineItemMap[key];
+        if (item.unitPrice === 0) continue;
+        const { min } = getQuantityBounds(form, quantities, key);
+        const next = quantities[key] - item.step;
+        if (next < min) continue;
+
+        const candidate = applyDependentQuantityRules(form, {
+          ...quantities,
+          [key]: next
+        });
+
+        if (subtotalFor(form, candidate) === subtotalFor(form, quantities) && candidate[key] === quantities[key]) {
+          continue;
+        }
+
+        quantities = candidate;
+        changed = true;
+        break;
+      }
+
+      if (!changed) break;
+      guard += 1;
+    }
+  }
+
   return applyDependentQuantityRules(form, quantities);
 }
 
@@ -889,7 +933,8 @@ function calculateQuote(form: FormState, quantities: Quantities, rate: number, n
   const vat = Math.round(taxable * 0.1);
   const total = taxable + vat;
   const budget = form.monthlyBudget ?? 4400000;
-  const utilization = budget > 0 ? Math.round((taxable / budget) * 1000) / 10 : 0;
+  const utilizationRaw = budget > 0 ? (taxable / budget) * 100 : 0;
+  const utilization = Math.round(Math.min(utilizationRaw, 100) * 10) / 10;
 
   return {
     lineTotals,
@@ -1158,7 +1203,7 @@ export default function DiagnosticCalculator() {
                       <p className="mt-1 text-sm text-black/58">
                         {form.addOns.consultingOnly
                           ? '사전 설문 + 오프라인 1회(2시간 이내) + 온라인 보고서 1회 구성'
-                          : `예산 활용도 ${quote.utilization}% · 할인율 ${formatRate(quote.discountRate)}% 적용`}
+                          : `예산 적합도 ${quote.utilization}% · 총 혜택 ${formatRate(quote.discountRate)}% 적용`}
                       </p>
                     </div>
                     <p className="text-sm font-medium text-black/52">산출일: {new Date().toLocaleDateString()}</p>
@@ -1225,7 +1270,7 @@ export default function DiagnosticCalculator() {
                               </td>
                               <td className="px-4 py-4 text-center text-black/55">{item.unitLabel}</td>
                               <td className="px-4 py-4 text-right font-semibold text-[#0B0F0E]">
-                                {unitPrice === 0 ? '필수 절차' : formatWon(quote.lineTotals[item.key])}
+                                {unitPrice === 0 ? '기본 제공' : formatWon(quote.lineTotals[item.key])}
                               </td>
                             </tr>
                           );
@@ -1236,7 +1281,7 @@ export default function DiagnosticCalculator() {
 
                   <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
                     <div className="rounded-xl border border-[#21c1a2]/35 bg-[#21c1a2]/8 p-4">
-                      <p className="text-[13px] font-semibold text-black/70">할인율 산정 근거</p>
+                      <p className="text-[13px] font-semibold text-black/70">할인 적용 안내</p>
                       <ul className="mt-2 space-y-1 text-[13px] leading-[1.7] text-black/64">
                         {quote.discountNotes.map((note) => (
                           <li key={note}>- {note}</li>

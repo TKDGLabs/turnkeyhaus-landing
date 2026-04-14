@@ -172,7 +172,7 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageStructuredData) }}
       />
-      <header className="sticky top-0 z-40 border-b border-black/15 bg-white/95 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-black/8 bg-white/95 backdrop-blur-xl">
         <div className={`${shell} flex items-center justify-between py-4`}>
           <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
             <Image
@@ -220,21 +220,31 @@ export default function Page() {
         </div>
       </header>
 
-      <section id="top" className="relative isolate min-h-[60svh] overflow-hidden border-b border-black/15 bg-[#0d1312] md:min-h-[68svh]">
+      <section id="top" className="relative isolate min-h-[60svh] overflow-hidden bg-[#dfe7ea] md:min-h-[68svh]">
         <video
           autoPlay
           muted
           loop
           playsInline
           preload="auto"
-          className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center brightness-[1.08] contrast-[1.02]"
+          className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-[1.04] object-cover object-center opacity-35 blur-[2px]"
         >
           <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
         </video>
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(107deg,rgba(7,10,10,0.48)_0%,rgba(7,10,10,0.22)_46%,rgba(7,10,10,0.04)_100%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_14%,rgba(29,137,120,0.09),transparent_60%)]" />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="pointer-events-none absolute inset-0 z-10 h-full w-full object-contain object-center brightness-[1.02] contrast-[1.01]"
+        >
+          <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
+        </video>
+        <div className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(107deg,rgba(7,10,10,0.46)_0%,rgba(7,10,10,0.2)_48%,rgba(7,10,10,0.05)_100%)]" />
+        <div className="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(circle_at_82%_14%,rgba(29,137,120,0.12),transparent_60%)]" />
 
-        <div className={`${shell} relative flex min-h-[60svh] flex-col justify-end pb-16 pt-28 md:min-h-[68svh] md:pb-20 md:pt-32`}>
+        <div className={`${shell} relative z-30 flex min-h-[60svh] flex-col justify-end pb-16 pt-28 md:min-h-[68svh] md:pb-20 md:pt-32`}>
           <div className="fade-up max-w-[820px] space-y-6 text-white">
             <p className="text-sm font-semibold tracking-[0.18em] text-white/72">TURNKEYHAUS</p>
             <h1 className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.26] tracking-tight md:text-[68px] md:leading-[1.16]">
@@ -522,8 +532,6 @@ export default function Page() {
         </div>
       </section>
 
-      <DiagnosticCalculator />
-
       <section id="fit" className="border-b border-black/15 bg-[#fcfdfd]">
         <div className={`${shell} py-20 md:py-24`}>
           <SectionHeader
@@ -535,7 +543,7 @@ export default function Page() {
           <div className="mt-10 border-y border-black/15">
             {content.aiRecommendation.items.map((item) => (
               <article key={item.prompt} className="border-b border-black/10 py-7 last:border-b-0">
-                <p className="text-xs font-semibold tracking-[0.1em] text-black/48">AI 검색 질의 예시</p>
+                <p className="text-xs font-semibold tracking-[0.1em] text-black/48">자주 들어온 의뢰 유형</p>
                 <h3 className="mt-1 text-[24px] font-semibold tracking-tight text-[#0B0F0E]">{item.prompt}</h3>
                 <p className="mt-3 text-[16px] leading-[1.85] text-black/74">{item.fit}</p>
                 <ul className="mt-4 space-y-1.5 border-t border-black/12 pt-4 text-[15px] leading-[1.8] text-black/68">
@@ -551,65 +559,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="blog" className="border-b border-black/15">
-        <div className={`${shell} py-20 md:py-24`}>
-          <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
-
-          {insightPosts.length > 0 ? (
-            <div className="mt-10 border-y border-black/15">
-              {insightPosts.map((post) => (
-                <article
-                  key={post.slug}
-                  className="grid gap-4 border-b border-black/10 py-6 last:border-b-0 md:grid-cols-[130px_1fr_auto] md:items-start md:gap-8"
-                >
-                  <div className="text-sm font-medium text-black/55">{post.publishedAt}</div>
-                  <div className="space-y-2">
-                    <h3 className="text-[26px] font-semibold tracking-tight text-[#0B0F0E]">{post.title}</h3>
-                    <p className="text-sm leading-[1.85] text-black/68">{post.description}</p>
-                  </div>
-                  <Link
-                    href={`/insights/${post.slug}`}
-                    className={`inline-flex w-fit items-center border-b border-[#21c1a2] pb-1 text-sm font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197] ${focusRing}`}
-                  >
-                    읽기
-                  </Link>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-8 text-sm text-black/60">인사이트 글을 추가하면 이 영역에 자동으로 반영됩니다.</p>
-          )}
-
-          <div className="mt-8">
-            <Link
-              href="/insights"
-              className={`inline-flex items-center border border-black/20 px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-black/5 ${focusRing}`}
-            >
-              {content.blog.ctaLabel}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section id="faq" className="border-b border-black/15">
-        <div className={`${shell} py-20 md:py-24`}>
-          <SectionHeader label={content.faq.label} title={content.faq.h2} />
-
-          <div className="mt-10 border-y border-black/15">
-            {content.faq.items.map((item) => (
-              <details key={item.q} className="group border-b border-black/10 py-4 last:border-b-0">
-                <summary className={`cursor-pointer list-none pr-8 text-[19px] font-semibold tracking-tight text-[#0B0F0E] ${focusRing}`}>
-                  {item.q}
-                  <span className="ml-2 text-black/35 transition-transform group-open:rotate-45">+</span>
-                </summary>
-                <p className="mt-3 max-w-[78ch] whitespace-pre-line break-keep text-sm leading-[1.9] text-black/70 md:text-base">
-                  {item.a}
-                </p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
+      <DiagnosticCalculator />
 
       <section id="contact" className="border-b border-black/15 bg-white">
         <div className={`${shell} py-20 md:py-24`}>
@@ -672,6 +622,66 @@ export default function Page() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" className="border-b border-black/15">
+        <div className={`${shell} py-20 md:py-24`}>
+          <SectionHeader label={content.faq.label} title={content.faq.h2} />
+
+          <div className="mt-10 border-y border-black/15">
+            {content.faq.items.map((item) => (
+              <details key={item.q} className="group border-b border-black/10 py-4 last:border-b-0">
+                <summary className={`cursor-pointer list-none pr-8 text-[19px] font-semibold tracking-tight text-[#0B0F0E] ${focusRing}`}>
+                  {item.q}
+                  <span className="ml-2 text-black/35 transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p className="mt-3 max-w-[78ch] whitespace-pre-line break-keep text-sm leading-[1.9] text-black/70 md:text-base">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="blog" className="border-b border-black/15">
+        <div className={`${shell} py-20 md:py-24`}>
+          <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
+
+          {insightPosts.length > 0 ? (
+            <div className="mt-10 border-y border-black/15">
+              {insightPosts.map((post) => (
+                <article
+                  key={post.slug}
+                  className="grid gap-4 border-b border-black/10 py-6 last:border-b-0 md:grid-cols-[130px_1fr_auto] md:items-start md:gap-8"
+                >
+                  <div className="text-sm font-medium text-black/55">{post.publishedAt}</div>
+                  <div className="space-y-2">
+                    <h3 className="text-[26px] font-semibold tracking-tight text-[#0B0F0E]">{post.title}</h3>
+                    <p className="text-sm leading-[1.85] text-black/68">{post.description}</p>
+                  </div>
+                  <Link
+                    href={`/insights/${post.slug}`}
+                    className={`inline-flex w-fit items-center border-b border-[#21c1a2] pb-1 text-sm font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197] ${focusRing}`}
+                  >
+                    읽기
+                  </Link>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 text-sm text-black/60">인사이트 글을 추가하면 이 영역에 자동으로 반영됩니다.</p>
+          )}
+
+          <div className="mt-8">
+            <Link
+              href="/insights"
+              className={`inline-flex items-center border border-black/20 px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-black/5 ${focusRing}`}
+            >
+              {content.blog.ctaLabel}
+            </Link>
           </div>
         </div>
       </section>
