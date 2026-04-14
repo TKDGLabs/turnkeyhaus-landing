@@ -220,37 +220,29 @@ export default function Page() {
         </div>
       </header>
 
-      <section id="top" className="relative isolate min-h-[60svh] overflow-hidden bg-[#dfe7ea] md:min-h-[68svh]">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="pointer-events-none absolute inset-0 z-0 h-full w-full scale-[1.04] object-cover object-center opacity-35 blur-[2px]"
-        >
-          <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
-        </video>
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="pointer-events-none absolute inset-0 z-10 h-full w-full object-contain object-center brightness-[1.02] contrast-[1.01]"
-        >
-          <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
-        </video>
-        <div className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(107deg,rgba(7,10,10,0.46)_0%,rgba(7,10,10,0.2)_48%,rgba(7,10,10,0.05)_100%)]" />
-        <div className="pointer-events-none absolute inset-0 z-20 bg-[radial-gradient(circle_at_82%_14%,rgba(29,137,120,0.12),transparent_60%)]" />
+      <section id="top" className="overflow-hidden border-b border-black/10 bg-white">
+        <div className={`${shell} py-14 md:py-16`}>
+          <div className="overflow-hidden border border-black/10 bg-white">
+            <div className="relative aspect-[4/3] w-full md:aspect-[16/9]">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
+              >
+                <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
 
-        <div className={`${shell} relative z-30 flex min-h-[60svh] flex-col justify-end pb-16 pt-28 md:min-h-[68svh] md:pb-20 md:pt-32`}>
-          <div className="fade-up max-w-[820px] space-y-6 text-white">
-            <p className="text-sm font-semibold tracking-[0.18em] text-white/72">TURNKEYHAUS</p>
+          <div className="mt-10 max-w-[860px] space-y-6 text-[#0B0F0E] md:mt-12">
+            <p className="text-sm font-semibold tracking-[0.18em] text-black/55">TURNKEYHAUS</p>
             <h1 className="whitespace-pre-line break-keep text-[34px] font-semibold leading-[1.26] tracking-tight md:text-[68px] md:leading-[1.16]">
               {content.heroValue.headline}
             </h1>
-            <p className="max-w-[58ch] whitespace-pre-line break-keep text-base leading-[1.85] text-white/82 md:text-[20px] md:leading-[1.7]">
+            <p className="max-w-[58ch] whitespace-pre-line break-keep text-base leading-[1.85] text-black/72 md:text-[20px] md:leading-[1.7]">
               {content.heroValue.body}
             </p>
 
@@ -263,24 +255,24 @@ export default function Page() {
               </ActionLink>
               <ActionLink
                 href={content.heroValue.secondaryCta.href}
-                className="inline-flex items-center border border-white/40 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/18"
+                className="inline-flex items-center border border-black/20 bg-white px-5 py-3 text-sm font-semibold text-black/80 transition-colors hover:bg-black/[0.03]"
               >
                 {content.heroValue.secondaryCta.label}
               </ActionLink>
             </div>
           </div>
 
-          <dl className="fade-up mt-12 grid gap-5 border-t border-white/25 pt-6 text-white sm:grid-cols-3">
+          <dl className="mt-12 grid gap-5 border-t border-black/15 pt-6 text-[#0B0F0E] sm:grid-cols-3">
             <div className="space-y-1">
-              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">대표 사례</dt>
+              <dt className="text-xs font-semibold tracking-[0.14em] text-black/52">대표 사례</dt>
               <dd className="text-[34px] font-semibold tracking-tight">{content.portfolio.items.length}개 채널</dd>
             </div>
             <div className="space-y-1">
-              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">현재 구독자 합산</dt>
+              <dt className="text-xs font-semibold tracking-[0.14em] text-black/52">현재 구독자 합산</dt>
               <dd className="text-[34px] font-semibold tracking-tight">{formatInteger(totalSubscribers)}명</dd>
             </div>
             <div className="space-y-1">
-              <dt className="text-xs font-semibold tracking-[0.14em] text-white/62">전체 영상 누적 조회수</dt>
+              <dt className="text-xs font-semibold tracking-[0.14em] text-black/52">전체 영상 누적 조회수</dt>
               <dd className="text-[34px] font-semibold tracking-tight">약 {totalVideoViewsInMan}</dd>
             </div>
           </dl>
