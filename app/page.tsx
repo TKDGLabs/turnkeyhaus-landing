@@ -204,7 +204,6 @@ export default function Page() {
             소개서 다운로드
           </ActionLink>
         </div>
-
       </header>
 
       <section id="top" className="overflow-hidden bg-white">
@@ -658,6 +657,9 @@ export default function Page() {
           </div>
           
           <div className="flex flex-wrap gap-4 font-semibold text-black/60 md:text-right md:justify-end">
+            <Link href="/store" className="hover:text-[#21c1a2] text-[#21c1a2] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]">
+              서비스 상품/결제
+            </Link>
             <Link href="/terms" className="hover:text-[#21c1a2] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]">
               이용약관
             </Link>
