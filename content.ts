@@ -250,16 +250,13 @@ export const content: Content = {
       "브랜딩 콘텐츠 제작부터 채널 운영대행까지 통합 지원. 병원·로펌·정부 기관·커머스 업종별 전환형 운영 구조를 설계합니다.",
     locale: "ko_KR"
   },
+  // 상단 메뉴(GNB)를 핵심 5개로 압축하고, 결제 페이지(/store)를 눈에 띄게 추가했습니다!
   nav: [
-    { label: "문제", href: "#problem" },
-    { label: "방식", href: "#approach" },
-    { label: "업종별 적용", href: "#professional" },
-    { label: "실행 증거", href: "#proof" },
-    { label: "포트폴리오", href: "#portfolio" },
+    { label: "브랜딩 방식", href: "/#approach" },
+    { label: "포트폴리오", href: "/#portfolio" },
     { label: "인사이트", href: "/insights" },
-    { label: "운영 레벨", href: "#pricing" },
-    { label: "상황별 체크", href: "#fit" },
-    { label: "채널 진단", href: "#contact" }
+    { label: "서비스 결제", href: "/store" },
+    { label: "채널 진단", href: "/#contact" }
   ],
   heroValue: {
     headline: "브랜딩 채널은\n지속 가능한\n운영 구조부터.",
@@ -497,9 +494,9 @@ export const content: Content = {
         clientName: "더앞선치과병원",
         oneLiner: "신규 런칭부터 월간 포맷 운영까지 진행",
         tags: ["치과", "런칭", "운영"],
-        result: "구독자 0 → 541명",
+        result: "구독자 0 → 559명",
         subscriberStart: 0,
-        subscriberCurrent: 541,
+        subscriberCurrent: 559,
         maxVideoViews: 23000,
         href: "https://youtu.be/ajOQC_X-5bE",
         youtubeId: "ajOQC_X-5bE",
@@ -510,9 +507,9 @@ export const content: Content = {
         clientName: "법무법인 선율로",
         oneLiner: "기존 채널 리빌딩과 SEO 기반 운영 구조 재정비",
         tags: ["로펌", "리빌딩", "브랜딩"],
-        result: "구독자 500 → 5,970명",
+        result: "구독자 500 → 5,990명",
         subscriberStart: 500,
-        subscriberCurrent: 5970,
+        subscriberCurrent: 5990,
         maxVideoViews: 370000,
         href: "https://youtu.be/mozP07dCcuk",
         youtubeId: "mozP07dCcuk",
