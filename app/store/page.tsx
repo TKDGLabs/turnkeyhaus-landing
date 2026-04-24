@@ -18,7 +18,7 @@ export default function StorePage() {
     if (loading) return;
     setLoading(true);
 
-    // 1. 포트원 V2 라이브러리 확인
+    // 포트원 V2 라이브러리 확인
     const PortOne = (window as any).PortOne;
     if (!PortOne) {
       alert('결제 모듈을 불러오지 못했습니다. 페이지를 새로고침해 주세요.');
@@ -27,11 +27,12 @@ export default function StorePage() {
     }
 
     try {
-      // 2. 포트원 V2 결제 요청
       const paymentId = `order_${new Date().getTime()}`;
+      
+      // 포트원 V2 결제 요청 (대표님 키 적용 완료)
       const response = await PortOne.requestPayment({
-        storeId: "여기에_포트원_관리자콘솔에서_확인한_Store_ID_입력", // 예: store-1234-5678
-        channelKey: "여기에_채널_키_입력", // 관리자 콘솔 -> 결제연동에서 확인 가능
+        storeId: "store-0ed9b0da-1fc2-4b02-a8fd-b061102dd544", 
+        channelKey: "channel-key-de2c3299-45cd-470d-8a06-08af0141abc9",
         paymentId: paymentId,
         orderName: checkoutItem.name,
         totalAmount: checkoutItem.price,
@@ -44,14 +45,13 @@ export default function StorePage() {
         },
       });
 
-      // 결제창에서 오류가 난 경우
       if (response.code !== undefined) {
         alert(`결제 실패: ${response.message}`);
         setLoading(false);
         return;
       }
 
-      // 3. 우리 서버 API(/api/confirm)로 결제 검증 요청
+      // 서버 승인 API 호출
       const validation = await fetch('/api/confirm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -64,10 +64,10 @@ export default function StorePage() {
       const result = await validation.json();
 
       if (result.status === 'success') {
-        alert('결제 및 검증이 완료되었습니다!');
+        alert('결제가 완료되었습니다!');
         window.location.href = '/store?status=success';
       } else {
-        alert(`검증 실패: ${result.message}`);
+        alert(`결제 검증 실패: ${result.message}`);
       }
     } catch (error) {
       console.error(error);
@@ -79,10 +79,9 @@ export default function StorePage() {
 
   return (
     <main className="mx-auto w-full max-w-4xl px-5 py-20 text-[#0B0F0E]">
-      {/* 포트원 V2 SDK 로드 */}
       <Script src="https://cdn.portone.io/v2/browser-sdk.js" strategy="lazyOnload" />
       
-      <h1 className="text-3xl font-bold mb-10 text-center">서비스 결제 (PortOne V2)</h1>
+      <h1 className="text-3xl font-bold mb-10 text-center">서비스 결제</h1>
       
       <div className="grid md:grid-cols-3 gap-6">
         {products.map((product) => (
@@ -110,11 +109,10 @@ export default function StorePage() {
             disabled={loading}
             className="w-full py-4 bg-[#21c1a2] text-white font-bold text-lg rounded-xl hover:bg-[#1db197] disabled:bg-gray-400"
           >
-            {loading ? '처리 중...' : `${checkoutItem.price.toLocaleString()}원 결제하기`}
+            {loading ? '결제창 여는 중...' : `${checkoutItem.price.toLocaleString()}원 결제하기`}
           </button>
         </div>
       )}
     </main>
   );
-}
 }
