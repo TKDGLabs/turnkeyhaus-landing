@@ -184,6 +184,7 @@ export default function StorePage() {
       }
 
       if (!user) {
+        setAuthReady(true);
         router.replace("/auth?next=/store");
         return;
       }
@@ -429,6 +430,35 @@ export default function StorePage() {
 
       {!authReady ? (
         <section className="border border-black/15 bg-white p-8 text-[15px] text-black/68">로그인 상태를 확인하는 중입니다...</section>
+      ) : null}
+
+      {authReady && !authUser ? (
+        <section className="border border-black/15 bg-white p-8">
+          <h2 className="text-[23px] font-semibold tracking-tight text-[#0B0F0E]">로그인(또는 회원가입) 후 결제를 진행해 주세요.</h2>
+          <p className="mt-3 text-[15px] leading-[1.8] text-black/66">
+            결제 정보와 상담 이력을 정확히 관리하기 위해, 결제 페이지는 회원 인증 후에만 이용할 수 있습니다.
+          </p>
+
+          {error ? (
+            <p className="mt-4 rounded-none border border-red-200 bg-red-50 px-3 py-2 text-sm leading-[1.6] text-red-700">{error}</p>
+          ) : null}
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/auth?next=/store"
+              className={`inline-flex h-11 items-center border border-[#21c1a2] bg-[#21c1a2] px-4 text-[14px] font-semibold text-[#07211d] transition-colors hover:bg-[#1db197] ${focusRing}`}
+            >
+              로그인 / 회원가입 하러 가기
+            </Link>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className={`inline-flex h-11 items-center border border-black/15 px-4 text-[14px] font-semibold text-black/70 transition-colors hover:bg-black/[0.03] ${focusRing}`}
+            >
+              다시 확인
+            </button>
+          </div>
+        </section>
       ) : null}
 
       {authReady && authUser ? (
