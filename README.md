@@ -35,9 +35,16 @@ Google Form에서 `보내기` 버튼을 누른 뒤 `< >`(임베드) 탭으로 �
 2. 아래 값을 입력
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (또는 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)
+   - `SUPABASE_SECRET_KEY` (서버 전용)
+   - `SUPABASE_SERVICE_ROLE_KEY` (서버 전용, 절대 클라이언트 노출 금지)
 3. Supabase SQL Editor에서 아래 파일 실행
    - `scripts/supabase/auth-profile-setup.sql`
 4. Authentication > URL Configuration에서 Site URL/Redirect URL을 운영 도메인으로 설정
+
+### 보안 주의
+- `NEXT_PUBLIC_`로 시작하는 값만 브라우저에서 사용됩니다.
+- `SUPABASE_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`는 서버 코드/API Route에서만 사용해야 합니다.
+- 키가 외부에 노출되었으면 Supabase Dashboard에서 즉시 재발급(회전)하세요.
 
 ### 구현된 내용
 - 회원가입 시 `first_name`, `last_name`, `company_name`, `phone_number`, `role`, `business_registration_number`를 `user_metadata`로 저장
