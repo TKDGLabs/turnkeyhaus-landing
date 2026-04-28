@@ -5,6 +5,7 @@ export type StoreProduct = {
   name: string;
   summary: string;
   price: number;
+  galaxiaItemCode: string;
 };
 
 export const STORE_PRODUCTS: StoreProduct[] = [
@@ -12,19 +13,22 @@ export const STORE_PRODUCTS: StoreProduct[] = [
     id: "tier-1",
     name: "구조 세팅형 (월 운영 시작)",
     summary: "채널 구조 진단 + 월간 편성/제작 운영",
-    price: 3_800_000
+    price: 3_800_000,
+    galaxiaItemCode: "TKDH001"
   },
   {
     id: "tier-2",
     name: "구조 성장형 (월 운영 확장)",
     summary: "세팅형 포함 + 성과 고도화 루프 강화",
-    price: 4_800_000
+    price: 4_800_000,
+    galaxiaItemCode: "TKDH002"
   },
   {
     id: "tier-3",
     name: "단건 기획/촬영 프로젝트",
     summary: "캠페인성 단건 콘텐츠 제작",
-    price: 1_500_000
+    price: 1_500_000,
+    galaxiaItemCode: "TKDH003"
   }
 ];
 
@@ -35,4 +39,3 @@ export function getStoreProductById(productId: string) {
 export function getStoreProductByAmount(amount: number) {
   return STORE_PRODUCTS.find((item) => item.price === amount);
 }
-

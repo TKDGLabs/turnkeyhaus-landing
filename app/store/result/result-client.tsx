@@ -18,6 +18,20 @@ type VerifyResponse = {
   };
 };
 
+type LastPaymentDraft = {
+  paymentId?: string;
+  payMethod?: string;
+  companyName?: string;
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  customerRole?: string;
+  zipcode?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  businessRegistrationNumber?: string;
+};
+
 const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
@@ -30,11 +44,24 @@ export default function StoreResultClient() {
   const [state, setState] = useState<VerificationState>("loading");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [result, setResult] = useState<VerifyResponse["data"]>();
+  const [lastPaymentDraft, setLastPaymentDraft] = useState<LastPaymentDraft | null>(null);
 
   const decodedFailMessage = useMemo(
     () => (failMessage ? decodeURIComponent(failMessage) : ""),
     [failMessage]
   );
+
+  useEffect(() => {
+    const raw = sessionStorage.getItem("turnkeyhaus:last-payment");
+    if (!raw) return;
+
+    try {
+      const parsed = JSON.parse(raw) as LastPaymentDraft;
+      setLastPaymentDraft(parsed);
+    } catch {
+      setLastPaymentDraft(null);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -118,6 +145,37 @@ export default function StoreResultClient() {
                 <dd className="font-semibold text-[#0B0F0E]">{result.paidAmount.toLocaleString("ko-KR")}원</dd>
               </div>
             </dl>
+
+            {lastPaymentDraft ? (
+              <dl className="divide-y divide-black/10 border-y border-black/10 text-[14px]">
+                <div className="grid grid-cols-[140px_1fr] gap-3 py-2.5">
+                  <dt className="text-black/52">상호명</dt>
+                  <dd className="text-[#0B0F0E]">{lastPaymentDraft.companyName || "-"}</dd>
+                </div>
+                <div className="grid grid-cols-[140px_1fr] gap-3 py-2.5">
+                  <dt className="text-black/52">담당자</dt>
+                  <dd className="text-[#0B0F0E]">
+                    {[lastPaymentDraft.customerName, lastPaymentDraft.customerRole].filter(Boolean).join(" / ") || "-"}
+                  </dd>
+                </div>
+                <div className="grid grid-cols-[140px_1fr] gap-3 py-2.5">
+                  <dt className="text-black/52">연락처</dt>
+                  <dd className="text-[#0B0F0E]">{lastPaymentDraft.customerPhone || "-"}</dd>
+                </div>
+                <div className="grid grid-cols-[140px_1fr] gap-3 py-2.5">
+                  <dt className="text-black/52">주소</dt>
+                  <dd className="text-[#0B0F0E]">
+                    {[lastPaymentDraft.zipcode, lastPaymentDraft.addressLine1, lastPaymentDraft.addressLine2]
+                      .filter(Boolean)
+                      .join(" ") || "-"}
+                  </dd>
+                </div>
+                <div className="grid grid-cols-[140px_1fr] gap-3 py-2.5">
+                  <dt className="text-black/52">사업자번호</dt>
+                  <dd className="text-[#0B0F0E]">{lastPaymentDraft.businessRegistrationNumber || "-"}</dd>
+                </div>
+              </dl>
+            ) : null}
           </div>
         ) : null}
 
@@ -145,4 +203,3 @@ export default function StoreResultClient() {
     </main>
   );
 }
-

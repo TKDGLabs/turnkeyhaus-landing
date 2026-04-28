@@ -36,9 +36,22 @@ Google Form에서 `보내기` 버튼을 누른 뒤 `< >`(임베드) 탭으로 �
    - `NEXT_PUBLIC_PORTONE_STORE_ID`
    - `NEXT_PUBLIC_PORTONE_CHANNEL_KEY`
    - `PORTONE_API_SECRET` (서버 전용)
+   - `PORTONE_WEBHOOK_SECRET` (실연동)
+   - `PORTONE_WEBHOOK_SECRET_TEST` (테스트 연동)
 3. 개발 서버 실행 후 `/store`에서 테스트 결제 진행
+
+### 갤럭시아 채널 사용 시 반영 사항
+- 결제 요청에 `customer.customerId`를 자동 생성하여 전달합니다.
+- 결제 요청에 `bypass.galaxia.ITEM_CODE`를 상품별 코드로 전달합니다.
+- 결제 페이지에서 `상호명/이름/전화번호/주소/직함/사업자번호`를 입력하면 `storeDetails`/`customData`로 함께 전달됩니다.
+
+### 웹훅 연동
+- 웹훅 수신 URL: `/api/portone/webhook`
+- 포트원 콘솔 > 결제연동 > 연동정보 > 결제알림(Webhook) 관리에서 테스트/실연동 각각 URL과 시크릿을 발급하세요.
+- 이 엔드포인트는 시그니처 검증 후 처리하며, `paymentId`가 있는 이벤트는 포트원 결제 조회를 한 번 더 수행합니다.
 
 ### 보안 주의
 - `PORTONE_API_SECRET`은 절대 클라이언트 코드에 넣지 않습니다.
+- `PORTONE_WEBHOOK_SECRET`도 서버에서만 사용해야 하며 외부에 노출되면 즉시 교체해야 합니다.
 - 과거에 스토어/채널 키를 코드에 직접 넣었다면 콘솔에서 키를 재발급(회전)하는 것을 권장합니다.
 - 서버(`app/api/confirm/route.ts`)에서 결제 상태/금액을 반드시 검증한 뒤 성공 처리합니다.

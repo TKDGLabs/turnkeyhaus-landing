@@ -8,11 +8,55 @@ import { STORE_PRODUCTS, StoreProductId } from "@/lib/store-products";
 const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
+const PAY_METHOD_OPTIONS = [
+  { value: "CARD", label: "카드" },
+  { value: "TRANSFER", label: "계좌이체" },
+  { value: "MOBILE", label: "휴대폰 소액결제" },
+  { value: "GIFT_CERTIFICATE", label: "상품권" },
+  { value: "EASY_PAY", label: "간편결제" }
+] as const;
+
+type PayMethod = (typeof PAY_METHOD_OPTIONS)[number]["value"];
+
+function sanitizeDigits(value: string) {
+  return value.replace(/[^0-9]/g, "");
+}
+
+function buildCustomerId({
+  phone,
+  businessNumber,
+  email
+}: {
+  phone: string;
+  businessNumber: string;
+  email: string;
+}) {
+  const businessDigits = sanitizeDigits(businessNumber);
+  if (businessDigits) return `biz-${businessDigits}`.slice(0, 20);
+
+  const phoneDigits = sanitizeDigits(phone);
+  if (phoneDigits) return `hp-${phoneDigits.slice(-11)}`.slice(0, 20);
+
+  const emailSlug = email.toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (emailSlug) return `em-${emailSlug.slice(0, 16)}`.slice(0, 20);
+
+  return `guest-${Date.now().toString().slice(-8)}`;
+}
+
 export default function StorePage() {
   const [selectedProductId, setSelectedProductId] = useState<StoreProductId>("tier-1");
+  const [payMethod, setPayMethod] = useState<PayMethod>("CARD");
+
+  const [companyName, setCompanyName] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [customerRole, setCustomerRole] = useState("");
+  const [zipcode, setZipcode] = useState("");
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [businessRegistrationNumber, setBusinessRegistrationNumber] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +75,17 @@ export default function StorePage() {
       return;
     }
 
+    if (!customerName.trim()) {
+      setError("이름을 입력해 주세요.");
+      return;
+    }
+
+    const phoneDigits = sanitizeDigits(customerPhone);
+    if (phoneDigits.length < 9) {
+      setError("전화번호를 정확히 입력해 주세요.");
+      return;
+    }
+
     const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID?.trim();
     const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY?.trim();
     if (!storeId || !channelKey) {
@@ -42,6 +97,18 @@ export default function StorePage() {
     try {
       const paymentId = `tkdh-${selectedProduct.id}-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
       const redirectUrl = `${window.location.origin}/store/result`;
+      const normalizedBizNo = sanitizeDigits(businessRegistrationNumber);
+      const customerId = buildCustomerId({
+        phone: customerPhone,
+        businessNumber: businessRegistrationNumber,
+        email: customerEmail
+      });
+      const address = addressLine1.trim()
+        ? {
+            addressLine1: addressLine1.trim(),
+            addressLine2: addressLine2.trim() || "-"
+          }
+        : undefined;
 
       sessionStorage.setItem(
         "turnkeyhaus:last-payment",
@@ -49,7 +116,17 @@ export default function StorePage() {
           paymentId,
           productId: selectedProduct.id,
           amount: selectedProduct.price,
-          productName: selectedProduct.name
+          productName: selectedProduct.name,
+          payMethod,
+          companyName: companyName.trim(),
+          customerName: customerName.trim(),
+          customerPhone: phoneDigits,
+          customerEmail: customerEmail.trim(),
+          customerRole: customerRole.trim(),
+          zipcode: zipcode.trim(),
+          addressLine1: addressLine1.trim(),
+          addressLine2: addressLine2.trim(),
+          businessRegistrationNumber: normalizedBizNo
         })
       );
 
@@ -59,12 +136,49 @@ export default function StorePage() {
         paymentId,
         orderName: selectedProduct.name,
         totalAmount: selectedProduct.price,
-        currency: "CURRENCY_KRW",
-        payMethod: "CARD",
+        currency: "KRW",
+        payMethod,
         customer: {
-          fullName: customerName || undefined,
-          phoneNumber: customerPhone || undefined,
-          email: customerEmail || undefined
+          customerId,
+          fullName: customerName.trim(),
+          phoneNumber: phoneDigits,
+          email: customerEmail.trim() || undefined,
+          address,
+          zipcode: zipcode.trim() || undefined
+        },
+        products: [
+          {
+            id: selectedProduct.id,
+            name: selectedProduct.name,
+            amount: selectedProduct.price,
+            quantity: 1,
+            code: selectedProduct.galaxiaItemCode
+          }
+        ],
+        storeDetails: {
+          businessName: companyName.trim() || undefined,
+          businessRegistrationNumber: normalizedBizNo || undefined,
+          address: [addressLine1.trim(), addressLine2.trim()].filter(Boolean).join(" ") || undefined,
+          zipcode: zipcode.trim() || undefined,
+          contactName: customerRole.trim() || undefined,
+          phoneNumber: phoneDigits,
+          email: customerEmail.trim() || undefined
+        },
+        customData: {
+          companyName: companyName.trim() || null,
+          customerRole: customerRole.trim() || null,
+          businessRegistrationNumber: normalizedBizNo || null,
+          requestedCashReceipt: Boolean(normalizedBizNo),
+          address: {
+            zipcode: zipcode.trim() || null,
+            addressLine1: addressLine1.trim() || null,
+            addressLine2: addressLine2.trim() || null
+          }
+        },
+        bypass: {
+          galaxia: {
+            ITEM_CODE: selectedProduct.galaxiaItemCode
+          }
         },
         // SDK 타입 정의 상 필수로 잡히는 필드(실제 카드 결제에서는 미사용)
         alipayPlus: {},
@@ -89,16 +203,17 @@ export default function StorePage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1120px] px-5 py-14 text-[#0B0F0E] sm:px-6 md:py-20">
+    <main className="mx-auto w-full max-w-[1180px] px-5 py-14 text-[#0B0F0E] sm:px-6 md:py-20">
       <div className="mb-10 space-y-4 border-b border-black/10 pb-7">
         <p className="text-xs font-semibold tracking-[0.14em] text-black/48">[ 서비스 결제 ]</p>
         <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">포트원 결제로 바로 결제하기</h1>
-        <p className="max-w-[70ch] break-keep text-[16px] leading-[1.8] text-black/68">
-          결제 완료 후 자동 검증을 거쳐 접수됩니다. 카드 결제가 완료되면 결과 페이지에서 결제 상태를 확인할 수 있습니다.
+        <p className="max-w-[72ch] break-keep text-[16px] leading-[1.8] text-black/68">
+          갤럭시아머니트리 채널 기준으로 결제 요청을 보냅니다. 상호/담당자/주소/사업자번호를 입력하면 결제 메타데이터에 함께 기록되어
+          후속 정산과 현금영수증 요청 확인에 활용할 수 있습니다.
         </p>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-[1.1fr_0.9fr]">
+      <div className="grid gap-8 md:grid-cols-[1.08fr_0.92fr]">
         <section className="space-y-4">
           {STORE_PRODUCTS.map((product) => {
             const active = selectedProductId === product.id;
@@ -113,9 +228,14 @@ export default function StorePage() {
               >
                 <p className="text-[20px] font-semibold tracking-tight text-[#0B0F0E]">{product.name}</p>
                 <p className="mt-1 text-[15px] leading-[1.7] text-black/65">{product.summary}</p>
-                <p className="mt-4 text-[26px] font-semibold tracking-tight text-[#0B0F0E]">
-                  {product.price.toLocaleString("ko-KR")}원
-                </p>
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <p className="text-[26px] font-semibold tracking-tight text-[#0B0F0E]">
+                    {product.price.toLocaleString("ko-KR")}원
+                  </p>
+                  <p className="text-[12px] font-semibold tracking-[0.08em] text-black/45">
+                    ITEM_CODE: {product.galaxiaItemCode}
+                  </p>
+                </div>
               </button>
             );
           })}
@@ -124,37 +244,125 @@ export default function StorePage() {
         <aside className="border border-black/15 bg-white p-6 md:p-7">
           <h2 className="text-[24px] font-semibold tracking-tight">결제 정보 입력</h2>
           <p className="mt-2 text-[14px] leading-[1.75] text-black/60">
-            고객 정보는 결제 확인 및 후속 안내 용도로만 사용됩니다.
+            이름/전화번호는 갤럭시아 채널 결제에서 권장되는 필수 정보입니다.
           </p>
 
           <form className="mt-6 space-y-4" onSubmit={handleProcessPayment}>
+            <div className="space-y-2">
+              <p className="text-[13px] font-semibold tracking-[0.06em] text-black/58">결제수단</p>
+              <div className="flex flex-wrap gap-2">
+                {PAY_METHOD_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setPayMethod(option.value)}
+                    className={`inline-flex h-9 items-center border px-3 text-[13px] font-semibold transition-colors ${focusRing} ${
+                      payMethod === option.value
+                        ? "border-[#21c1a2] bg-[#21c1a2] text-[#07211d]"
+                        : "border-black/16 text-black/65 hover:bg-black/[0.03]"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <label className="block space-y-1.5">
-              <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">이름(선택)</span>
+              <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">상호명</span>
               <input
-                value={customerName}
-                onChange={(event) => setCustomerName(event.target.value)}
-                placeholder="홍길동"
+                value={companyName}
+                onChange={(event) => setCompanyName(event.target.value)}
+                placeholder="티케이디지랩스 주식회사"
+                className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
+              />
+            </label>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1.5">
+                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">이름*</span>
+                <input
+                  value={customerName}
+                  onChange={(event) => setCustomerName(event.target.value)}
+                  placeholder="홍길동"
+                  required
+                  className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
+                />
+              </label>
+
+              <label className="block space-y-1.5">
+                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">직함</span>
+                <input
+                  value={customerRole}
+                  onChange={(event) => setCustomerRole(event.target.value)}
+                  placeholder="대표 / 실장 / 담당자"
+                  className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1.5">
+                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">전화번호*</span>
+                <input
+                  value={customerPhone}
+                  onChange={(event) => setCustomerPhone(event.target.value)}
+                  placeholder="010-1234-5678"
+                  required
+                  className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
+                />
+              </label>
+
+              <label className="block space-y-1.5">
+                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">이메일</span>
+                <input
+                  type="email"
+                  value={customerEmail}
+                  onChange={(event) => setCustomerEmail(event.target.value)}
+                  placeholder="hello@company.com"
+                  className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-[140px_1fr]">
+              <label className="block space-y-1.5">
+                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">우편번호</span>
+                <input
+                  value={zipcode}
+                  onChange={(event) => setZipcode(event.target.value)}
+                  placeholder="06236"
+                  className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
+                />
+              </label>
+
+              <label className="block space-y-1.5">
+                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">주소</span>
+                <input
+                  value={addressLine1}
+                  onChange={(event) => setAddressLine1(event.target.value)}
+                  placeholder="서울특별시 강남구 ..."
+                  className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
+                />
+              </label>
+            </div>
+
+            <label className="block space-y-1.5">
+              <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">상세주소</span>
+              <input
+                value={addressLine2}
+                onChange={(event) => setAddressLine2(event.target.value)}
+                placeholder="층/호수 등"
                 className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
               />
             </label>
 
             <label className="block space-y-1.5">
-              <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">연락처(선택)</span>
+              <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">사업자번호 (현금영수증 요청용)</span>
               <input
-                value={customerPhone}
-                onChange={(event) => setCustomerPhone(event.target.value)}
-                placeholder="010-1234-5678"
-                className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
-              />
-            </label>
-
-            <label className="block space-y-1.5">
-              <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">이메일(선택)</span>
-              <input
-                type="email"
-                value={customerEmail}
-                onChange={(event) => setCustomerEmail(event.target.value)}
-                placeholder="hello@company.com"
+                value={businessRegistrationNumber}
+                onChange={(event) => setBusinessRegistrationNumber(event.target.value)}
+                placeholder="123-45-67890"
                 className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
               />
             </label>
@@ -181,8 +389,8 @@ export default function StorePage() {
           </form>
 
           <div className="mt-5 border-t border-black/10 pt-4 text-[13px] leading-[1.7] text-black/58">
-            <p>- 카드 결제 완료 후 서버 검증이 자동 진행됩니다.</p>
-            <p>- 환불/취소 기준은 아래 정책 문서를 따릅니다.</p>
+            <p>- 결제 완료 후 서버 검증(`paymentId` 조회)이 자동 진행됩니다.</p>
+            <p>- 사업자번호 입력 시 요청 정보가 저장되며, 실제 발급 가능 여부는 결제수단/PG 정책에 따라 달라질 수 있습니다.</p>
             <div className="mt-2 flex flex-wrap gap-3 text-[13px] font-semibold">
               <Link href="/terms" className={`text-[#21c1a2] hover:text-[#1db197] ${focusRing}`}>
                 서비스 이용약관
@@ -200,3 +408,4 @@ export default function StorePage() {
     </main>
   );
 }
+
