@@ -1,9 +1,12 @@
 "use client";
 
 import * as PortOne from "@portone/browser-sdk/v2";
+import type { User } from "@supabase/supabase-js";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { STORE_PRODUCTS, StoreProductId } from "@/lib/store-products";
 
 const focusRing =
@@ -18,6 +21,15 @@ const PAY_METHOD_OPTIONS = [
 ] as const;
 
 type PayMethod = (typeof PAY_METHOD_OPTIONS)[number]["value"];
+
+type ProfileRow = {
+  first_name: string | null;
+  last_name: string | null;
+  company_name: string | null;
+  phone_number: string | null;
+  role: string | null;
+  business_registration_number: string | null;
+};
 
 type KakaoPostcodeAddressData = {
   zonecode: string;
@@ -111,7 +123,16 @@ function composeSelectedAddress(data: KakaoPostcodeAddressData) {
   return extraAddress ? `${mainAddress} (${extraAddress})` : mainAddress;
 }
 
+function getMetadataString(user: User | null, key: string) {
+  if (!user) return "";
+  const value = user.user_metadata?.[key];
+  return typeof value === "string" ? value : "";
+}
+
 export default function StorePage() {
+  const router = useRouter();
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+
   const [selectedProductId, setSelectedProductId] = useState<StoreProductId>("tier-1");
   const [payMethod, setPayMethod] = useState<PayMethod>("CARD");
 
@@ -129,11 +150,81 @@ export default function StorePage() {
   const [error, setError] = useState<string | null>(null);
   const [postcodeLoaded, setPostcodeLoaded] = useState(false);
   const detailAddressInputRef = useRef<HTMLInputElement>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [authUser, setAuthUser] = useState<User | null>(null);
 
   const selectedProduct = useMemo(
     () => STORE_PRODUCTS.find((item) => item.id === selectedProductId),
     [selectedProductId]
   );
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function initializeAuth() {
+      if (!supabase) {
+        if (mounted) {
+          setError("Supabase 인증 환경 변수가 설정되지 않았습니다. NEXT_PUBLIC_SUPABASE_URL / KEY를 확인해 주세요.");
+          setAuthReady(true);
+        }
+        return;
+      }
+
+      const {
+        data: { user },
+        error: authError
+      } = await supabase.auth.getUser();
+
+      if (!mounted) return;
+
+      if (authError) {
+        setError("로그인 상태 확인에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+        setAuthReady(true);
+        return;
+      }
+
+      if (!user) {
+        router.replace("/auth?next=/store");
+        return;
+      }
+
+      setAuthUser(user);
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("first_name,last_name,company_name,phone_number,role,business_registration_number")
+        .eq("id", user.id)
+        .maybeSingle<ProfileRow>();
+
+      const firstName = profile?.first_name || getMetadataString(user, "first_name");
+      const lastName = profile?.last_name || getMetadataString(user, "last_name");
+      const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
+
+      setCustomerName((prev) => prev || fullName);
+      setCustomerEmail((prev) => prev || user.email || "");
+      setCompanyName((prev) => prev || profile?.company_name || getMetadataString(user, "company_name"));
+      setCustomerPhone((prev) => prev || profile?.phone_number || getMetadataString(user, "phone_number"));
+      setCustomerRole((prev) => prev || profile?.role || getMetadataString(user, "role"));
+      setBusinessRegistrationNumber(
+        (prev) => prev || profile?.business_registration_number || getMetadataString(user, "business_registration_number")
+      );
+
+      setAuthReady(true);
+    }
+
+    void initializeAuth();
+
+    return () => {
+      mounted = false;
+    };
+  }, [router, supabase]);
+
+  async function handleSignOut() {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    router.replace("/auth");
+    router.refresh();
+  }
 
   function handleOpenPostcodePopup() {
     setError(null);
@@ -167,6 +258,11 @@ export default function StorePage() {
     if (loading) return;
     setError(null);
 
+    if (!authUser) {
+      setError("로그인 상태를 확인한 뒤 결제를 진행해 주세요.");
+      return;
+    }
+
     if (!selectedProduct) {
       setError("선택된 상품 정보를 찾을 수 없습니다.");
       return;
@@ -195,10 +291,11 @@ export default function StorePage() {
       const paymentId = `tkdh-${selectedProduct.id}-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
       const redirectUrl = `${window.location.origin}/store/result`;
       const normalizedBizNo = sanitizeDigits(businessRegistrationNumber);
+      const normalizedEmail = customerEmail.trim() || authUser.email || "";
       const customerId = buildCustomerId({
         phone: customerPhone,
         businessNumber: businessRegistrationNumber,
-        email: customerEmail
+        email: normalizedEmail
       });
       const address = addressLine1.trim()
         ? {
@@ -218,7 +315,7 @@ export default function StorePage() {
           companyName: companyName.trim(),
           customerName: customerName.trim(),
           customerPhone: phoneDigits,
-          customerEmail: customerEmail.trim(),
+          customerEmail: normalizedEmail,
           customerRole: customerRole.trim(),
           zipcode: zipcode.trim(),
           addressLine1: addressLine1.trim(),
@@ -239,7 +336,7 @@ export default function StorePage() {
           customerId,
           fullName: customerName.trim(),
           phoneNumber: phoneDigits,
-          email: customerEmail.trim() || undefined,
+          email: normalizedEmail || undefined,
           address,
           zipcode: zipcode.trim() || undefined
         },
@@ -259,9 +356,11 @@ export default function StorePage() {
           zipcode: zipcode.trim() || undefined,
           contactName: customerRole.trim() || undefined,
           phoneNumber: phoneDigits,
-          email: customerEmail.trim() || undefined
+          email: normalizedEmail || undefined
         },
         customData: {
+          userId: authUser.id,
+          loginEmail: authUser.email || normalizedEmail,
           companyName: companyName.trim() || null,
           customerRole: customerRole.trim() || null,
           businessRegistrationNumber: normalizedBizNo || null,
@@ -314,9 +413,26 @@ export default function StorePage() {
           갤럭시아머니트리 채널 기준으로 결제 요청을 보냅니다. 상호/담당자/주소/사업자번호를 입력하면 결제 메타데이터에 함께 기록되어
           후속 정산과 현금영수증 요청 확인에 활용할 수 있습니다.
         </p>
+        {authUser ? (
+          <div className="flex flex-wrap items-center gap-2 text-[13px] text-black/58">
+            <span className="border border-black/12 bg-black/[0.02] px-2.5 py-1">{authUser.email}</span>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className={`h-8 border border-black/15 px-3 text-[12px] font-semibold text-black/65 transition-colors hover:bg-black/[0.03] ${focusRing}`}
+            >
+              로그아웃
+            </button>
+          </div>
+        ) : null}
       </div>
 
-      <div className="grid gap-8 md:grid-cols-[1.08fr_0.92fr]">
+      {!authReady ? (
+        <section className="border border-black/15 bg-white p-8 text-[15px] text-black/68">로그인 상태를 확인하는 중입니다...</section>
+      ) : null}
+
+      {authReady && authUser ? (
+        <div className="grid gap-8 md:grid-cols-[1.08fr_0.92fr]">
         <section className="space-y-4">
           {STORE_PRODUCTS.map((product) => {
             const active = selectedProductId === product.id;
@@ -520,6 +636,7 @@ export default function StorePage() {
           </div>
         </aside>
       </div>
+      ) : null}
     </main>
   );
 }
