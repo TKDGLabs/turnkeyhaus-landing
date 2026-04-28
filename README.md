@@ -44,6 +44,7 @@ Google Form에서 `보내기` 버튼을 누른 뒤 `< >`(임베드) 탭으로 �
 - 결제 요청에 `customer.customerId`를 자동 생성하여 전달합니다.
 - 결제 요청에 `bypass.galaxia.ITEM_CODE`를 상품별 코드로 전달합니다.
 - 결제 페이지에서 `상호명/이름/전화번호/주소/직함/사업자번호`를 입력하면 `storeDetails`/`customData`로 함께 전달됩니다.
+- 결제 페이지 주소 입력은 카카오 우편번호 팝업(`postcode.v2.js`)이 기본 연동되어 있어 `우편번호 찾기` 버튼으로 자동 입력할 수 있습니다.
 
 ### 웹훅 연동
 - 웹훅 수신 URL: `/api/portone/webhook`

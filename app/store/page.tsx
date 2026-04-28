@@ -2,7 +2,8 @@
 
 import * as PortOne from "@portone/browser-sdk/v2";
 import Link from "next/link";
-import { FormEvent, useMemo, useState } from "react";
+import Script from "next/script";
+import { FormEvent, useMemo, useRef, useState } from "react";
 import { STORE_PRODUCTS, StoreProductId } from "@/lib/store-products";
 
 const focusRing =
@@ -17,6 +18,48 @@ const PAY_METHOD_OPTIONS = [
 ] as const;
 
 type PayMethod = (typeof PAY_METHOD_OPTIONS)[number]["value"];
+
+type KakaoPostcodeAddressData = {
+  zonecode: string;
+  address: string;
+  roadAddress: string;
+  jibunAddress: string;
+  userSelectedType: "R" | "J";
+  bname: string;
+  buildingName: string;
+  apartment: "Y" | "N";
+};
+
+type KakaoPostcodeOptions = {
+  oncomplete: (data: KakaoPostcodeAddressData) => void;
+  onclose?: (state: "FORCE_CLOSE" | "COMPLETE_CLOSE") => void;
+  animation?: boolean;
+  focusInput?: boolean;
+  autoMapping?: boolean;
+  hideMapBtn?: boolean;
+  hideEngBtn?: boolean;
+};
+
+type KakaoPostcodeOpenOptions = {
+  q?: string;
+  popupTitle?: string;
+  popupKey?: string;
+  autoClose?: boolean;
+};
+
+type KakaoPostcodeInstance = {
+  open: (options?: KakaoPostcodeOpenOptions) => void;
+};
+
+type KakaoPostcodeConstructor = new (options: KakaoPostcodeOptions) => KakaoPostcodeInstance;
+
+declare global {
+  interface Window {
+    kakao?: {
+      Postcode?: KakaoPostcodeConstructor;
+    };
+  }
+}
 
 function sanitizeDigits(value: string) {
   return value.replace(/[^0-9]/g, "");
@@ -43,6 +86,31 @@ function buildCustomerId({
   return `guest-${Date.now().toString().slice(-8)}`;
 }
 
+function composeSelectedAddress(data: KakaoPostcodeAddressData) {
+  const mainAddress =
+    data.userSelectedType === "R"
+      ? data.roadAddress || data.address
+      : data.jibunAddress || data.address;
+
+  if (data.userSelectedType !== "R") {
+    return mainAddress;
+  }
+
+  let extraAddress = "";
+
+  if (data.bname && /[동로가]$/.test(data.bname)) {
+    extraAddress = data.bname;
+  }
+
+  if (data.buildingName && data.apartment === "Y") {
+    extraAddress = extraAddress
+      ? `${extraAddress}, ${data.buildingName}`
+      : data.buildingName;
+  }
+
+  return extraAddress ? `${mainAddress} (${extraAddress})` : mainAddress;
+}
+
 export default function StorePage() {
   const [selectedProductId, setSelectedProductId] = useState<StoreProductId>("tier-1");
   const [payMethod, setPayMethod] = useState<PayMethod>("CARD");
@@ -59,11 +127,40 @@ export default function StorePage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [postcodeLoaded, setPostcodeLoaded] = useState(false);
+  const detailAddressInputRef = useRef<HTMLInputElement>(null);
 
   const selectedProduct = useMemo(
     () => STORE_PRODUCTS.find((item) => item.id === selectedProductId),
     [selectedProductId]
   );
+
+  function handleOpenPostcodePopup() {
+    setError(null);
+
+    const Postcode = window.kakao?.Postcode;
+    if (!Postcode) {
+      setError("주소 검색 모듈을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
+
+    new Postcode({
+      animation: true,
+      hideMapBtn: true,
+      oncomplete: (data) => {
+        const selectedAddress = composeSelectedAddress(data);
+        setZipcode(data.zonecode || "");
+        setAddressLine1(selectedAddress || "");
+
+        window.requestAnimationFrame(() => {
+          detailAddressInputRef.current?.focus();
+        });
+      }
+    }).open({
+      popupKey: "turnkeyhaus-postcode",
+      popupTitle: "우편번호 검색"
+    });
+  }
 
   async function handleProcessPayment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -204,6 +301,12 @@ export default function StorePage() {
 
   return (
     <main className="mx-auto w-full max-w-[1180px] px-5 py-14 text-[#0B0F0E] sm:px-6 md:py-20">
+      <Script
+        src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+        strategy="afterInteractive"
+        onLoad={() => setPostcodeLoaded(true)}
+      />
+
       <div className="mb-10 space-y-4 border-b border-black/10 pb-7">
         <p className="text-xs font-semibold tracking-[0.14em] text-black/48">[ 서비스 결제 ]</p>
         <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">포트원 결제로 바로 결제하기</h1>
@@ -336,20 +439,32 @@ export default function StorePage() {
                 />
               </label>
 
-              <label className="block space-y-1.5">
-                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">주소</span>
-                <input
-                  value={addressLine1}
-                  onChange={(event) => setAddressLine1(event.target.value)}
-                  placeholder="서울특별시 강남구 ..."
-                  className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
-                />
-              </label>
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
+                <label className="block space-y-1.5">
+                  <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">주소</span>
+                  <input
+                    value={addressLine1}
+                    onChange={(event) => setAddressLine1(event.target.value)}
+                    placeholder="서울특별시 강남구 ..."
+                    className={`h-11 w-full border border-black/16 px-3 text-[15px] text-[#0B0F0E] placeholder:text-black/35 ${focusRing}`}
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={handleOpenPostcodePopup}
+                  disabled={!postcodeLoaded}
+                  className={`h-11 whitespace-nowrap border border-[#21c1a2] px-4 text-[13px] font-semibold text-[#0B0F0E] transition-colors hover:bg-[#ecfbf7] disabled:cursor-not-allowed disabled:border-black/12 disabled:text-black/35 disabled:hover:bg-transparent ${focusRing}`}
+                >
+                  {postcodeLoaded ? "우편번호 찾기" : "주소 모듈 로딩중"}
+                </button>
+              </div>
             </div>
 
             <label className="block space-y-1.5">
               <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">상세주소</span>
               <input
+                ref={detailAddressInputRef}
                 value={addressLine2}
                 onChange={(event) => setAddressLine2(event.target.value)}
                 placeholder="층/호수 등"
@@ -408,4 +523,3 @@ export default function StorePage() {
     </main>
   );
 }
-
