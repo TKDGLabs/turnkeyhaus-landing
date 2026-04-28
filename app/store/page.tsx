@@ -184,6 +184,7 @@ export default function StorePage() {
       }
 
       if (!user) {
+        setAuthReady(true);
         router.replace("/auth?next=/store");
         return;
       }
@@ -429,6 +430,33 @@ export default function StorePage() {
 
       {!authReady ? (
         <section className="border border-black/15 bg-white p-8 text-[15px] text-black/68">로그인 상태를 확인하는 중입니다...</section>
+      ) : null}
+
+      {authReady && !authUser ? (
+        <section className="space-y-4 border border-black/15 bg-white p-8">
+          {error ? (
+            <p className="rounded-none border border-red-200 bg-red-50 px-3 py-2 text-sm leading-[1.6] text-red-700">{error}</p>
+          ) : (
+            <p className="text-[15px] leading-[1.7] text-black/65">
+              결제를 진행하려면 먼저 로그인(또는 회원가입)이 필요합니다.
+            </p>
+          )}
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/auth?next=/store"
+              className={`inline-flex h-11 items-center justify-center border border-[#21c1a2] bg-[#21c1a2] px-4 text-[14px] font-semibold text-[#07211d] transition-colors hover:bg-[#1db197] ${focusRing}`}
+            >
+              로그인 / 회원가입 하러 가기
+            </Link>
+            <button
+              type="button"
+              onClick={() => router.refresh()}
+              className={`inline-flex h-11 items-center justify-center border border-black/15 px-4 text-[14px] font-semibold text-black/70 transition-colors hover:bg-black/[0.03] ${focusRing}`}
+            >
+              다시 확인
+            </button>
+          </div>
+        </section>
       ) : null}
 
       {authReady && authUser ? (
