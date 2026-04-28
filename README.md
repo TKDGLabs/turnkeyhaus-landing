@@ -34,7 +34,7 @@ Google Form에서 `보내기` 버튼을 누른 뒤 `< >`(임베드) 탭으로 �
 1. `.env.example`을 복사해 `.env.local` 생성
 2. 아래 값을 입력
    - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (또는 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (또는 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, 레거시 `NEXT_PUBLIC_SUPABASE_KEY`도 지원)
 3. Supabase SQL Editor에서 아래 파일 실행
    - `scripts/supabase/auth-profile-setup.sql`
 4. Authentication > URL Configuration에서 Site URL/Redirect URL을 운영 도메인으로 설정

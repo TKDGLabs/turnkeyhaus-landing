@@ -50,7 +50,9 @@ export default function AuthPage() {
     setNotice(null);
 
     if (!supabase) {
-      setError("Supabase 환경 변수가 설정되지 않았습니다. NEXT_PUBLIC_SUPABASE_URL / KEY를 확인해 주세요.");
+      setError(
+        "Supabase 환경 변수가 설정되지 않았습니다. NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY(또는 NEXT_PUBLIC_SUPABASE_ANON_KEY / NEXT_PUBLIC_SUPABASE_KEY)를 확인해 주세요."
+      );
       return;
     }
 
