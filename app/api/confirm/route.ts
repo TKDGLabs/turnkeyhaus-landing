@@ -1,35 +1,90 @@
 import { NextResponse } from "next/server";
+import { getStoreProductByAmount } from "@/lib/store-products";
+
+type PortOnePayment = {
+  paymentId?: string;
+  orderName?: string;
+  status?: string;
+  currency?: string;
+  amount?: {
+    total?: number;
+  };
+};
 
 export async function POST(request: Request) {
   try {
-    const { paymentId, amount } = await request.json();
+    const body = await request.json();
+    const paymentId = typeof body.paymentId === "string" ? body.paymentId.trim() : "";
 
-    // 1. Vercel Environments에 저장한 시크릿 키를 가져옵니다.
+    if (!paymentId) {
+      return NextResponse.json({ status: "fail", message: "paymentId가 필요합니다." }, { status: 400 });
+    }
+
     const apiSecret = process.env.PORTONE_API_SECRET;
+    if (!apiSecret) {
+      return NextResponse.json(
+        { status: "fail", message: "PORTONE_API_SECRET 환경 변수가 설정되지 않았습니다." },
+        { status: 500 }
+      );
+    }
 
-    // 2. 포트원 V2 API를 통해 실제 결제 내역을 조회합니다.
-    const response = await fetch(`https://api.portone.io/payments/${paymentId}`, {
+    const response = await fetch(`https://api.portone.io/payments/${encodeURIComponent(paymentId)}`, {
       method: "GET",
       headers: {
         "Authorization": `PortOne ${apiSecret}`,
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     });
 
     if (!response.ok) {
-      return NextResponse.json({ message: "포트원 결제 조회 실패" }, { status: response.status });
+      const failed = await response.text();
+      return NextResponse.json(
+        { status: "fail", message: "포트원 결제 조회 실패", detail: failed.slice(0, 300) },
+        { status: response.status }
+      );
     }
 
-    const payment = await response.json();
+    const payment = (await response.json()) as PortOnePayment;
+    const paidAmount = payment.amount?.total;
+    const matchedProduct = typeof paidAmount === "number" ? getStoreProductByAmount(paidAmount) : undefined;
 
-    // 3. 결제 상태와 금액을 이중 검증합니다.
-    if (payment.status === "PAID" && payment.amount.total === amount) {
-      return NextResponse.json({ status: "success", data: payment });
-    } else {
-      return NextResponse.json({ status: "fail", message: "결제 금액 불일치 또는 미결제" }, { status: 400 });
+    if (payment.status !== "PAID") {
+      return NextResponse.json(
+        { status: "fail", message: "결제 완료 상태가 아닙니다.", paymentStatus: payment.status ?? "UNKNOWN" },
+        { status: 400 }
+      );
     }
+
+    if (typeof paidAmount !== "number") {
+      return NextResponse.json({ status: "fail", message: "결제 금액 정보를 확인할 수 없습니다." }, { status: 400 });
+    }
+
+    if (!matchedProduct) {
+      return NextResponse.json(
+        { status: "fail", message: "등록된 상품 금액과 일치하지 않는 결제입니다." },
+        { status: 400 }
+      );
+    }
+
+    if (payment.currency && !payment.currency.endsWith("KRW")) {
+      return NextResponse.json(
+        { status: "fail", message: "지원하지 않는 통화 결제입니다.", currency: payment.currency },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({
+      status: "success",
+      data: {
+        paymentId,
+        paidAmount,
+        orderName: payment.orderName ?? matchedProduct.name,
+        productId: matchedProduct.id,
+        productName: matchedProduct.name
+      }
+    });
   } catch (error) {
     console.error("Payment Confirmation Error:", error);
-    return NextResponse.json({ message: "서버 내부 오류" }, { status: 500 });
+    return NextResponse.json({ status: "fail", message: "서버 내부 오류" }, { status: 500 });
   }
 }

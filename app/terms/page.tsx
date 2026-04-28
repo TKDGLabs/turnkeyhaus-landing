@@ -6,7 +6,7 @@ export default function TermsPage() {
       <h1 className="text-3xl font-bold mb-8">이용약관</h1>
       <div className="space-y-8 text-sm leading-relaxed text-black/80">
         <p>
-          본 약관은 <strong>티케이디지랩스 주식회사</strong>(이하 "회사")가 제공하는 브랜딩 콘텐츠 제작 및 유튜브 채널 운영대행 서비스(이하 "서비스")의 이용 조건 및 절차에 관한 사항을 규정합니다.
+          본 약관은 <strong>티케이디지랩스 주식회사</strong>(이하 &quot;회사&quot;)가 제공하는 브랜딩 콘텐츠 제작 및 유튜브 채널 운영대행 서비스(이하 &quot;서비스&quot;)의 이용 조건 및 절차에 관한 사항을 규정합니다.
         </p>
 
         <section>

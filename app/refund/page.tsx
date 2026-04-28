@@ -6,7 +6,7 @@ export default function RefundPage() {
       <h1 className="text-3xl font-bold mb-8">환불 및 취소 정책</h1>
       <div className="space-y-8 text-sm leading-relaxed text-black/80">
         <p>
-          티케이디지랩스 주식회사(이하 "회사")는 영상 콘텐츠 제작 및 채널 운영대행 서비스의 특성을 고려하여, 단건 결제 및 정기결제(구독형) 등 모든 거래에 대하여 아래와 같은 환불 및 취소 정책을 적용합니다.
+          티케이디지랩스 주식회사(이하 &quot;회사&quot;)는 영상 콘텐츠 제작 및 채널 운영대행 서비스의 특성을 고려하여, 단건 결제 및 정기결제(구독형) 등 모든 거래에 대하여 아래와 같은 환불 및 취소 정책을 적용합니다.
         </p>
 
         <section>
