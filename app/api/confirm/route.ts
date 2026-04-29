@@ -17,13 +17,13 @@ export async function POST(request: Request) {
     const paymentId = typeof body.paymentId === "string" ? body.paymentId.trim() : "";
 
     if (!paymentId) {
-      return NextResponse.json({ status: "fail", message: "paymentId가 필요합니다." }, { status: 400 });
+      return NextResponse.json({ status: "fail", message: "결제 정보를 확인할 수 없습니다." }, { status: 400 });
     }
 
     const apiSecret = process.env.PORTONE_API_SECRET;
     if (!apiSecret) {
       return NextResponse.json(
-        { status: "fail", message: "PORTONE_API_SECRET 환경 변수가 설정되지 않았습니다." },
+        { status: "fail", message: "결제 확인 설정을 점검 중입니다. 담당자에게 문의해 주세요." },
         { status: 500 }
       );
     }
@@ -38,8 +38,9 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       const failed = await response.text();
+      console.error("Payment lookup failed:", failed.slice(0, 300));
       return NextResponse.json(
-        { status: "fail", message: "포트원 결제 조회 실패", detail: failed.slice(0, 300) },
+        { status: "fail", message: "결제 내역을 확인하지 못했습니다. 담당자에게 문의해 주세요." },
         { status: response.status }
       );
     }
@@ -85,6 +86,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Payment Confirmation Error:", error);
-    return NextResponse.json({ status: "fail", message: "서버 내부 오류" }, { status: 500 });
+    return NextResponse.json({ status: "fail", message: "결제 확인 중 문제가 발생했습니다." }, { status: 500 });
   }
 }

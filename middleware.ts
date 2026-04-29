@@ -28,15 +28,9 @@ export async function middleware(request: NextRequest) {
     data: { user }
   } = await supabase.auth.getUser();
 
-  const { pathname, search } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
-  const isProtectedStorePath = pathname.startsWith("/store");
   const isAuthPath = pathname === "/auth";
-
-  if (isProtectedStorePath && !user) {
-    const requestedPath = `${pathname}${search}`;
-    return NextResponse.redirect(buildRedirectUrl(request, "/auth", requestedPath));
-  }
 
   if (isAuthPath && user) {
     const next = request.nextUrl.searchParams.get("next");
@@ -49,5 +43,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/store/:path*", "/auth"]
+  matcher: ["/auth"]
 };

@@ -75,7 +75,7 @@ export default function StoreResultClient() {
 
       if (!paymentId) {
         setState("fail");
-        setErrorMessage("결제 식별값(paymentId)을 찾을 수 없습니다.");
+        setErrorMessage("결제 정보를 확인할 수 없습니다. 다시 결제를 시도해 주세요.");
         return;
       }
 
@@ -97,12 +97,12 @@ export default function StoreResultClient() {
         }
 
         setState("fail");
-        setErrorMessage(payload.message ?? "결제 검증에 실패했습니다.");
+        setErrorMessage(payload.message ?? "결제 확인에 실패했습니다.");
       } catch (error) {
         console.error(error);
         if (cancelled) return;
         setState("fail");
-        setErrorMessage("결제 검증 중 오류가 발생했습니다.");
+        setErrorMessage("결제 확인 중 문제가 발생했습니다.");
       }
     }
 
@@ -122,18 +122,18 @@ export default function StoreResultClient() {
 
       <section className="mt-8 border border-black/15 bg-white p-6 md:p-8">
         {state === "loading" ? (
-          <p className="text-[16px] leading-[1.85] text-black/70">포트원 결제 내역을 검증 중입니다. 잠시만 기다려 주세요.</p>
+          <p className="text-[16px] leading-[1.85] text-black/70">결제 내역을 확인하고 있습니다. 잠시만 기다려 주세요.</p>
         ) : null}
 
         {state === "success" && result ? (
           <div className="space-y-5">
             <p className="text-[16px] leading-[1.85] text-black/72">
-              결제가 완료되었고, 서버 검증까지 정상 처리되었습니다. 담당자가 입력하신 연락처 기준으로 후속 안내를 드립니다.
+              결제가 완료되었습니다. 담당자가 입력하신 연락처 기준으로 후속 안내를 드립니다.
             </p>
 
             <dl className="divide-y divide-black/12 border-y border-black/12">
               <div className="grid grid-cols-[110px_1fr] gap-3 py-3 text-[15px]">
-                <dt className="text-black/55">결제 번호</dt>
+                <dt className="text-black/55">접수 번호</dt>
                 <dd className="break-all font-semibold text-[#0B0F0E]">{result.paymentId}</dd>
               </div>
               <div className="grid grid-cols-[110px_1fr] gap-3 py-3 text-[15px]">

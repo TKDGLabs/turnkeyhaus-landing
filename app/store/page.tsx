@@ -164,9 +164,6 @@ export default function StorePage() {
     async function initializeAuth() {
       if (!supabase) {
         if (mounted) {
-          setError(
-            "Supabase 인증 환경 변수가 설정되지 않았습니다. NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY(또는 NEXT_PUBLIC_SUPABASE_ANON_KEY / NEXT_PUBLIC_SUPABASE_KEY)를 확인해 주세요."
-          );
           setAuthReady(true);
         }
         return;
@@ -180,14 +177,13 @@ export default function StorePage() {
       if (!mounted) return;
 
       if (authError) {
-        setError("로그인 상태 확인에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+        console.warn("Failed to check Supabase session.", authError);
         setAuthReady(true);
         return;
       }
 
       if (!user) {
         setAuthReady(true);
-        router.replace("/auth?next=/store");
         return;
       }
 
@@ -261,11 +257,6 @@ export default function StorePage() {
     if (loading) return;
     setError(null);
 
-    if (!authUser) {
-      setError("로그인 상태를 확인한 뒤 결제를 진행해 주세요.");
-      return;
-    }
-
     if (!selectedProduct) {
       setError("선택된 상품 정보를 찾을 수 없습니다.");
       return;
@@ -285,7 +276,7 @@ export default function StorePage() {
     const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID?.trim();
     const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY?.trim();
     if (!storeId || !channelKey) {
-      setError("결제 환경 변수가 누락되었습니다. NEXT_PUBLIC_PORTONE_STORE_ID / NEXT_PUBLIC_PORTONE_CHANNEL_KEY를 확인해 주세요.");
+      setError("결제창 설정을 확인 중입니다. 바로 결제가 필요하시면 카카오톡 또는 전화 상담으로 요청해 주세요.");
       return;
     }
 
@@ -294,7 +285,7 @@ export default function StorePage() {
       const paymentId = `tkdh-${selectedProduct.id}-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
       const redirectUrl = `${window.location.origin}/store/result`;
       const normalizedBizNo = sanitizeDigits(businessRegistrationNumber);
-      const normalizedEmail = customerEmail.trim() || authUser.email || "";
+      const normalizedEmail = customerEmail.trim() || authUser?.email || "";
       const customerId = buildCustomerId({
         phone: customerPhone,
         businessNumber: businessRegistrationNumber,
@@ -362,8 +353,8 @@ export default function StorePage() {
           email: normalizedEmail || undefined
         },
         customData: {
-          userId: authUser.id,
-          loginEmail: authUser.email || normalizedEmail,
+          userId: authUser?.id ?? null,
+          loginEmail: authUser?.email || normalizedEmail || null,
           companyName: companyName.trim() || null,
           customerRole: customerRole.trim() || null,
           businessRegistrationNumber: normalizedBizNo || null,
@@ -411,10 +402,10 @@ export default function StorePage() {
 
       <div className="mb-10 space-y-4 border-b border-black/10 pb-7">
         <p className="text-xs font-semibold tracking-[0.14em] text-black/48">[ 서비스 결제 ]</p>
-        <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">포트원 결제로 바로 결제하기</h1>
+        <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">결제 정보 입력</h1>
         <p className="max-w-[72ch] break-keep text-[16px] leading-[1.8] text-black/68">
-          갤럭시아머니트리 채널 기준으로 결제 요청을 보냅니다. 상호/담당자/주소/사업자번호를 입력하면 결제 메타데이터에 함께 기록되어
-          후속 정산과 현금영수증 요청 확인에 활용할 수 있습니다.
+          결제하실 상품을 선택하고 담당자 정보를 입력해 주세요. 입력하신 정보는 결제 확인, 세금계산서 또는 현금영수증 발급 확인,
+          후속 상담 안내에 사용됩니다.
         </p>
         {authUser ? (
           <div className="flex flex-wrap items-center gap-2 text-[13px] text-black/58">
@@ -431,39 +422,28 @@ export default function StorePage() {
       </div>
 
       {!authReady ? (
-        <section className="border border-black/15 bg-white p-8 text-[15px] text-black/68">로그인 상태를 확인하는 중입니다...</section>
+        <section className="border border-black/15 bg-white p-8 text-[15px] text-black/68">결제 페이지를 준비하는 중입니다...</section>
       ) : null}
 
       {authReady && !authUser ? (
-        <section className="border border-black/15 bg-white p-8">
-          <h2 className="text-[23px] font-semibold tracking-tight text-[#0B0F0E]">로그인(또는 회원가입) 후 결제를 진행해 주세요.</h2>
-          <p className="mt-3 text-[15px] leading-[1.8] text-black/66">
-            결제 정보와 상담 이력을 정확히 관리하기 위해, 결제 페이지는 회원 인증 후에만 이용할 수 있습니다.
+        <section className="mb-6 border border-black/12 bg-black/[0.02] p-5">
+          <h2 className="text-[18px] font-semibold tracking-tight text-[#0B0F0E]">회원가입 없이도 결제할 수 있습니다.</h2>
+          <p className="mt-2 text-[14px] leading-[1.75] text-black/62">
+            로그인하면 다음 결제 때 담당자 정보가 더 빠르게 채워집니다. 지금 바로 결제가 필요하면 아래 정보만 입력해 진행해 주세요.
           </p>
 
-          {error ? (
-            <p className="mt-4 rounded-none border border-red-200 bg-red-50 px-3 py-2 text-sm leading-[1.6] text-red-700">{error}</p>
-          ) : null}
-
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-4 flex flex-wrap gap-3">
             <Link
               href="/auth?next=/store"
-              className={`inline-flex h-11 items-center border border-[#21c1a2] bg-[#21c1a2] px-4 text-[14px] font-semibold text-[#07211d] transition-colors hover:bg-[#1db197] ${focusRing}`}
+              className={`inline-flex h-10 items-center border border-black/15 bg-white px-4 text-[13px] font-semibold text-black/70 transition-colors hover:bg-black/[0.03] ${focusRing}`}
             >
-              로그인 / 회원가입 하러 가기
+              로그인하고 결제하기
             </Link>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className={`inline-flex h-11 items-center border border-black/15 px-4 text-[14px] font-semibold text-black/70 transition-colors hover:bg-black/[0.03] ${focusRing}`}
-            >
-              다시 확인
-            </button>
           </div>
         </section>
       ) : null}
 
-      {authReady && authUser ? (
+      {authReady ? (
         <div className="grid gap-8 md:grid-cols-[1.08fr_0.92fr]">
         <section className="space-y-4">
           {STORE_PRODUCTS.map((product) => {
@@ -483,9 +463,7 @@ export default function StorePage() {
                   <p className="text-[26px] font-semibold tracking-tight text-[#0B0F0E]">
                     {product.price.toLocaleString("ko-KR")}원
                   </p>
-                  <p className="text-[12px] font-semibold tracking-[0.08em] text-black/45">
-                    ITEM_CODE: {product.galaxiaItemCode}
-                  </p>
+                  <p className="text-[12px] font-semibold tracking-[0.08em] text-black/45">VAT 포함 결제 가능</p>
                 </div>
               </button>
             );
@@ -495,7 +473,7 @@ export default function StorePage() {
         <aside className="border border-black/15 bg-white p-6 md:p-7">
           <h2 className="text-[24px] font-semibold tracking-tight">결제 정보 입력</h2>
           <p className="mt-2 text-[14px] leading-[1.75] text-black/60">
-            이름/전화번호는 갤럭시아 채널 결제에서 권장되는 필수 정보입니다.
+            담당자 확인과 결제 안내를 위해 이름과 전화번호는 꼭 입력해 주세요.
           </p>
 
           <form className="mt-6 space-y-4" onSubmit={handleProcessPayment}>
@@ -652,7 +630,7 @@ export default function StorePage() {
           </form>
 
           <div className="mt-5 border-t border-black/10 pt-4 text-[13px] leading-[1.7] text-black/58">
-            <p>- 결제 완료 후 서버 검증(`paymentId` 조회)이 자동 진행됩니다.</p>
+            <p>- 결제 완료 후 담당자가 결제 내역을 확인해 안내드립니다.</p>
             <p>- 사업자번호 입력 시 요청 정보가 저장되며, 실제 발급 가능 여부는 결제수단/PG 정책에 따라 달라질 수 있습니다.</p>
             <div className="mt-2 flex flex-wrap gap-3 text-[13px] font-semibold">
               <Link href="/terms" className={`text-[#21c1a2] hover:text-[#1db197] ${focusRing}`}>
