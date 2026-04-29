@@ -509,7 +509,7 @@ export default function StorePage() {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block space-y-1.5">
-                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">이름*</span>
+                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">담당자명*</span>
                 <input
                   value={customerName}
                   onChange={(event) => setCustomerName(event.target.value)}
@@ -599,7 +599,7 @@ export default function StorePage() {
             </label>
 
             <label className="block space-y-1.5">
-              <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">사업자번호 (현금영수증 요청용)</span>
+              <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">사업자번호 (증빙 발급 확인용)</span>
               <input
                 value={businessRegistrationNumber}
                 onChange={(event) => setBusinessRegistrationNumber(event.target.value)}
@@ -631,7 +631,7 @@ export default function StorePage() {
 
           <div className="mt-5 border-t border-black/10 pt-4 text-[13px] leading-[1.7] text-black/58">
             <p>- 결제 완료 후 담당자가 결제 내역을 확인해 안내드립니다.</p>
-            <p>- 사업자번호 입력 시 요청 정보가 저장되며, 실제 발급 가능 여부는 결제수단/PG 정책에 따라 달라질 수 있습니다.</p>
+            <p>- 사업자번호 입력 시 증빙 발급 확인에 활용하며, 발급 방식은 결제수단별 정책에 따라 달라질 수 있습니다.</p>
             <div className="mt-2 flex flex-wrap gap-3 text-[13px] font-semibold">
               <Link href="/terms" className={`text-[#21c1a2] hover:text-[#1db197] ${focusRing}`}>
                 서비스 이용약관

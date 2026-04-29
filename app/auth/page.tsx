@@ -10,6 +10,28 @@ const focusRing =
 
 type AuthMode = "signin" | "signup";
 
+function getFriendlyAuthError(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("invalid login credentials")) {
+    return "이메일 또는 비밀번호를 확인해 주세요.";
+  }
+
+  if (normalized.includes("email not confirmed")) {
+    return "이메일 인증을 완료한 뒤 로그인해 주세요.";
+  }
+
+  if (normalized.includes("already registered") || normalized.includes("user already registered")) {
+    return "이미 가입된 이메일입니다. 로그인으로 진행해 주세요.";
+  }
+
+  if (normalized.includes("password")) {
+    return "비밀번호 조건을 확인해 주세요. 8자 이상으로 입력하면 가장 안전합니다.";
+  }
+
+  return "계정 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+}
+
 export default function AuthPage() {
   const router = useRouter();
   const [nextPath, setNextPath] = useState("/store");
@@ -22,7 +44,7 @@ export default function AuthPage() {
   const [passwordConfirm, setPasswordConfirm] = useState("");
 
   const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [lastName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [role, setRole] = useState("");
@@ -88,7 +110,7 @@ export default function AuthPage() {
         });
 
         if (signInError) {
-          setError(signInError.message);
+          setError(getFriendlyAuthError(signInError.message));
           return;
         }
 
@@ -113,7 +135,7 @@ export default function AuthPage() {
       });
 
       if (signUpError) {
-        setError(signUpError.message);
+        setError(getFriendlyAuthError(signUpError.message));
         return;
       }
 
@@ -134,9 +156,9 @@ export default function AuthPage() {
     <main className="mx-auto w-full max-w-[760px] px-5 py-14 text-[#0B0F0E] sm:px-6 md:py-20">
       <div className="mb-10 space-y-4 border-b border-black/10 pb-7">
         <p className="text-xs font-semibold tracking-[0.14em] text-black/48">[ 계정 관리 ]</p>
-        <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">로그인 또는 회원가입</h1>
+        <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">결제용 계정 관리</h1>
         <p className="max-w-[72ch] break-keep text-[16px] leading-[1.8] text-black/68">
-          결제 내역을 저장하거나 다음 결제를 빠르게 진행하려면 로그인해 주세요. 결제는 회원가입 없이도 바로 진행할 수 있습니다.
+          계정은 선택 사항입니다. 결제는 바로 진행할 수 있고, 계정을 만들면 담당자 정보와 결제 내역을 다음 상담 때 더 빠르게 확인할 수 있습니다.
         </p>
       </div>
 
@@ -206,22 +228,12 @@ export default function AuthPage() {
           {mode === "signup" ? (
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block space-y-1.5">
-                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">이름*</span>
+                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">담당자명*</span>
                 <input
                   value={firstName}
                   onChange={(event) => setFirstName(event.target.value)}
                   placeholder="홍길동"
                   required
-                  className={`h-11 w-full border border-black/16 px-3 text-[15px] placeholder:text-black/35 ${focusRing}`}
-                />
-              </label>
-
-              <label className="block space-y-1.5">
-                <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">성</span>
-                <input
-                  value={lastName}
-                  onChange={(event) => setLastName(event.target.value)}
-                  placeholder="(선택)"
                   className={`h-11 w-full border border-black/16 px-3 text-[15px] placeholder:text-black/35 ${focusRing}`}
                 />
               </label>
@@ -256,7 +268,7 @@ export default function AuthPage() {
                 />
               </label>
 
-              <label className="block space-y-1.5">
+              <label className="block space-y-1.5 sm:col-span-2">
                 <span className="text-[13px] font-semibold tracking-[0.06em] text-black/58">사업자번호</span>
                 <input
                   value={businessRegistrationNumber}
