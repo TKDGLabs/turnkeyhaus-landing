@@ -276,7 +276,7 @@ export default function StorePage() {
     const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID?.trim();
     const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY?.trim();
     if (!storeId || !channelKey) {
-      setError("결제창 설정을 확인 중입니다. 바로 결제가 필요하시면 카카오톡 또는 전화 상담으로 요청해 주세요.");
+      setError("결제창 설정을 확인 중입니다. 결제 요청이 급하시면 카카오톡 또는 전화 상담으로 요청해 주세요.");
       return;
     }
 
@@ -401,11 +401,11 @@ export default function StorePage() {
       />
 
       <div className="mb-10 space-y-4 border-b border-black/10 pb-7">
-        <p className="text-xs font-semibold tracking-[0.14em] text-black/48">[ 서비스 결제 ]</p>
-        <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">결제 정보 입력</h1>
+        <p className="text-xs font-semibold tracking-[0.14em] text-black/48">[ 운영 플랜 신청 ]</p>
+        <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">운영 플랜 신청 및 결제</h1>
         <p className="max-w-[72ch] break-keep text-[16px] leading-[1.8] text-black/68">
-          결제하실 상품을 선택하고 담당자 정보를 입력해 주세요. 입력하신 정보는 결제 확인, 세금계산서 또는 현금영수증 발급 확인,
-          후속 상담 안내에 사용됩니다.
+          턴키하우스의 월간 운영은 업종, 촬영 환경, 승인 구조를 먼저 확인한 뒤 계약서와 카드 정기결제 등록 또는
+          세금계산서 계약으로 진행합니다. 이 페이지에서는 진단 리포트와 운영 착수금, 인하우스 구축 사전 진단만 결제할 수 있습니다.
         </p>
         {authUser ? (
           <div className="flex flex-wrap items-center gap-2 text-[13px] text-black/58">
@@ -422,14 +422,14 @@ export default function StorePage() {
       </div>
 
       {!authReady ? (
-        <section className="border border-black/15 bg-white p-8 text-[15px] text-black/68">결제 페이지를 준비하는 중입니다...</section>
+        <section className="border border-black/15 bg-white p-8 text-[15px] text-black/68">결제 정보를 불러오는 중입니다...</section>
       ) : null}
 
       {authReady && !authUser ? (
         <section className="mb-6 border border-black/12 bg-black/[0.02] p-5">
           <h2 className="text-[18px] font-semibold tracking-tight text-[#0B0F0E]">회원가입 없이도 결제할 수 있습니다.</h2>
           <p className="mt-2 text-[14px] leading-[1.75] text-black/62">
-            로그인하면 다음 결제 때 담당자 정보가 더 빠르게 채워집니다. 지금 바로 결제가 필요하면 아래 정보만 입력해 진행해 주세요.
+            로그인하면 다음 결제 때 담당자 정보가 더 빠르게 채워집니다. 월간 운영 계약은 상담 후 범위를 확정한 뒤 결제 등록을 안내합니다.
           </p>
 
           <div className="mt-4 flex flex-wrap gap-3">
@@ -473,7 +473,7 @@ export default function StorePage() {
         <aside className="border border-black/15 bg-white p-6 md:p-7">
           <h2 className="text-[24px] font-semibold tracking-tight">결제 정보 입력</h2>
           <p className="mt-2 text-[14px] leading-[1.75] text-black/60">
-            담당자 확인과 결제 안내를 위해 이름과 전화번호는 꼭 입력해 주세요.
+            담당자 확인과 증빙 발급 안내를 위해 이름과 전화번호는 꼭 입력해 주세요.
           </p>
 
           <form className="mt-6 space-y-4" onSubmit={handleProcessPayment}>
@@ -625,12 +625,12 @@ export default function StorePage() {
               disabled={loading || !selectedProduct}
               className={`inline-flex h-12 w-full items-center justify-center border border-[#21c1a2] bg-[#21c1a2] text-[15px] font-semibold text-[#07211d] transition-colors hover:bg-[#1db197] disabled:cursor-not-allowed disabled:border-black/10 disabled:bg-black/10 disabled:text-black/40 ${focusRing}`}
             >
-              {loading ? "결제창 여는 중..." : "결제 진행하기"}
+              {loading ? "결제창 여는 중..." : "선택 항목 결제하기"}
             </button>
           </form>
 
           <div className="mt-5 border-t border-black/10 pt-4 text-[13px] leading-[1.7] text-black/58">
-            <p>- 결제 완료 후 담당자가 결제 내역을 확인해 안내드립니다.</p>
+            <p>- 월간 운영 범위는 결제 전후 담당자가 확인하며, 최종 계약 범위와 다른 경우 정산 또는 취소 안내를 드립니다.</p>
             <p>- 사업자번호 입력 시 증빙 발급 확인에 활용하며, 발급 방식은 결제수단별 정책에 따라 달라질 수 있습니다.</p>
             <div className="mt-2 flex flex-wrap gap-3 text-[13px] font-semibold">
               <Link href="/terms" className={`text-[#21c1a2] hover:text-[#1db197] ${focusRing}`}>

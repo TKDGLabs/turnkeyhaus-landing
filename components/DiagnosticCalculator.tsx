@@ -1,1756 +1,741 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
-import { content } from '../content';
+import { useMemo, useState } from 'react';
 
-type StepKey = 'channel' | 'budget' | 'goal' | 'mix' | 'term' | 'addons';
-type ChannelState = 'existing' | 'new' | 'rebuild';
-type GoalType = 'brand' | 'lead' | 'balanced';
-type MixType = 'long' | 'short' | 'balanced';
-type TermMonths = 3 | 6 | 9 | 12;
-type ConsultLocation = 'capital' | 'other';
-type LineItemKey =
-  | 'shoot'
-  | 'planning'
-  | 'longform'
-  | 'reedit'
-  | 'shortform'
-  | 'thumbnail'
-  | 'consultSurvey'
-  | 'consultSession'
-  | 'consultReport'
-  | 'inhouseSetup'
-  | 'practicalTraining';
+type IndustryId =
+  | 'medical'
+  | 'lawfirm'
+  | 'tax'
+  | 'b2b'
+  | 'public'
+  | 'commerce'
+  | 'other';
+type StatusId = 'new' | 'improve' | 'rebuild' | 'internalNoSystem' | 'outsourcedLowResult';
+type GoalId =
+  | 'conversion'
+  | 'authority'
+  | 'searchAsset'
+  | 'lessAds'
+  | 'internalBuild'
+  | 'hiringSupport'
+  | 'publicTrust';
+type ResourceId =
+  | 'speaker'
+  | 'space'
+  | 'editor'
+  | 'marketer'
+  | 'noScript'
+  | 'manyApprovers'
+  | 'hiringSoon'
+  | 'none';
+type ModelId = 'turnkey' | 'hybrid' | 'transfer' | 'inhouse' | 'talent';
+type VolumeId = 'light' | 'standard' | 'focused' | 'enablement';
+type InvestmentId = 'undecided' | 'starter' | 'growth' | 'authority' | 'project';
+type PaymentId = 'undecided' | 'card' | 'invoice';
+type PlanId = 'managedStarter' | 'managedGrowth' | 'managedAuthority' | 'inhouseBuild' | 'hybridTransfer' | 'talentEvaluation';
 
-type LineItem = {
-  key: LineItemKey;
-  label: string;
-  unitPrice: number;
-  unitLabel: string;
-  min: number;
-  max: number;
-  step: number;
+type Option<T extends string> = {
+  id: T;
+  title: string;
+  description: string;
+  meta?: string;
 };
 
-type Quantities = Record<LineItemKey, number>;
-
-type AddOns = {
-  drone: boolean;
-  motion: boolean;
-  consultingOnly: boolean;
-  inhouseSetup: boolean;
-  practicalTraining: boolean;
+type PlanDefinition = {
+  id: PlanId;
+  title: string;
+  subtitle: string;
+  investmentRange: string;
+  paymentGuide: string;
+  scope: string[];
+  nextStep: string;
 };
 
 type FormState = {
-  channelState?: ChannelState;
-  monthlyBudget?: number;
-  goal?: GoalType;
-  mix?: MixType;
-  term?: TermMonths;
-  consultLocation?: ConsultLocation;
-  addOns: AddOns;
+  industry?: IndustryId;
+  status?: StatusId;
+  goals: GoalId[];
+  resources: ResourceId[];
+  model?: ModelId;
+  volume?: VolumeId;
+  investment: InvestmentId;
+  payment: PaymentId;
 };
 
-type QuoteResult = {
-  lineTotals: Record<LineItemKey, number>;
-  quantities: Quantities;
-  subtotal: number;
-  discountRate: number;
-  discountAmount: number;
-  taxable: number;
-  vat: number;
-  total: number;
-  budget: number;
-  utilization: number;
-  addOns: AddOns;
-  discountNotes: string[];
-};
-
-const steps: { key: StepKey; title: string; subtitle: string }[] = [
-  {
-    key: 'channel',
-    title: '채널 상태를 선택해 주세요',
-    subtitle: '현재 단계에 따라 기획/리빌딩 투입량이 달라집니다.'
-  },
-  {
-    key: 'budget',
-    title: '월 운영 예산(공급가 기준)을 선택해 주세요',
-    subtitle: '선택 예산 안에서 우선순위 항목을 최적 배치합니다.'
-  },
-  {
-    key: 'goal',
-    title: '이번 분기 운영 목표를 선택해 주세요',
-    subtitle: '브랜딩 중심인지, 문의 중심인지에 따라 편집 비중이 달라집니다.'
-  },
-  {
-    key: 'mix',
-    title: '콘텐츠 믹스를 선택해 주세요',
-    subtitle: '롱폼/숏폼 비율에 맞춰 제작 수량을 자동 조정합니다.'
-  },
-  {
-    key: 'term',
-    title: '계약 기간을 선택해 주세요',
-    subtitle: '장기 운영일수록 안정 운영 혜택이 적용됩니다.'
-  },
-  {
-    key: 'addons',
-    title: '추가 옵션을 선택해 주세요',
-    subtitle: '선택하지 않아도 바로 견적 생성이 가능합니다. 필요한 옵션만 추가해 주세요.'
-  }
-];
-
-const stepDisplayLabels: Record<StepKey, string> = {
-  channel: '채널 현황',
-  budget: '월 예산',
-  goal: '운영 목표',
-  mix: '콘텐츠 믹스',
-  term: '계약 기간',
-  addons: '추가 옵션'
-};
-
-const lineItems: LineItem[] = [
-  {
-    key: 'shoot',
-    label: '촬영 (PD 2인, 3CAM 기준)',
-    unitPrice: 600000,
-    unitLabel: '회차',
-    min: 0,
-    max: 3,
-    step: 1
-  },
-  {
-    key: 'planning',
-    label: '콘텐츠 기획 및 연출',
-    unitPrice: 200000,
-    unitLabel: '편',
-    min: 2,
-    max: 16,
-    step: 1
-  },
-  {
-    key: 'longform',
-    label: '롱폼 편집 (10분 이내)',
-    unitPrice: 600000,
-    unitLabel: '편',
-    min: 0,
-    max: 8,
-    step: 1
-  },
-  {
-    key: 'reedit',
-    label: '쇼츠 편집 (기존 영상 재편집)',
-    unitPrice: 0,
-    unitLabel: '편',
-    min: 0,
-    max: 32,
-    step: 2
-  },
-  {
-    key: 'shortform',
-    label: '숏폼 편집 (신규 촬영 후 편집)',
-    unitPrice: 200000,
-    unitLabel: '편',
-    min: 0,
-    max: 24,
-    step: 1
-  },
-  {
-    key: 'thumbnail',
-    label: '썸네일 디자인',
-    unitPrice: 50000,
-    unitLabel: '편',
-    min: 0,
-    max: 24,
-    step: 1
-  },
-  {
-    key: 'consultSurvey',
-    label: '사전 설문/진단 분석',
-    unitPrice: 0,
-    unitLabel: '회',
-    min: 0,
-    max: 1,
-    step: 1
-  },
-  {
-    key: 'consultSession',
-    label: '오프라인 컨설팅 (2시간 이내)',
-    unitPrice: 150000,
-    unitLabel: '회',
-    min: 0,
-    max: 1,
-    step: 1
-  },
-  {
-    key: 'consultReport',
-    label: '온라인 보고서 제공',
-    unitPrice: 100000,
-    unitLabel: '건',
-    min: 0,
-    max: 5,
-    step: 1
-  },
-  {
-    key: 'inhouseSetup',
-    label: '인하우스 마케팅팀 셋업 및 채용 대행',
-    unitPrice: 500000,
-    unitLabel: '월',
-    min: 0,
-    max: 12,
-    step: 1
-  },
-  {
-    key: 'practicalTraining',
-    label: '영상 촬영/편집 실무 교육 (1개월·주1회·2시간·총8회)',
-    unitPrice: 800000,
-    unitLabel: '패키지',
-    min: 0,
-    max: 1,
-    step: 1
-  }
-];
-
-const lineItemMap = Object.fromEntries(lineItems.map((item) => [item.key, item])) as Record<
-  LineItemKey,
-  LineItem
->;
-
-const initialFormState: FormState = {
-  consultLocation: 'capital',
-  addOns: {
-    drone: false,
-    motion: false,
-    consultingOnly: false,
-    inhouseSetup: false,
-    practicalTraining: false
-  }
-};
-
-const budgetOptions = [
-  { value: 2200000, label: '220만원', desc: '저예산 테스트 운영' },
-  { value: 2800000, label: '280만원', desc: '라이트 운영' },
-  { value: 3300000, label: '330만원', desc: '필수 운영 중심' },
-  { value: 4400000, label: '440만원', desc: '표준 운영 권장' },
-  { value: 5500000, label: '550만원', desc: '확장 운영' },
-  { value: 6600000, label: '660만원', desc: '집중 운영' }
+const steps = [
+  { label: '업종', title: '어떤 조직의 채널인가요?', subtitle: '업종에 따라 검색 의도, 표현 리스크, 전환 CTA가 달라집니다.' },
+  { label: '현재 상태', title: '현재 채널 상태를 알려주세요', subtitle: '신규 개설인지, 리빌딩인지, 기존 외주 문제인지에 따라 운영 설계가 달라집니다.' },
+  { label: '운영 목표', title: '이번 운영에서 가장 중요한 목표는 무엇인가요?', subtitle: '해당되는 목표를 모두 선택해 주세요. 편수보다 먼저 목표를 맞춥니다.' },
+  { label: '내부 리소스', title: '현재 내부에 어떤 리소스가 있나요?', subtitle: '보유 리소스에 따라 전체 턴키, 하이브리드, 내부화 구축을 나눕니다.' },
+  { label: '운영 방식', title: '원하는 운영 방식을 선택해 주세요', subtitle: '턴키하우스가 맡을 범위와 내부팀 참여 수준을 정합니다.' },
+  { label: '월간 볼륨', title: '월간 제작 볼륨은 어느 정도가 적합할까요?', subtitle: '편수만 계산하지 않고 기획·제작·업로드·리포트까지 포함한 운영 단위로 봅니다.' },
+  { label: '추천 결과', title: '추천 운영 플랜을 확인해 주세요', subtitle: '이 결과는 확정 견적이 아니라 상담 전 운영 범위를 빠르게 맞추기 위한 기준입니다.' }
 ] as const;
 
-const anniversaryBenefit = {
-  active: true,
-  title: '법인 전환 1주년 혜택',
-  body: '이번 달 내 계약 시 1개월 무료 진행 (12+1개월)'
+const industries: Option<IndustryId>[] = [
+  { id: 'medical', title: '병원·의료기관', description: '내원 전환, 의료광고 리스크, 원장 브랜딩을 함께 봅니다.', meta: '#내원 #의료광고 #진료과목' },
+  { id: 'lawfirm', title: '로펌·변호사', description: '사건 분야별 검색 유입과 상담 CTA를 중심으로 설계합니다.', meta: '#수임 #상담 #사건분야' },
+  { id: 'tax', title: '세무·노무·회계', description: '시즌성 이슈와 판단 기준을 검색 자산으로 누적합니다.', meta: '#신고시즌 #이슈캘린더' },
+  { id: 'b2b', title: '기업·B2B 브랜드', description: '복잡한 제품/서비스를 신뢰와 세일즈 지원 콘텐츠로 바꿉니다.', meta: '#세일즈지원 #브랜드신뢰' },
+  { id: 'public', title: '정부기관·공공단체', description: '정책, 사업, 성과, FAQ를 월간 커뮤니케이션 구조로 정리합니다.', meta: '#정책홍보 #공공신뢰' },
+  { id: 'commerce', title: '커머스·온라인 서비스', description: '탐색, 비교, 구매, 재방문까지 이어지는 콘텐츠 동선을 봅니다.', meta: '#전환 #리텐션' },
+  { id: 'other', title: '기타 고관여 브랜드', description: '업종 특성을 먼저 진단한 뒤 운영 가능성을 확인합니다.', meta: '#맞춤진단' }
+];
+
+const statuses: Option<StatusId>[] = [
+  { id: 'new', title: '신규 채널을 시작해야 합니다', description: '채널명, 설명, 주제 구조, 첫 촬영 기준부터 잡아야 하는 상태입니다.' },
+  { id: 'improve', title: '운영 중인데 성과가 애매합니다', description: '조회수, 검색 유입, CTA, 재생목록, 썸네일 기준을 다시 봐야 합니다.' },
+  { id: 'rebuild', title: '기존 채널을 리빌딩해야 합니다', description: '이미 올라간 영상과 채널 자산을 살리면서 방향을 다시 세웁니다.' },
+  { id: 'internalNoSystem', title: '내부팀은 있지만 운영 기준이 없습니다', description: '촬영, 편집, 업로드, 리포트 기준이 사람마다 달라지는 상태입니다.' },
+  { id: 'outsourcedLowResult', title: '외주를 맡겼지만 유입이 없습니다', description: '제작물보다 채널 세팅, 주제 구조, 운영 리포트부터 검토해야 합니다.' }
+];
+
+const goals: Option<GoalId>[] = [
+  { id: 'conversion', title: '상담·내원·수임 문의 증가', description: '검색과 추천으로 들어온 사람이 문의까지 이동하는 구조가 필요합니다.' },
+  { id: 'authority', title: '대표/전문가 브랜딩', description: '출연자의 전문성과 신뢰감을 오래 남는 콘텐츠 자산으로 만듭니다.' },
+  { id: 'searchAsset', title: '검색 유입 누적', description: '한 번 올리고 끝나는 영상보다 계속 발견되는 주제 구조가 필요합니다.' },
+  { id: 'lessAds', title: '광고 의존도 감소', description: '광고를 멈춰도 비교·검토 단계에서 남아 있는 채널 자산을 만듭니다.' },
+  { id: 'internalBuild', title: '내부 영상팀 구축', description: '장비, 역할, SOP, 템플릿까지 내부에서 반복할 기준이 필요합니다.' },
+  { id: 'hiringSupport', title: 'PD/편집자 실무평가 지원', description: '포트폴리오, 실무 과제, 면접 질문으로 채용 판단을 돕습니다.' },
+  { id: 'publicTrust', title: '공공사업·기관 신뢰 커뮤니케이션', description: '성과와 안내를 공식 채널에 맞는 언어로 꾸준히 정리해야 합니다.' }
+];
+
+const resources: Option<ResourceId>[] = [
+  { id: 'speaker', title: '출연 가능한 대표/전문가가 있습니다', description: '원장, 변호사, 대표, 실무 책임자가 직접 설명할 수 있습니다.' },
+  { id: 'space', title: '내부 촬영 공간이 있습니다', description: '병원, 사무실, 회의실 등 반복 촬영이 가능한 공간이 있습니다.' },
+  { id: 'editor', title: '내부 편집자가 있습니다', description: '제작 일부를 내부화하거나 검수 기준을 세울 여지가 있습니다.' },
+  { id: 'marketer', title: '마케팅 담당자가 있습니다', description: '업로드, 승인, 블로그/SNS 연동을 함께 맞출 담당자가 있습니다.' },
+  { id: 'noScript', title: '대본/기획 담당자가 없습니다', description: '촬영 전 질문지와 메시지 구조를 외부에서 잡아줘야 합니다.' },
+  { id: 'manyApprovers', title: '검수/승인자가 많습니다', description: '법무, 홍보, 의료진, 기관 담당자 등 승인 구조를 고려해야 합니다.' },
+  { id: 'hiringSoon', title: '영상 인력 채용을 준비 중입니다', description: '직무기술서, 실무 과제, 면접 기준을 함께 세워야 합니다.' },
+  { id: 'none', title: '아직 확보된 내부 리소스가 없습니다', description: '초기에는 외부 운영팀이 전체 구조를 잡는 편이 안전합니다.' }
+];
+
+const models: Option<ModelId>[] = [
+  { id: 'turnkey', title: '턴키하우스가 전체 운영', description: '기획, 대본, 촬영, 편집, 썸네일, 업로드, 월간 리포트까지 맡깁니다.' },
+  { id: 'hybrid', title: '내부 담당자와 하이브리드 운영', description: '내부 리소스를 살리되 전략/기획/검수 기준은 함께 잡습니다.' },
+  { id: 'transfer', title: '외주 운영 후 내부팀으로 이관', description: '처음에는 턴키로 운영하고, SOP와 템플릿을 만들어 내부화합니다.' },
+  { id: 'inhouse', title: '사내 영상 시스템 구축 우선', description: '장비, 공간, 역할표, 파일 관리, 업로드·리포트 기준부터 만듭니다.' },
+  { id: 'talent', title: 'PD/편집자 실무평가까지 포함', description: '채용 판단에 필요한 포트폴리오 평가, 과제, 면접 질문을 설계합니다.' }
+];
+
+const volumes: Option<VolumeId>[] = [
+  { id: 'light', title: '검증 운영', description: '롱폼 2편 + 쇼츠 4편 기준. 신규/검증 단계에 적합합니다.', meta: '월 1회 촬영 기준' },
+  { id: 'standard', title: '표준 운영', description: '롱폼 4편 + 쇼츠 8편 기준. 검색 자산과 발견 채널을 함께 키웁니다.', meta: '가장 일반적인 운영 단위' },
+  { id: 'focused', title: '집중 운영', description: '롱폼 6~8편 + 쇼츠 12~16편 기준. 대표 브랜딩과 확장 운영에 적합합니다.', meta: '월 2회 촬영 가능성 검토' },
+  { id: 'enablement', title: '내부화 병행', description: '제작 일부 + 교육 + 템플릿 + SOP를 함께 구성합니다.', meta: '운영 이관/내부팀 구축형' }
+];
+
+const investments: Option<InvestmentId>[] = [
+  { id: 'undecided', title: '상담 후 확정', description: '운영 범위와 내부 리소스를 먼저 보고 결정합니다.' },
+  { id: 'starter', title: '월 150~250만원대', description: '검증 운영 또는 최소 운영 기준을 먼저 확인합니다.' },
+  { id: 'growth', title: '월 300~500만원대', description: '월간 운영팀을 붙여 성과 구조를 만들고 싶습니다.' },
+  { id: 'authority', title: '월 700만원대 이상', description: '대표 브랜딩, 다채널 연동, 집중 운영까지 고려합니다.' },
+  { id: 'project', title: '프로젝트형', description: '인하우스 구축, 교육, 실무평가처럼 범위를 따로 확정합니다.' }
+];
+
+const payments: Option<PaymentId>[] = [
+  { id: 'undecided', title: '상담 후 결정', description: '계약 방식과 결제 방식을 함께 확인합니다.' },
+  { id: 'card', title: '카드 정기결제 희망', description: '월간 운영 확정 후 카드 자동결제 등록을 원합니다.' },
+  { id: 'invoice', title: '세금계산서/계좌이체 희망', description: '기업/기관 내부 정산 절차에 맞춰 진행합니다.' }
+];
+
+const planDefinitions: Record<PlanId, PlanDefinition> = {
+  managedStarter: {
+    id: 'managedStarter',
+    title: 'Managed Starter',
+    subtitle: '작게 검증하되 운영 기준은 제대로 잡는 월간 시작 플랜',
+    investmentRange: '월 150~250만원대부터',
+    paymentGuide: '최소 운영 범위 확정 후 카드 정기결제 또는 세금계산서로 진행',
+    scope: ['월간 콘텐츠 캘린더', '대본/질문지 설계', '월 1회 촬영 기준', '롱폼 2편 + 쇼츠 4편', '썸네일/제목/설명 업로드 세팅', '30일 반응 리포트'],
+    nextStep: '3개월 검증 운영으로 시작해 채널 구조와 반응을 먼저 확인하는 방식이 적합합니다.'
+  },
+  managedGrowth: {
+    id: 'managedGrowth',
+    title: 'Managed Growth',
+    subtitle: '검색 유입과 문의 전환을 함께 만드는 표준 월간 운영 플랜',
+    investmentRange: '월 300~500만원대부터',
+    paymentGuide: '월간 운영 범위 확정 후 카드 정기결제 또는 세금계산서로 진행',
+    scope: ['월간 전략 회의', '주제/검색 의도 설계', '대본/질문지 사전 확정', '롱폼 4편 + 쇼츠 8편', 'SEO/CTA 업로드 세팅', '월간 리포트와 다음 달 개선안'],
+    nextStep: '현재 채널을 리빌딩하거나 본격 운영을 시작할 때 가장 현실적인 기준입니다.'
+  },
+  managedAuthority: {
+    id: 'managedAuthority',
+    title: 'Managed Authority',
+    subtitle: '대표 브랜딩과 채널 자산 확장을 동시에 가져가는 집중 운영 플랜',
+    investmentRange: '월 700만원대부터',
+    paymentGuide: '촬영 회차, 승인 구조, 연동 채널을 확인한 뒤 월간 운영 계약으로 진행',
+    scope: ['월 2회 촬영 가능성 검토', '롱폼 6~8편 + 쇼츠 12~16편', '대표/전문가 브랜딩 시리즈', '썸네일/제목 A-B 점검', '블로그/SNS/뉴스레터 연동 설계', '월간 전략 리포트'],
+    nextStep: '단순 운영보다 브랜드 권위와 세일즈/상담 자산을 강하게 쌓아야 할 때 적합합니다.'
+  },
+  inhouseBuild: {
+    id: 'inhouseBuild',
+    title: 'In-house Video System Build',
+    subtitle: '외주 의존도를 낮추기 위한 사내 영상 제작 시스템 구축 플랜',
+    investmentRange: '프로젝트 범위 산정',
+    paymentGuide: '착수 범위 확정 후 카드 결제 또는 세금계산서로 진행',
+    scope: ['장비/촬영 공간 진단', '역할표와 제작 워크플로우', '대본/썸네일/업로드 템플릿', '파일 관리와 검수 기준', '월간 콘텐츠 캘린더', '실무 교육 및 운영 이관'],
+    nextStep: '내부팀이 반복 운영할 수 있는 기준부터 만들고, 필요한 부분만 외부 운영팀이 보완합니다.'
+  },
+  hybridTransfer: {
+    id: 'hybridTransfer',
+    title: 'Hybrid Transfer',
+    subtitle: '초기에는 턴키로 운영하고 점차 내부팀으로 이관하는 혼합 플랜',
+    investmentRange: '월 운영 + 구축 컨설팅 혼합 산정',
+    paymentGuide: '운영 기간과 이관 범위를 나눠 계약 후 결제 방식 확정',
+    scope: ['초기 채널 리빌딩', '월간 턴키 운영', 'SOP/템플릿 제작', '내부 담당자 교육', '업로드/리포트 기준 이관', '전환 시점별 운영 점검'],
+    nextStep: '당장 성과를 멈추지 않으면서 장기적으로 내부 운영 역량을 만들 때 적합합니다.'
+  },
+  talentEvaluation: {
+    id: 'talentEvaluation',
+    title: 'Video Talent Evaluation',
+    subtitle: '영상/콘텐츠 인재 채용 판단을 돕는 실무평가 컨설팅',
+    investmentRange: '실무평가 범위 산정',
+    paymentGuide: '직무 범위와 면접 참여 수준을 확정한 뒤 프로젝트형으로 진행',
+    scope: ['직무기술서 검토', '포트폴리오 평가 기준', '실무 과제 설계', '면접 질문지 구성', '실무 면접 동석/평가 지원', '입사 후 운영 기준 제안'],
+    nextStep: '채용 알선이 아니라 좋은 PD/편집자를 판단할 수 있는 실무 기준을 제공하는 방식입니다.'
+  }
 };
 
-const formEntries = {
-  budget: '285925672',
-  goal: '1552981172',
-  detailNote: '699812247'
-} as const;
-
-const formatWon = (n: number) => n.toLocaleString('ko-KR');
-const formatRate = (n: number) => Math.round(n * 1000) / 10;
-const formatPercentLabel = (n: number) => {
-  const percent = n * 100;
-  if (Number.isInteger(percent)) return `${percent}%`;
-  return `${Math.round(percent * 10) / 10}%`;
+const initialState: FormState = {
+  goals: [],
+  resources: [],
+  investment: 'undecided',
+  payment: 'undecided'
 };
 
-const clampBudget = (value: number) => {
-  if (!Number.isFinite(value)) return 0;
-  return Math.min(12000000, Math.max(1500000, Math.round(value / 100000) * 100000));
-};
-
-const toSafeFileDate = () => {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  return `${y}${m}${d}`;
-};
-
-function toBudgetBandLabel(monthlyBudget: number) {
-  if (monthlyBudget <= 2000000) return '월 150만 ~ 200만 원 (테스트 운영형)';
-  if (monthlyBudget <= 3000000) return '월 200만 ~ 300만 원 (라이트 운영형)';
-  if (monthlyBudget <= 5000000) return '월 300 ~ 500만 원 (성장기/브랜딩 강화형)';
-  if (monthlyBudget <= 10000000) return '월 500 ~ 1,000만 원 (공격적 확장/시장 선점형)';
-  return '월 1,000만 원 이상 (VIP/통합 마케팅형)';
+function getTitle<T extends string>(options: Option<T>[], id?: T) {
+  return options.find((option) => option.id === id)?.title ?? '미선택';
 }
 
-function toGoalLabel(goal?: GoalType) {
-  if (goal === 'lead') return '직접적인 신규 상담 및 매출 증대';
-  if (goal === 'brand') return '브랜드 신뢰도 상승 및 권위자 이미지 구축';
-  return '기업/브랜드 홍보 자산 축적';
+function joinTitles<T extends string>(options: Option<T>[], ids: T[]) {
+  if (ids.length === 0) return '미선택';
+  return ids.map((id) => getTitle(options, id)).join(', ');
 }
 
-function toChannelLabel(channel?: ChannelState) {
-  if (channel === 'new') return '신규 채널 개설';
-  if (channel === 'rebuild') return '채널 리빌딩';
-  return '운영 중인 채널 개선';
-}
-
-function toMixLabel(mix?: MixType) {
-  if (mix === 'long') return '롱폼 중심';
-  if (mix === 'short') return '숏폼 중심';
-  return '균형 믹스';
-}
-
-function toConsultLocationLabel(location?: ConsultLocation) {
-  return location === 'other' ? '그 외 지역' : '서울·수도권';
-}
-
-function toAddOnLabel(addOns: AddOns) {
-  const list: string[] = [];
-  if (addOns.consultingOnly) list.push('컨설팅 단독 상품');
-  if (addOns.inhouseSetup) list.push('인하우스 마케팅팀 셋업/채용 대행');
-  if (addOns.practicalTraining) list.push('영상 촬영/편집 실무 교육');
-  if (addOns.drone) list.push('드론 촬영');
-  if (addOns.motion) list.push('고급 모션 그래픽');
-  return list.length > 0 ? list.join(', ') : '없음';
-}
-
-function getLineItemUnitPrice(form: FormState, key: LineItemKey) {
-  if (key === 'consultSession') {
-    return form.consultLocation === 'other' ? 250000 : 150000;
+function buildPlanId(state: FormState): PlanId {
+  if (state.model === 'talent' || state.goals.includes('hiringSupport') || state.resources.includes('hiringSoon')) {
+    return 'talentEvaluation';
   }
 
-  return lineItemMap[key].unitPrice;
-}
-
-function getGoogleFormViewUrl() {
-  const embedUrl = content.contact.googleFormEmbedUrl.trim();
-  try {
-    const url = new URL(embedUrl);
-    url.search = '';
-    return url.toString();
-  } catch {
-    return content.contact.googleFormShareUrl.trim();
+  if (state.model === 'inhouse' || state.goals.includes('internalBuild')) {
+    return 'inhouseBuild';
   }
+
+  if (state.model === 'transfer' || state.volume === 'enablement' || state.status === 'internalNoSystem') {
+    return 'hybridTransfer';
+  }
+
+  if (state.volume === 'focused' || state.goals.includes('authority')) {
+    return 'managedAuthority';
+  }
+
+  if (state.volume === 'standard' || state.status === 'rebuild' || state.status === 'outsourcedLowResult' || state.goals.length >= 2) {
+    return 'managedGrowth';
+  }
+
+  return 'managedStarter';
 }
 
-function buildConsultPrefillUrl(form: FormState, quote: QuoteResult) {
-  const url = new URL(getGoogleFormViewUrl());
-  const term = form.term ?? 3;
-  const summary = [
-    '[자동 입력] 견적 기반 상담 요청',
-    `월 예산(공급가): ${formatWon(quote.budget)}원`,
-    `예산 적합도: ${quote.utilization}%`,
-    `공급가액: ${formatWon(quote.subtotal)}원`,
-    `총 혜택: ${formatRate(quote.discountRate)}%`,
-    `최종 금액(VAT 포함): ${formatWon(quote.total)}원`,
-    `채널 상태: ${toChannelLabel(form.channelState)}`,
-    `운영 목표: ${toGoalLabel(form.goal)}`,
-    `콘텐츠 믹스: ${toMixLabel(form.mix)}`,
-    `계약 기간: ${term}개월${anniversaryBenefit.active && term === 12 ? ' (12+1 혜택 문의)' : ''}`,
-    `선택 옵션: ${toAddOnLabel(form.addOns)}`,
-    `컨설팅 지역: ${toConsultLocationLabel(form.consultLocation)}`,
-    form.addOns.consultingOnly
-      ? '컨설팅 단독 구성: 사전 설문(필수) + 오프라인 컨설팅(2시간) + 온라인 보고서(건별)'
-      : '월 운영대행 중심 구성'
-  ].join('\n');
+function buildReason(state: FormState, plan: PlanDefinition) {
+  const industryTitle = getTitle(industries, state.industry);
+  const statusTitle = getTitle(statuses, state.status);
+  const modelTitle = getTitle(models, state.model);
+  const volumeTitle = getTitle(volumes, state.volume);
+  const selectedGoals = joinTitles(goals, state.goals);
 
-  url.searchParams.set('usp', 'pp_url');
-  url.searchParams.set(`entry.${formEntries.budget}`, toBudgetBandLabel(quote.budget));
-  url.searchParams.set(`entry.${formEntries.goal}`, toGoalLabel(form.goal));
-  url.searchParams.set(`entry.${formEntries.detailNote}`, summary);
+  if (plan.id === 'talentEvaluation') {
+    return `${industryTitle}에서 영상 인력 채용 또는 실무 판단이 중요한 상태입니다. 지금은 제작 편수를 늘리기보다 직무기술서, 포트폴리오 평가, 실무 과제와 면접 기준을 먼저 잡는 편이 안전합니다.`;
+  }
 
-  return url.toString();
+  if (plan.id === 'inhouseBuild') {
+    return `${industryTitle} 내부에서 반복 운영할 구조가 필요한 상태입니다. ${statusTitle} 조건에서는 장비, 촬영 공간, 역할표, 템플릿, 리포트 기준을 먼저 만들어야 외주 의존도를 줄일 수 있습니다.`;
+  }
+
+  if (plan.id === 'hybridTransfer') {
+    return `${industryTitle} 채널을 당장 멈추지 않으면서 내부 운영 기준을 만들어야 합니다. ${modelTitle} 방식으로 운영하면 초기 성과와 내부화 준비를 동시에 가져갈 수 있습니다.`;
+  }
+
+  return `${industryTitle} 채널의 현재 상태는 “${statusTitle}”에 가깝고, 핵심 목표는 ${selectedGoals}입니다. ${volumeTitle} 기준으로 운영하면 기획, 제작, 업로드, 리포트가 한 번에 맞물려 상담 전 운영 범위를 빠르게 확정할 수 있습니다.`;
+}
+
+function buildSummary(state: FormState, plan: PlanDefinition) {
+  const rows = [
+    ['추천 플랜', plan.title],
+    ['적합 이유', buildReason(state, plan)],
+    ['업종', getTitle(industries, state.industry)],
+    ['현재 상태', getTitle(statuses, state.status)],
+    ['운영 목표', joinTitles(goals, state.goals)],
+    ['내부 리소스', joinTitles(resources, state.resources)],
+    ['희망 운영 방식', getTitle(models, state.model)],
+    ['월간 제작 볼륨', getTitle(volumes, state.volume)],
+    ['예상 투자 범위', getTitle(investments, state.investment)],
+    ['희망 결제 방식', getTitle(payments, state.payment)],
+    ['기본 포함 범위', plan.scope.join(' / ')],
+    ['다음 단계', plan.nextStep]
+  ];
+
+  return rows.map(([label, value]) => `${label}: ${value}`).join('\n');
 }
 
 function escapeHtml(value: string) {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-
-function getQuantityBounds(form: FormState, quantities: Quantities, key: LineItemKey) {
-  const item = lineItemMap[key];
-  let min = item.min;
-  let max = item.max;
-  const budget = form.monthlyBudget ?? 4400000;
-  const isLeanBudget = budget <= 3000000;
-  const isConsultingOnly = form.addOns.consultingOnly;
-  const term = form.term ?? 3;
-
-  const operationKeys: LineItemKey[] = ['shoot', 'planning', 'longform', 'reedit', 'shortform', 'thumbnail'];
-  const consultingFixedKeys: LineItemKey[] = ['consultSurvey', 'consultSession'];
-
-  if (isConsultingOnly && operationKeys.includes(key)) {
-    min = 0;
-    max = 0;
-    return { min, max, step: item.step };
-  }
-
-  if (consultingFixedKeys.includes(key)) {
-    const value = isConsultingOnly ? 1 : 0;
-    min = value;
-    max = value;
-    return { min, max, step: item.step };
-  }
-
-  if (key === 'consultReport') {
-    if (isConsultingOnly) {
-      min = 1;
-      max = 5;
-    } else {
-      min = 0;
-      max = 0;
-    }
-    return { min, max, step: item.step };
-  }
-
-  if (key === 'inhouseSetup') {
-    if (form.addOns.inhouseSetup) {
-      min = term;
-      max = term;
-    } else {
-      min = 0;
-      max = 0;
-    }
-    return { min, max, step: item.step };
-  }
-
-  if (key === 'practicalTraining') {
-    const enabled =
-      form.addOns.practicalTraining;
-    min = enabled ? 1 : 0;
-    max = enabled ? 1 : 0;
-    return { min, max, step: item.step };
-  }
-
-  if (key === 'thumbnail') {
-    if (quantities.longform <= 0) {
-      min = 0;
-      max = 0;
-    } else {
-      min = Math.max(min, quantities.longform);
-    }
-  }
-
-  if (key === 'shoot' && isLeanBudget) {
-    min = 0;
-    max = Math.min(max, 1);
-  }
-
-  if (key === 'planning' && isLeanBudget) {
-    min = Math.max(min, 2);
-  }
-
-  if (key === 'reedit') {
-    if (form.mix === 'short') {
-      min = Math.max(min, 4);
-    } else {
-      min = Math.max(min, 2);
-    }
-  }
-
-  if (key === 'shortform') {
-    if (form.mix === 'short') {
-      min = Math.max(min, isLeanBudget ? 2 : 4);
-    } else if (form.mix === 'balanced') {
-      min = Math.max(min, isLeanBudget ? 1 : 2);
-    }
-  }
-
-  if (key === 'longform') {
-    if (form.mix === 'short') {
-      min = 0;
-    } else if (form.mix === 'long') {
-      min = Math.max(min, isLeanBudget ? 1 : 2);
-    } else if (form.goal === 'brand' && !isLeanBudget) {
-      min = Math.max(min, 1);
-    }
-  }
-
-  return { min, max, step: item.step };
-}
-
-function applyDependentQuantityRules(form: FormState, quantities: Quantities): Quantities {
-  const next = { ...quantities };
-  const longformBounds = getQuantityBounds(form, next, 'longform');
-  next.longform = Math.min(longformBounds.max, Math.max(longformBounds.min, next.longform));
-
-  const thumbnailBounds = getQuantityBounds(form, next, 'thumbnail');
-  next.thumbnail = Math.min(thumbnailBounds.max, Math.max(thumbnailBounds.min, next.thumbnail));
-
-  const shootBounds = getQuantityBounds(form, next, 'shoot');
-  next.shoot = Math.min(shootBounds.max, Math.max(shootBounds.min, next.shoot));
-
-  const planningBounds = getQuantityBounds(form, next, 'planning');
-  next.planning = Math.min(planningBounds.max, Math.max(planningBounds.min, next.planning));
-
-  const shortformBounds = getQuantityBounds(form, next, 'shortform');
-  next.shortform = Math.min(shortformBounds.max, Math.max(shortformBounds.min, next.shortform));
-
-  const reeditBounds = getQuantityBounds(form, next, 'reedit');
-  next.reedit = Math.min(reeditBounds.max, Math.max(reeditBounds.min, next.reedit));
-
-  const consultSurveyBounds = getQuantityBounds(form, next, 'consultSurvey');
-  next.consultSurvey = Math.min(consultSurveyBounds.max, Math.max(consultSurveyBounds.min, next.consultSurvey));
-
-  const consultSessionBounds = getQuantityBounds(form, next, 'consultSession');
-  next.consultSession = Math.min(consultSessionBounds.max, Math.max(consultSessionBounds.min, next.consultSession));
-
-  const consultReportBounds = getQuantityBounds(form, next, 'consultReport');
-  next.consultReport = Math.min(consultReportBounds.max, Math.max(consultReportBounds.min, next.consultReport));
-
-  const inhouseSetupBounds = getQuantityBounds(form, next, 'inhouseSetup');
-  next.inhouseSetup = Math.min(inhouseSetupBounds.max, Math.max(inhouseSetupBounds.min, next.inhouseSetup));
-
-  const practicalTrainingBounds = getQuantityBounds(form, next, 'practicalTraining');
-  next.practicalTraining = Math.min(
-    practicalTrainingBounds.max,
-    Math.max(practicalTrainingBounds.min, next.practicalTraining)
-  );
-
-  return next;
-}
-
-function getVisibleLineItems(quote: QuoteResult) {
-  return lineItems.filter((item) => quote.quantities[item.key] > 0);
-}
-
-function downloadEstimateCsv(form: FormState, quote: QuoteResult) {
-  const term = form.term ?? 3;
-  const visibleLineItems = getVisibleLineItems(quote);
-  const rows = [
-    ['항목', '단가', '수량', '구분', '합계'],
-    ...visibleLineItems.map((item) => [
-      item.label,
-      String(getLineItemUnitPrice(form, item.key)),
-      String(quote.quantities[item.key]),
-      item.unitLabel,
-      getLineItemUnitPrice(form, item.key) === 0 ? '기본 제공' : String(quote.lineTotals[item.key])
-    ]),
-    [],
-    ['채널 상태', toChannelLabel(form.channelState)],
-    ['운영 목표', toGoalLabel(form.goal)],
-    ['콘텐츠 믹스', toMixLabel(form.mix)],
-    ['계약 기간', `${term}개월`],
-    ['선택 옵션', toAddOnLabel(form.addOns)],
-    ['공급가액', String(quote.subtotal)],
-    ['총 혜택(%)', String(formatRate(quote.discountRate))],
-    ['할인금액', String(quote.discountAmount)],
-    ['할인 반영 공급가', String(quote.taxable)],
-    ['부가세(10%)', String(quote.vat)],
-    ['최종 금액(VAT 포함)', String(quote.total)]
-  ];
-
-  const csv = rows.map((line) => line.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(',')).join('\n');
-  const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
-  const href = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = href;
-  a.download = `turnkeyhaus-estimate-${toSafeFileDate()}.csv`;
-  a.click();
-  URL.revokeObjectURL(href);
-}
-
-function openEstimatePdfPrint(form: FormState, quote: QuoteResult) {
-  const term = form.term ?? 3;
-  const visibleLineItems = getVisibleLineItems(quote);
-  const tableRows = visibleLineItems
-    .map((item) => {
-      const unitPrice = getLineItemUnitPrice(form, item.key);
-      const total = unitPrice === 0 ? '기본 제공' : `${formatWon(quote.lineTotals[item.key])}원`;
-      return `<tr>
-        <td>${escapeHtml(item.label)}</td>
-        <td style="text-align:right;">${unitPrice === 0 ? '0' : `${formatWon(unitPrice)}원`}</td>
-        <td style="text-align:center;">${quote.quantities[item.key]}</td>
-        <td style="text-align:center;">${escapeHtml(item.unitLabel)}</td>
-        <td style="text-align:right;">${total}</td>
-      </tr>`;
-    })
-    .join('');
-
-  const html = `<!doctype html>
-  <html lang="ko">
-    <head>
-      <meta charset="utf-8" />
-      <title>Turnkeyhaus 견적서</title>
-      <style>
-        body { font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; color:#111; padding:24px; }
-        h1 { margin:0 0 6px; font-size:24px; }
-        p { margin:4px 0; font-size:13px; color:#444; }
-        table { width:100%; border-collapse:collapse; margin-top:20px; }
-        th, td { border:1px solid #d8d8d8; padding:8px 10px; font-size:12px; }
-        th { background:#f4f4f4; text-align:left; }
-        .summary { margin-top:20px; width:360px; margin-left:auto; }
-        .summary div { display:flex; justify-content:space-between; font-size:13px; margin:4px 0; }
-        .total { border-top:1px solid #333; padding-top:8px; margin-top:8px; font-weight:700; font-size:18px; }
-        .badge { margin-top:10px; display:inline-block; border:1px solid #21c1a2; background:#e9fbf7; color:#0b3d35; padding:6px 10px; font-size:12px; font-weight:600; }
-      </style>
-    </head>
-    <body>
-      <h1>Turnkeyhaus 월 운영 견적서</h1>
-      <p>산출일: ${new Date().toLocaleDateString('ko-KR')}</p>
-      <p>채널 상태: ${escapeHtml(toChannelLabel(form.channelState))} · 운영 목표: ${escapeHtml(
-    toGoalLabel(form.goal)
-  )} · 콘텐츠 믹스: ${escapeHtml(toMixLabel(form.mix))}</p>
-      <p>계약 기간: ${term}개월 · 선택 옵션: ${escapeHtml(toAddOnLabel(form.addOns))} · 컨설팅 지역: ${escapeHtml(
-    toConsultLocationLabel(form.consultLocation)
-  )}</p>
-      ${anniversaryBenefit.active && term === 12 ? `<span class="badge">${escapeHtml(anniversaryBenefit.body)}</span>` : ''}
-
-      <table>
-        <thead>
-          <tr>
-            <th>항목</th><th style="text-align:right;">단가</th><th style="text-align:center;">수량</th><th style="text-align:center;">구분</th><th style="text-align:right;">합계</th>
-          </tr>
-        </thead>
-        <tbody>${tableRows}</tbody>
-      </table>
-
-      <div class="summary">
-        <div><span>공급가액</span><strong>${formatWon(quote.subtotal)}원</strong></div>
-        <div><span>할인금액</span><strong>- ${formatWon(quote.discountAmount)}원</strong></div>
-        <div><span>할인 반영 공급가</span><strong>${formatWon(quote.taxable)}원</strong></div>
-        <div><span>부가세 (10%)</span><strong>+ ${formatWon(quote.vat)}원</strong></div>
-        <div class="total"><span>최종 금액 (VAT 포함)</span><strong>${formatWon(quote.total)}원</strong></div>
-      </div>
-      <script>window.onload = () => window.print();</script>
-    </body>
-  </html>`;
-
-  const printWindow = window.open('', '_blank', 'width=960,height=720');
-  if (!printWindow) return;
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
-}
-
-const copyQuantities = (source: Quantities): Quantities => ({ ...source });
-
-function getInitialQuantities(form: FormState): Quantities {
-  const budget = form.monthlyBudget ?? 4400000;
-  const quantities: Quantities =
-    budget <= 2600000
-      ? {
-          shoot: 0,
-          planning: 2,
-          longform: 0,
-          reedit: 6,
-          shortform: 3,
-          thumbnail: 0,
-          consultSurvey: 0,
-          consultSession: 0,
-          consultReport: 0,
-          inhouseSetup: 0,
-          practicalTraining: 0
-        }
-      : budget <= 3600000
-      ? {
-          shoot: 1,
-          planning: 4,
-          longform: 1,
-          reedit: 8,
-          shortform: 3,
-          thumbnail: 1,
-          consultSurvey: 0,
-          consultSession: 0,
-          consultReport: 0,
-          inhouseSetup: 0,
-          practicalTraining: 0
-        }
-      : budget <= 5000000
-      ? {
-          shoot: 1,
-          planning: 6,
-          longform: 2,
-          reedit: 10,
-          shortform: 4,
-          thumbnail: 2,
-          consultSurvey: 0,
-          consultSession: 0,
-          consultReport: 0,
-          inhouseSetup: 0,
-          practicalTraining: 0
-        }
-      : {
-          shoot: 2,
-          planning: 8,
-          longform: 3,
-          reedit: 12,
-          shortform: 6,
-          thumbnail: 3,
-          consultSurvey: 0,
-          consultSession: 0,
-          consultReport: 0,
-          inhouseSetup: 0,
-          practicalTraining: 0
-        };
-
-  if (form.channelState === 'new') {
-    quantities.planning += budget <= 3000000 ? 1 : 2;
-    quantities.thumbnail += budget <= 3000000 ? 0 : 1;
-  }
-
-  if (form.channelState === 'rebuild') {
-    quantities.planning += 3;
-    quantities.longform += 1;
-  }
-
-  if (form.goal === 'lead') {
-    quantities.longform = Math.max(0, quantities.longform - 1);
-    quantities.shortform += 2;
-    quantities.reedit += 2;
-  }
-
-  if (form.goal === 'brand') {
-    quantities.longform += 1;
-    quantities.thumbnail += 1;
-    quantities.shortform = Math.max(0, quantities.shortform - 1);
-  }
-
-  if (form.mix === 'long') {
-    quantities.longform += 2;
-    quantities.shortform = Math.max(0, quantities.shortform - 2);
-    quantities.reedit = Math.max(4, quantities.reedit - 4);
-  }
-
-  if (form.mix === 'short') {
-    quantities.longform = Math.max(0, quantities.longform - 2);
-    quantities.shortform += 4;
-    quantities.reedit += 4;
-  }
-
-  if ((form.term ?? 3) >= 9) {
-    quantities.planning += 1;
-    quantities.reedit += 2;
-  }
-
-  return applyDependentQuantityRules(form, quantities);
-}
-
-function getDiscountRate(form: FormState) {
-  if (form.addOns.consultingOnly) {
-    return {
-      rate: 0,
-      notes: ['컨설팅 단독 상품은 고정 단가 상품으로, 별도 할인 없이 명확한 금액으로 안내합니다.']
+  return value.replace(/[&<>"']/g, (char) => {
+    const entities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
     };
-  }
-
-  const term = form.term ?? 3;
-  const budget = form.monthlyBudget ?? 4400000;
-
-  const termRate =
-    term === 12 ? 0.1 :
-    term === 9 ? 0.07 :
-    term === 6 ? 0.04 :
-    0;
-
-  const budgetRate = budget >= 5500000 ? 0.01 : budget >= 4400000 ? 0.005 : 0;
-  const goalRate =
-    form.goal === 'lead' && term >= 9 ? 0.01 :
-    form.goal === 'lead' ? 0.005 :
-    form.goal === 'balanced' && term >= 9 ? 0.005 :
-    0;
-
-  const raw = termRate + budgetRate + goalRate;
-  const rate = Math.min(raw, 0.12);
-
-  const notes: string[] = [];
-  if (termRate > 0) notes.push(`계약 기간 혜택 ${formatPercentLabel(termRate)} 적용`);
-  if (budgetRate > 0) notes.push(`예산 구간 혜택 ${formatPercentLabel(budgetRate)} 적용`);
-  if (goalRate > 0) notes.push(`운영 목표 맞춤 혜택 ${formatPercentLabel(goalRate)} 적용`);
-  notes.push('운영 품질 유지를 위해 최대 혜택은 12%까지만 적용됩니다.');
-
-  return { rate, notes };
+    return entities[char];
+  });
 }
 
-function subtotalFor(form: FormState, quantities: Quantities) {
-  return lineItems.reduce((sum, item) => sum + getLineItemUnitPrice(form, item.key) * quantities[item.key], 0);
-}
-
-function taxableFor(form: FormState, quantities: Quantities, discountRate: number) {
-  const subtotal = subtotalFor(form, quantities);
-  const discountAmount = Math.min(Math.round(subtotal * discountRate), Math.round(subtotal * 0.12));
-  return Math.max(0, subtotal - discountAmount);
-}
-
-function getAdjustmentOrders(form: FormState) {
-  if (form.addOns.consultingOnly) {
-    return {
-      addOrder: [] as LineItemKey[],
-      removeOrder: [] as LineItemKey[]
-    };
-  }
-
-  const mix = form.mix;
-  const goal = form.goal;
-  const budget = form.monthlyBudget ?? 4400000;
-  const isLeanBudget = budget <= 3000000;
-
-  if (mix === 'short') {
-    return {
-      addOrder: ['shortform', 'reedit', 'planning', 'thumbnail', 'longform', 'shoot'] as LineItemKey[],
-      removeOrder: (isLeanBudget
-        ? ['thumbnail', 'longform', 'shoot', 'planning', 'shortform']
-        : ['thumbnail', 'planning', 'longform', 'shortform', 'shoot']) as LineItemKey[]
-    };
-  }
-
-  if (mix === 'long') {
-    return {
-      addOrder: ['longform', 'planning', 'thumbnail', 'shortform', 'shoot'] as LineItemKey[],
-      removeOrder: (isLeanBudget
-        ? ['thumbnail', 'shortform', 'shoot', 'planning', 'longform']
-        : ['thumbnail', 'planning', 'shortform', 'longform', 'shoot']) as LineItemKey[]
-    };
-  }
-
-  if (goal === 'lead') {
-    return {
-      addOrder: ['shortform', 'reedit', 'planning', 'longform', 'thumbnail', 'shoot'] as LineItemKey[],
-      removeOrder: (isLeanBudget
-        ? ['thumbnail', 'longform', 'shoot', 'planning', 'shortform']
-        : ['thumbnail', 'planning', 'longform', 'shortform', 'shoot']) as LineItemKey[]
-    };
-  }
-
-  return {
-    addOrder: ['planning', 'longform', 'shortform', 'reedit', 'thumbnail', 'shoot'] as LineItemKey[],
-    removeOrder: (isLeanBudget
-      ? ['thumbnail', 'shoot', 'longform', 'planning', 'shortform']
-      : ['thumbnail', 'planning', 'shortform', 'longform', 'shoot']) as LineItemKey[]
-  };
-}
-
-function optimizeQuantities(form: FormState, base: Quantities, discountRate: number): Quantities {
-  const budget = form.monthlyBudget ?? 4400000;
-  const targetSubtotal = Math.round(budget / Math.max(0.01, 1 - discountRate));
-  let quantities = applyDependentQuantityRules(form, copyQuantities(base));
-  const { addOrder, removeOrder } = getAdjustmentOrders(form);
-
-  let loopCount = 0;
-  while (subtotalFor(form, quantities) > targetSubtotal * 1.03 && loopCount < 240) {
-    let changed = false;
-
-    for (const key of removeOrder) {
-      const item = lineItemMap[key];
-      if (item.unitPrice === 0) continue;
-      const { min } = getQuantityBounds(form, quantities, key);
-
-      const next = quantities[key] - item.step;
-      if (next >= min) {
-        const candidate = applyDependentQuantityRules(form, {
-          ...quantities,
-          [key]: next
-        });
-        if (subtotalFor(form, candidate) === subtotalFor(form, quantities) && candidate[key] === quantities[key]) continue;
-        quantities = candidate;
-        changed = true;
-        break;
-      }
-    }
-
-    if (!changed) break;
-    loopCount += 1;
-  }
-
-  loopCount = 0;
-  while (subtotalFor(form, quantities) < targetSubtotal * 0.97 && loopCount < 240) {
-    let changed = false;
-
-    for (const key of addOrder) {
-      const item = lineItemMap[key];
-      const { max } = getQuantityBounds(form, quantities, key);
-      const next = quantities[key] + item.step;
-      if (next <= max) {
-        const candidate = applyDependentQuantityRules(form, {
-          ...quantities,
-          [key]: next
-        });
-        if (subtotalFor(form, candidate) === subtotalFor(form, quantities) && candidate[key] === quantities[key]) continue;
-        quantities = candidate;
-        changed = true;
-        break;
-      }
-    }
-
-    if (!changed) break;
-    loopCount += 1;
-  }
-
-  if (form.mix === 'short') {
-    quantities.reedit = Math.max(10, quantities.shortform * 2);
-  } else if (form.mix === 'long') {
-    quantities.reedit = Math.max(4, quantities.shortform);
-  } else {
-    quantities.reedit = Math.max(8, Math.round(quantities.shortform * 1.5));
-  }
-
-  quantities = applyDependentQuantityRules(form, quantities);
-
-  if (!form.addOns.consultingOnly) {
-    let guard = 0;
-    while (taxableFor(form, quantities, discountRate) > budget && guard < 240) {
-      let changed = false;
-
-      for (const key of removeOrder) {
-        const item = lineItemMap[key];
-        if (item.unitPrice === 0) continue;
-        const { min } = getQuantityBounds(form, quantities, key);
-        const next = quantities[key] - item.step;
-        if (next < min) continue;
-
-        const candidate = applyDependentQuantityRules(form, {
-          ...quantities,
-          [key]: next
-        });
-
-        if (subtotalFor(form, candidate) === subtotalFor(form, quantities) && candidate[key] === quantities[key]) {
-          continue;
-        }
-
-        quantities = candidate;
-        changed = true;
-        break;
-      }
-
-      if (!changed) break;
-      guard += 1;
-    }
-  }
-
-  return applyDependentQuantityRules(form, quantities);
-}
-
-function calculateQuote(form: FormState, quantities: Quantities, rate: number, notes: string[]): QuoteResult {
-  const normalizedQuantities = applyDependentQuantityRules(form, quantities);
-  const lineTotals = lineItems.reduce((acc, item) => {
-    acc[item.key] = getLineItemUnitPrice(form, item.key) * normalizedQuantities[item.key];
-    return acc;
-  }, {} as Record<LineItemKey, number>);
-
-  const subtotal = Object.values(lineTotals).reduce((sum, value) => sum + value, 0);
-  const discountAmount = Math.min(Math.round(subtotal * rate), Math.round(subtotal * 0.12));
-  const taxable = Math.max(0, subtotal - discountAmount);
-  const vat = Math.round(taxable * 0.1);
-  const total = taxable + vat;
-  const budget = form.monthlyBudget ?? 4400000;
-  const utilizationRaw = budget > 0 ? (taxable / budget) * 100 : 0;
-  const utilization = Math.round(Math.min(utilizationRaw, 100) * 10) / 10;
-
-  return {
-    lineTotals,
-    quantities: normalizedQuantities,
-    subtotal,
-    discountRate: rate,
-    discountAmount,
-    taxable,
-    vat,
-    total,
-    budget,
-    utilization,
-    addOns: form.addOns,
-    discountNotes: notes
-  };
-}
-
-function buildQuote(form: FormState): QuoteResult {
-  const { rate, notes } = getDiscountRate(form);
-  const base = getInitialQuantities(form);
-  const optimized = optimizeQuantities(form, base, rate);
-  return calculateQuote(form, optimized, rate, notes);
-}
-
-function getStepCompletion(form: FormState, step: StepKey) {
-  switch (step) {
-    case 'channel':
-      return Boolean(form.channelState);
-    case 'budget':
-      return Boolean(form.monthlyBudget);
-    case 'goal':
-      return Boolean(form.goal);
-    case 'mix':
-      return Boolean(form.mix);
-    case 'term':
-      return Boolean(form.term);
-    case 'addons':
-      return true;
-    default:
-      return false;
-  }
+function csvCell(value: string) {
+  return `"${value.replace(/"/g, '""')}"`;
 }
 
 export default function DiagnosticCalculator() {
-  const [form, setForm] = useState<FormState>(initialFormState);
-  const [stepIndex, setStepIndex] = useState(0);
-  const [quote, setQuote] = useState<QuoteResult | null>(null);
-  const [isCalculating, setIsCalculating] = useState(false);
-  const [expandAddOnOptions, setExpandAddOnOptions] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [state, setState] = useState<FormState>(initialState);
+  const [copied, setCopied] = useState(false);
 
-  const currentStep = steps[stepIndex];
-  const canProceed = getStepCompletion(form, currentStep.key);
+  const plan = useMemo(() => planDefinitions[buildPlanId(state)], [state]);
+  const summary = useMemo(() => buildSummary(state, plan), [state, plan]);
+  const progress = Math.round(((currentStep + 1) / steps.length) * 100);
 
-  const updateForm = <K extends keyof FormState>(key: K, value: FormState[K]) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
+  const canProceed = (() => {
+    if (currentStep === 0) return Boolean(state.industry);
+    if (currentStep === 1) return Boolean(state.status);
+    if (currentStep === 2) return state.goals.length > 0;
+    if (currentStep === 3) return state.resources.length > 0;
+    if (currentStep === 4) return Boolean(state.model);
+    if (currentStep === 5) return Boolean(state.volume);
+    return true;
+  })();
 
-  const setBudget = (value: number) => {
-    updateForm('monthlyBudget', clampBudget(value));
-  };
+  function goNext() {
+    if (!canProceed) return;
+    setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
+  }
 
-  const toggleAddOn = (key: keyof AddOns) => {
-    setForm((prev) => {
-      const nextValue = !prev.addOns[key];
+  function goPrev() {
+    setCurrentStep((step) => Math.max(step - 1, 0));
+  }
+
+  function reset() {
+    setState(initialState);
+    setCurrentStep(0);
+    setCopied(false);
+  }
+
+  function toggleGoal(id: GoalId) {
+    setState((prev) => ({
+      ...prev,
+      goals: prev.goals.includes(id) ? prev.goals.filter((goal) => goal !== id) : [...prev.goals, id]
+    }));
+  }
+
+  function toggleResource(id: ResourceId) {
+    setState((prev) => {
+      if (id === 'none') {
+        return { ...prev, resources: prev.resources.includes('none') ? [] : ['none'] };
+      }
+
+      const withoutNone = prev.resources.filter((resource) => resource !== 'none');
       return {
         ...prev,
-        consultLocation:
-          key === 'consultingOnly' && nextValue ? (prev.consultLocation ?? 'capital') : prev.consultLocation,
-        addOns: {
-          ...prev.addOns,
-          [key]: nextValue
-        }
+        resources: withoutNone.includes(id)
+          ? withoutNone.filter((resource) => resource !== id)
+          : [...withoutNone, id]
       };
     });
-  };
+  }
 
-  const goNext = () => {
-    if (!canProceed) return;
-    if (stepIndex >= steps.length - 1) return;
-    setStepIndex((prev) => prev + 1);
-  };
+  async function copySummary() {
+    try {
+      await navigator.clipboard.writeText(summary);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  }
 
-  const goPrev = () => {
-    if (stepIndex <= 0) return;
-    setStepIndex((prev) => prev - 1);
-  };
+  function moveToContact(intent: 'consult' | 'payment') {
+    const payload = `${summary}\n\n요청 유형: ${intent === 'payment' ? '카드 정기결제 등록 문의' : '이 플랜으로 상담 신청'}`;
+    window.sessionStorage.setItem('turnkeyhaus:plan-recommendation', payload);
+    if (navigator.clipboard) {
+      void navigator.clipboard.writeText(payload).catch(() => undefined);
+    }
 
-  const generateQuote = () => {
-    setIsCalculating(true);
-    setTimeout(() => {
-      setQuote(buildQuote(form));
-      setIsCalculating(false);
-    }, 700);
-  };
-
-  const resetAll = () => {
-    setForm(initialFormState);
-    setStepIndex(0);
-    setQuote(null);
-    setIsCalculating(false);
-  };
-
-  const adjustQuantity = (key: LineItemKey, direction: -1 | 1) => {
-    setQuote((prev) => {
-      if (!prev) return prev;
-
-      const item = lineItemMap[key];
-      const { min, max } = getQuantityBounds(form, prev.quantities, key);
-      const next = prev.quantities[key] + item.step * direction;
-      if (next < min || next > max) return prev;
-
-      const quantities = applyDependentQuantityRules(form, {
-        ...prev.quantities,
-        [key]: next
-      });
-
-      return calculateQuote(form, quantities, prev.discountRate, prev.discountNotes);
-    });
-  };
-
-  const handleBudgetInputChange = (raw: string) => {
-    const digits = raw.replaceAll(/[^0-9]/g, '');
-    if (!digits) {
-      updateForm('monthlyBudget', undefined);
+    const contact = document.getElementById('contact');
+    if (contact) {
+      contact.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
-    setBudget(Number(digits));
-  };
 
-  const handleDownloadExcel = () => {
-    if (!quote) return;
-    downloadEstimateCsv(form, quote);
-  };
+    window.location.href = '/#contact';
+  }
 
-  const handleDownloadPdf = () => {
-    if (!quote) return;
-    openEstimatePdfPrint(form, quote);
-  };
+  function downloadCsv() {
+    const rows = summary.split('\n').map((line) => {
+      const [label, ...value] = line.split(': ');
+      return [label, value.join(': ')];
+    });
+    const csv = rows.map((row) => row.map(csvCell).join(',')).join('\n');
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `turnkeyhaus-plan-${new Date().toISOString().slice(0, 10)}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
 
-  const consultPrefillUrl = quote ? buildConsultPrefillUrl(form, quote) : content.contact.googleFormShareUrl.trim();
-  const progressRatio = quote ? 1 : (stepIndex + 1) / steps.length;
-  const progressPercent = Math.round(progressRatio * 100);
-  const selectedAddOnCount = Object.values(form.addOns).filter(Boolean).length;
-  const shouldShowAddOnOptions = expandAddOnOptions || selectedAddOnCount > 0;
+  function printPlan() {
+    const popup = window.open('', 'turnkeyhaus-plan-print', 'width=860,height=960');
+    const html = `<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>턴키하우스 운영 플랜 추천 결과</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #101816; margin: 48px; line-height: 1.7; }
+    h1 { font-size: 32px; margin: 0 0 8px; }
+    p { color: #4a5551; margin: 0 0 28px; }
+    dl { border-top: 1px solid #d9dfdc; }
+    div { border-bottom: 1px solid #d9dfdc; padding: 14px 0; }
+    dt { font-size: 12px; font-weight: 700; color: #66726e; letter-spacing: .08em; text-transform: uppercase; }
+    dd { margin: 4px 0 0; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>턴키하우스 운영 플랜 추천 결과</h1>
+  <p>이 결과는 상담 전 운영 범위를 빠르게 맞추기 위한 기준입니다. 최종 범위와 금액은 업종, 촬영 환경, 승인 구조 확인 후 확정됩니다.</p>
+  <dl>
+    ${summary
+      .split('\n')
+      .map((line) => {
+        const [label, ...value] = line.split(': ');
+        return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value.join(': '))}</dd></div>`;
+      })
+      .join('')}
+  </dl>
+</body>
+</html>`;
 
-  const clearAddOns = () => {
-    setForm((prev) => ({
-      ...prev,
-      consultLocation: 'capital',
-      addOns: {
-        consultingOnly: false,
-        inhouseSetup: false,
-        practicalTraining: false,
-        drone: false,
-        motion: false
-      }
-    }));
-    setExpandAddOnOptions(false);
-  };
+    if (!popup) {
+      window.print();
+      return;
+    }
 
-  return (
-    <section id="pricing" className="border-y border-black/10 bg-white py-24">
-      <div className="mx-auto max-w-[1180px] px-5 sm:px-6">
-        <div className="mb-12 space-y-4 text-center">
-          <div className="inline-flex items-center rounded-full border border-black/10 px-3 py-1 text-[13px] font-bold tracking-[0.1em] text-black/45">
-            [ 운영 견적 플래너 ]
-          </div>
-          <h2 className="whitespace-pre-line text-[32px] font-bold leading-[1.28] tracking-tight text-[#0B0F0E] md:text-[44px]">
-            내 월 예산으로 바로 확인하는
-            {'\n'}
-            유튜브 채널 운영 견적
-          </h2>
-          <p className="mx-auto max-w-[70ch] text-[16px] leading-[1.85] text-black/60 md:text-[17px]">
-            월 예산과 운영 목표를 선택하면 실행 가능한 제작 조합과 예상 금액을 자동 산출합니다. 상담 신청 시
-            선택한 견적 내용이 함께 전달되어 빠르게 맞춤 제안을 받을 수 있습니다.
-          </p>
-          {anniversaryBenefit.active ? (
-            <div className="mx-auto inline-flex max-w-[760px] items-center rounded-xl border border-[#21c1a2]/35 bg-[#e9fbf7] px-4 py-2.5 text-[14px] font-semibold text-[#0b3d35]">
-              {anniversaryBenefit.title} · {anniversaryBenefit.body}
+    popup.document.open();
+    popup.document.write(html);
+    popup.document.close();
+    popup.focus();
+    window.setTimeout(() => popup.print(), 250);
+  }
+
+  function renderSingleChoice<T extends string>(options: Option<T>[], selected: T | undefined, onSelect: (id: T) => void) {
+    return (
+      <div className="grid gap-3 md:grid-cols-2">
+        {options.map((option) => {
+          const active = selected === option.id;
+          return (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => onSelect(option.id)}
+              className={`group border p-5 text-left transition ${
+                active
+                  ? 'border-[#21c1a2] bg-[#e8fbf7] shadow-[inset_0_0_0_1px_#21c1a2]'
+                  : 'border-black/10 bg-white hover:border-black/30'
+              }`}
+            >
+              <span className="mb-4 inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/15 text-xs font-black">
+                {active ? '✓' : '+'}
+              </span>
+              <strong className="block text-lg font-black leading-tight text-[#111816]">{option.title}</strong>
+              <span className="mt-3 block text-sm leading-6 text-black/60">{option.description}</span>
+              {option.meta ? <span className="mt-4 block text-xs font-bold text-[#16a88e]">{option.meta}</span> : null}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function renderMultiChoice<T extends string>(options: Option<T>[], selected: T[], onToggle: (id: T) => void) {
+    return (
+      <div className="grid gap-3 md:grid-cols-2">
+        {options.map((option) => {
+          const active = selected.includes(option.id);
+          return (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => onToggle(option.id)}
+              aria-pressed={active}
+              className={`border p-5 text-left transition ${
+                active
+                  ? 'border-[#21c1a2] bg-[#e8fbf7] shadow-[inset_0_0_0_1px_#21c1a2]'
+                  : 'border-black/10 bg-white hover:border-black/30'
+              }`}
+            >
+              <span className="mb-4 inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/15 text-xs font-black">
+                {active ? '✓' : '+'}
+              </span>
+              <strong className="block text-lg font-black leading-tight text-[#111816]">{option.title}</strong>
+              <span className="mt-3 block text-sm leading-6 text-black/60">{option.description}</span>
+              {option.meta ? <span className="mt-4 block text-xs font-bold text-[#16a88e]">{option.meta}</span> : null}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function renderStep() {
+    if (currentStep === 0) {
+      return renderSingleChoice(industries, state.industry, (industry) => setState((prev) => ({ ...prev, industry })));
+    }
+
+    if (currentStep === 1) {
+      return renderSingleChoice(statuses, state.status, (status) => setState((prev) => ({ ...prev, status })));
+    }
+
+    if (currentStep === 2) {
+      return renderMultiChoice(goals, state.goals, toggleGoal);
+    }
+
+    if (currentStep === 3) {
+      return renderMultiChoice(resources, state.resources, toggleResource);
+    }
+
+    if (currentStep === 4) {
+      return renderSingleChoice(models, state.model, (model) => setState((prev) => ({ ...prev, model })));
+    }
+
+    if (currentStep === 5) {
+      return renderSingleChoice(volumes, state.volume, (volume) => setState((prev) => ({ ...prev, volume })));
+    }
+
+    return (
+      <div className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
+        <div>
+          <p className="text-xs font-black tracking-[0.16em] text-[#16a88e]">추천 플랜</p>
+          <h3 className="mt-3 text-4xl font-black leading-tight text-[#101816] md:text-5xl">{plan.title}</h3>
+          <p className="mt-3 text-lg font-bold text-black/70">{plan.subtitle}</p>
+          <p className="mt-8 border-y border-black/10 py-6 text-base leading-8 text-black/70">{buildReason(state, plan)}</p>
+
+          <div className="mt-7 grid gap-6 md:grid-cols-2">
+            <div>
+              <p className="text-xs font-black tracking-[0.12em] text-black/45">예상 투자 범위</p>
+              <p className="mt-2 text-2xl font-black text-[#101816]">{plan.investmentRange}</p>
             </div>
-          ) : null}
+            <div>
+              <p className="text-xs font-black tracking-[0.12em] text-black/45">결제 안내</p>
+              <p className="mt-2 text-base font-bold leading-7 text-black/70">{plan.paymentGuide}</p>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <p className="text-sm font-black text-[#101816]">기본 포함 범위</p>
+            <ul className="mt-4 divide-y divide-black/10 border-y border-black/10">
+              {plan.scope.map((item) => (
+                <li key={item} className="flex gap-3 py-3 text-sm font-bold text-black/68">
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#21c1a2]" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-8 border border-[#21c1a2]/45 bg-[#e8fbf7] p-5">
+            <p className="text-sm font-black text-[#101816]">이 결과는 확정 견적이 아닙니다.</p>
+            <p className="mt-2 text-sm leading-6 text-black/65">
+              촬영 환경, 출연자 수, 검수/승인 구조, 업종별 표현 리스크를 확인한 뒤 운영 범위와 최종 금액을 확정합니다.
+              결제 등록 전에 맞는 플랜인지 먼저 확인하는 이유가 여기에 있습니다.
+            </p>
+          </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
-          <aside className="order-2 h-fit rounded-2xl border border-black/10 bg-white p-4 md:p-5 lg:order-1 lg:sticky lg:top-24">
-            <div className="mb-4">
-              <div className="flex items-end justify-between">
-                <p className="text-[13px] font-semibold tracking-[0.08em] text-black/55">진행 상태</p>
-                <p className="text-sm font-bold text-[#0B0F0E]">
-                  {quote ? '완료' : `${stepIndex + 1}/${steps.length}`}
-                </p>
-              </div>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/10">
-                <div
-                  className="h-full rounded-full bg-[#0B0F0E] transition-all duration-300"
-                  style={{ width: `${progressPercent}%` }}
-                />
+        <div className="border border-black/10 bg-white p-5 md:p-6">
+          <p className="text-sm font-black text-[#101816]">상담 전 확인할 항목</p>
+          <div className="mt-5 space-y-6">
+            <div>
+              <p className="mb-3 text-xs font-black tracking-[0.12em] text-black/45">희망 투자 범위</p>
+              <div className="grid gap-2">
+                {investments.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setState((prev) => ({ ...prev, investment: option.id }))}
+                    className={`border px-4 py-3 text-left transition ${
+                      state.investment === option.id ? 'border-[#21c1a2] bg-[#e8fbf7]' : 'border-black/10 hover:border-black/30'
+                    }`}
+                  >
+                    <strong className="block text-sm font-black text-[#101816]">{option.title}</strong>
+                    <span className="mt-1 block text-xs leading-5 text-black/55">{option.description}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
-            <ol className="space-y-2.5">
-              {steps.map((step, index) => {
-                const isDone = quote ? true : index < stepIndex;
-                const isActive = !quote && index === stepIndex;
-                const isLocked = !quote && index > stepIndex;
-
-                return (
-                  <li
-                    key={step.key}
-                    className={`flex items-center gap-2.5 rounded-lg border px-3 py-2.5 transition-colors ${
-                      isActive
-                        ? 'border-[#0B0F0E] bg-[#0B0F0E] text-white shadow-[0_2px_10px_rgba(11,15,14,0.18)]'
-                        : isDone
-                        ? 'border-black/15 bg-[#F3F5F6] text-[#0B0F0E]'
-                        : isLocked
-                        ? 'border-black/10 bg-white text-black/40'
-                        : 'border-black/10 bg-white text-black/55'
+            <div>
+              <p className="mb-3 text-xs font-black tracking-[0.12em] text-black/45">희망 결제 방식</p>
+              <div className="grid gap-2">
+                {payments.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setState((prev) => ({ ...prev, payment: option.id }))}
+                    className={`border px-4 py-3 text-left transition ${
+                      state.payment === option.id ? 'border-[#21c1a2] bg-[#e8fbf7]' : 'border-black/10 hover:border-black/30'
                     }`}
                   >
-                    <span
-                      className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
-                        isActive
-                          ? 'bg-white text-[#0B0F0E]'
-                          : isDone
-                          ? 'bg-[#0B0F0E] text-white'
-                          : 'bg-black/10 text-black/50'
+                    <strong className="block text-sm font-black text-[#101816]">{option.title}</strong>
+                    <span className="mt-1 block text-xs leading-5 text-black/55">{option.description}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-7 border-t border-black/10 pt-5">
+            <p className="text-xs font-black tracking-[0.12em] text-black/45">선택 요약</p>
+            <dl className="mt-3 space-y-3 text-sm">
+              <div className="flex justify-between gap-4"><dt className="text-black/45">업종</dt><dd className="text-right font-bold">{getTitle(industries, state.industry)}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-black/45">상태</dt><dd className="text-right font-bold">{getTitle(statuses, state.status)}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-black/45">운영 방식</dt><dd className="text-right font-bold">{getTitle(models, state.model)}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-black/45">월간 볼륨</dt><dd className="text-right font-bold">{getTitle(volumes, state.volume)}</dd></div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <section id="pricing" className="border-b border-black/10 bg-white px-4 py-24 md:px-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="max-w-3xl">
+          <p className="text-xs font-black tracking-[0.18em] text-black/45">[ 운영 플랜 추천기 ]</p>
+          <h2 className="mt-5 text-4xl font-black leading-tight tracking-[-0.04em] text-[#101816] md:text-6xl">
+            우리 조직에 맞는
+            <br />
+            유튜브 운영 플랜을 확인하세요.
+          </h2>
+          <p className="mt-6 text-lg leading-8 text-black/64">
+            업종, 채널 상태, 내부 리소스, 운영 목표를 선택하면 적합한 월간 운영 방식과 예상 투자 범위를 안내합니다.
+            상담 신청 시 이 내용으로 운영 범위를 더 빠르게 맞출 수 있습니다.
+          </p>
+          <div className="mt-7 border border-[#21c1a2]/40 bg-[#e8fbf7] px-5 py-4 text-sm font-bold leading-7 text-[#123c35]">
+            턴키하우스는 단건 촬영·편집만 진행하지 않습니다. 채널 성과는 기획, 제작, 업로드, 리포트가 함께 움직일 때 만들어지기 때문에 월간 운영 단위로만 플랜을 제안합니다.
+          </div>
+        </div>
+
+        <div className="mt-14 grid gap-8 lg:grid-cols-[280px_1fr]">
+          <aside className="h-fit border border-black/10 bg-white p-5 lg:sticky lg:top-24">
+            <div className="mb-5 flex items-center justify-between">
+              <span className="text-xs font-black tracking-[0.14em] text-black/45">진행 단계</span>
+              <span className="text-xs font-black text-[#16a88e]">{progress}%</span>
+            </div>
+            <div className="h-1 bg-black/10">
+              <div className="h-full bg-[#21c1a2] transition-all" style={{ width: `${progress}%` }} />
+            </div>
+            <ol className="mt-5 space-y-2">
+              {steps.map((step, index) => {
+                const active = index === currentStep;
+                const done = index < currentStep;
+                return (
+                  <li key={step.label}>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(index)}
+                      className={`flex w-full items-center gap-3 border px-3 py-2 text-left text-sm font-bold transition ${
+                        active
+                          ? 'border-[#21c1a2] bg-[#e8fbf7] text-[#101816]'
+                          : done
+                            ? 'border-black/10 bg-black/[0.03] text-black/70'
+                            : 'border-black/10 text-black/45'
                       }`}
                     >
-                      {index + 1}
-                    </span>
-                    <span className={`text-[14px] font-semibold leading-[1.3] ${isActive ? 'text-white' : 'text-current'}`}>
-                      {stepDisplayLabels[step.key]}
-                    </span>
+                      <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs ${active || done ? 'bg-[#101816] text-white' : 'bg-black/10 text-black/55'}`}>
+                        {done ? '✓' : index + 1}
+                      </span>
+                      {step.label}
+                    </button>
                   </li>
                 );
               })}
             </ol>
 
-            {form.monthlyBudget ? (
-              <div className="mt-4 rounded-xl border border-black/12 bg-[#FAFAFA] p-3">
-                <p className="text-xs font-semibold text-black/50">선택 예산 (공급가 기준)</p>
-                <p className="mt-1 text-[22px] font-bold tracking-tight text-[#0B0F0E]">
-                  {formatWon(form.monthlyBudget)}원
-                </p>
-              </div>
-            ) : null}
+            <div className="mt-6 border-t border-black/10 pt-5">
+              <p className="text-xs font-black tracking-[0.12em] text-black/45">현재 추천</p>
+              <p className="mt-2 text-xl font-black text-[#101816]">{plan.title}</p>
+              <p className="mt-2 text-xs leading-5 text-black/55">선택값에 따라 추천 플랜이 실시간으로 바뀝니다.</p>
+            </div>
           </aside>
 
-          <div className="order-1 rounded-2xl border border-black/10 bg-white p-6 shadow-[0_10px_28px_rgba(0,0,0,0.04)] md:p-8 lg:order-2">
-            <AnimatePresence mode="wait">
-              {quote ? (
-                <motion.div
-                  key="quote-result"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="space-y-7"
+          <div className="border border-black/10 bg-white p-5 md:p-8">
+            <div className="border-b border-black/10 pb-6">
+              <p className="text-sm font-black tracking-[0.14em] text-[#16a88e]">STEP {currentStep + 1} / {steps.length}</p>
+              <h3 className="mt-3 text-3xl font-black tracking-[-0.03em] text-[#101816] md:text-4xl">{steps[currentStep].title}</h3>
+              <p className="mt-4 text-base leading-7 text-black/58">{steps[currentStep].subtitle}</p>
+            </div>
+
+            <div className="py-8">{renderStep()}</div>
+
+            <div className="flex flex-col gap-3 border-t border-black/10 pt-6 md:flex-row md:items-center md:justify-between">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  disabled={currentStep === 0}
+                  className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black disabled:cursor-not-allowed disabled:opacity-35"
                 >
-                  <div className="flex flex-col gap-4 border-b border-black/10 pb-5 md:flex-row md:items-end md:justify-between">
-                    <div>
-                      <p className="text-xs font-semibold tracking-[0.12em] text-black/45">맞춤 견적서</p>
-                      <h3 className="mt-1 text-[30px] font-bold tracking-tight text-[#0B0F0E] md:text-[34px]">
-                        {form.addOns.consultingOnly
-                          ? '컨설팅 단독 상품 견적안'
-                          : `월 ${formatWon(quote.budget)}원 예산 최적안`}
-                      </h3>
-                      <p className="mt-1 text-sm text-black/58">
-                        {form.addOns.consultingOnly
-                          ? '사전 설문 + 오프라인 1회(2시간 이내) + 온라인 보고서 1회 구성'
-                          : `예산 적합도 ${quote.utilization}% · 총 혜택 ${formatRate(quote.discountRate)}% 적용`}
-                      </p>
-                    </div>
-                    <p className="text-sm font-medium text-black/52">산출일: {new Date().toLocaleDateString()}</p>
-                  </div>
+                  이전
+                </button>
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black"
+                >
+                  다시 선택
+                </button>
+              </div>
 
-                  {anniversaryBenefit.active && form.term === 12 ? (
-                    <div className="rounded-xl border border-[#21c1a2]/35 bg-[#e9fbf7] p-4">
-                      <p className="text-[13px] font-semibold text-[#0b3d35]">{anniversaryBenefit.title}</p>
-                      <p className="mt-1 text-[14px] font-medium text-[#0f4e45]">{anniversaryBenefit.body}</p>
-                    </div>
-                  ) : null}
-
-                  <div className="overflow-x-auto rounded-xl border border-black/10">
-                    <table className="w-full min-w-[780px] text-left">
-                      <thead className="bg-black/[0.03] text-[12px] font-bold tracking-[0.08em] text-black/58">
-                        <tr>
-                          <th className="px-4 py-3">항목</th>
-                          <th className="px-4 py-3 text-right">단가</th>
-                          <th className="px-4 py-3 text-center">수량</th>
-                          <th className="px-4 py-3 text-center">구분</th>
-                          <th className="px-4 py-3 text-right">합계</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {getVisibleLineItems(quote).map((item) => {
-                          const bounds = getQuantityBounds(form, quote.quantities, item.key);
-                          const canDecrement = quote.quantities[item.key] - item.step >= bounds.min;
-                          const canIncrement = quote.quantities[item.key] + item.step <= bounds.max;
-                          const unitPrice = getLineItemUnitPrice(form, item.key);
-
-                          return (
-                            <tr key={item.key} className="border-t border-black/8 text-sm text-black/72">
-                              <td className="px-4 py-4 font-medium text-[#0B0F0E]">
-                                {item.label}
-                                {item.key === 'thumbnail' && quote.quantities.longform === 0 ? (
-                                  <p className="mt-1 text-xs font-medium text-black/45">롱폼 1편 이상 선택 시 적용</p>
-                                ) : null}
-                              </td>
-                              <td className="px-4 py-4 text-right">
-                                {unitPrice === 0 ? '0' : formatWon(unitPrice)}
-                              </td>
-                              <td className="px-4 py-4">
-                                <div className="flex items-center justify-center gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => adjustQuantity(item.key, -1)}
-                                    disabled={!canDecrement}
-                                    className="inline-flex h-7 w-7 items-center justify-center rounded border border-black/15 text-black/70 leading-none transition-colors hover:bg-black/[0.04] disabled:cursor-not-allowed disabled:opacity-35"
-                                  >
-                                    -
-                                  </button>
-                                  <span className="min-w-[34px] text-center font-semibold text-[#0B0F0E]">
-                                    {quote.quantities[item.key]}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => adjustQuantity(item.key, 1)}
-                                    disabled={!canIncrement}
-                                    className="inline-flex h-7 w-7 items-center justify-center rounded border border-black/15 text-black/70 leading-none transition-colors hover:bg-black/[0.04] disabled:cursor-not-allowed disabled:opacity-35"
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              </td>
-                              <td className="px-4 py-4 text-center text-black/55">{item.unitLabel}</td>
-                              <td className="px-4 py-4 text-right font-semibold text-[#0B0F0E]">
-                                {unitPrice === 0 ? '기본 제공' : formatWon(quote.lineTotals[item.key])}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
-                    <div className="rounded-xl border border-[#21c1a2]/35 bg-[#21c1a2]/8 p-4">
-                      <p className="text-[13px] font-semibold text-black/70">할인 적용 안내</p>
-                      <ul className="mt-2 space-y-1 text-[13px] leading-[1.7] text-black/64">
-                        {quote.discountNotes.map((note) => (
-                          <li key={note}>- {note}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <dl className="w-full min-w-[300px] space-y-2 text-sm md:w-auto">
-                      <div className="flex items-center justify-between text-black/65">
-                        <dt>공급가액</dt>
-                        <dd>{formatWon(quote.subtotal)}</dd>
-                      </div>
-                      <div className="flex items-center justify-between text-black/65">
-                        <dt>할인금액</dt>
-                        <dd>-{formatWon(quote.discountAmount)}</dd>
-                      </div>
-                      <div className="flex items-center justify-between text-black/65">
-                        <dt>할인 반영 공급가</dt>
-                        <dd>{formatWon(quote.taxable)}</dd>
-                      </div>
-                      <div className="flex items-center justify-between text-black/65">
-                        <dt>부가세 (10%)</dt>
-                        <dd>+{formatWon(quote.vat)}</dd>
-                      </div>
-                      <div className="mt-2 flex items-center justify-between border-t border-black/12 pt-3 text-[30px] font-bold tracking-tight text-[#0B0F0E]">
-                        <dt className="text-base font-semibold">최종 금액 (VAT 포함)</dt>
-                        <dd>{formatWon(quote.total)}원</dd>
-                      </div>
-                    </dl>
-                  </div>
-
-                  {(quote.addOns.drone || quote.addOns.motion) ? (
-                    <div className="rounded-xl border border-amber-300/60 bg-amber-50 p-4">
-                      <p className="text-[13px] font-semibold text-amber-800">별도 협의 항목 (견적 미포함)</p>
-                      <ul className="mt-2 space-y-1 text-[13px] leading-[1.7] text-amber-700">
-                        {quote.addOns.drone ? (
-                          <li>- 드론 촬영: 촬영 환경/비행 허가/안전 조건에 따라 별도 협의</li>
-                        ) : null}
-                        {quote.addOns.motion ? (
-                          <li>- 고급 모션 그래픽: 작업 난이도/러닝타임에 따라 별도 협의</li>
-                        ) : null}
-                      </ul>
-                    </div>
-                  ) : null}
-
-                  <div className="space-y-3">
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                      <button
-                        type="button"
-                        onClick={handleDownloadExcel}
-                        className="rounded-xl border border-black/12 py-3.5 text-[14px] font-bold text-black/65 transition-colors hover:bg-black/[0.03]"
-                      >
-                        Excel 내보내기
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleDownloadPdf}
-                        className="rounded-xl border border-black/12 py-3.5 text-[14px] font-bold text-black/65 transition-colors hover:bg-black/[0.03]"
-                      >
-                        PDF 저장
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQuote(null)}
-                        className="rounded-xl border border-black/12 py-3.5 text-[14px] font-bold text-black/60 transition-colors hover:bg-black/[0.03]"
-                      >
-                        단계 다시 수정하기
-                      </button>
-                      <button
-                        type="button"
-                        onClick={resetAll}
-                        className="rounded-xl border border-black/12 py-3.5 text-[14px] font-bold text-black/60 transition-colors hover:bg-black/[0.03]"
-                      >
-                        처음부터 다시하기
-                      </button>
-                    </div>
-                    <a
-                      href={consultPrefillUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex w-full items-center justify-center rounded-xl bg-[#0B0F0E] px-5 py-4 text-[17px] font-bold text-white transition-colors hover:bg-zinc-800"
-                    >
-                      이 견적으로 상담 신청하기
-                    </a>
-                    <p className="text-center text-xs font-medium text-black/46">
-                      예산·믹스·예상 금액이 상담 폼에 자동 첨부됩니다.
-                    </p>
-                  </div>
-                </motion.div>
+              {currentStep < steps.length - 1 ? (
+                <button
+                  type="button"
+                  onClick={goNext}
+                  disabled={!canProceed}
+                  className="bg-[#101816] px-6 py-3 text-sm font-black text-white transition hover:bg-[#21c1a2] hover:text-[#101816] disabled:cursor-not-allowed disabled:bg-black/20 disabled:text-black/40"
+                >
+                  다음 단계
+                </button>
               ) : (
-                <motion.div key={currentStep.key} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                  <div className="mb-8 border-b border-black/10 pb-5">
-                    <p className="text-xs font-semibold tracking-[0.12em] text-black/45">
-                      STEP {stepIndex + 1} / {steps.length}
-                    </p>
-                    <h3 className="mt-1 text-[28px] font-bold tracking-tight text-[#0B0F0E] md:text-[32px]">
-                      {currentStep.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-black/58">{currentStep.subtitle}</p>
-                  </div>
-
-                  {currentStep.key === 'channel' ? (
-                    <div className="grid gap-3 md:grid-cols-3">
-                      {[
-                        { value: 'existing' as ChannelState, label: '운영 중인 채널', desc: '현재 채널을 개선' },
-                        { value: 'new' as ChannelState, label: '신규 채널 개설', desc: '채널 기획부터 시작' },
-                        { value: 'rebuild' as ChannelState, label: '채널 리빌딩', desc: '포지셔닝 재정비' }
-                      ].map((option) => {
-                        const selected = form.channelState === option.value;
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => updateForm('channelState', option.value)}
-                            className={`rounded-xl border px-4 py-5 text-left transition-colors ${
-                              selected
-                                ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                            }`}
-                          >
-                            <p className="text-[18px] font-semibold text-[#0B0F0E]">{option.label}</p>
-                            <p className="mt-1 text-sm text-black/58">{option.desc}</p>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-
-                  {currentStep.key === 'budget' ? (
-                    <div className="space-y-5">
-                      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                        {budgetOptions.map((option) => {
-                          const selected = form.monthlyBudget === option.value;
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => setBudget(option.value)}
-                              className={`rounded-xl border px-4 py-5 text-left transition-colors ${
-                                selected
-                                  ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                  : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                              }`}
-                            >
-                              <p className="text-[22px] font-bold tracking-tight text-[#0B0F0E]">
-                                {option.label}
-                              </p>
-                              <p className="mt-1 text-sm text-black/58">{option.desc}</p>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
-                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                          <p className="text-sm font-semibold text-black/62">예산 직접 입력 (150만원 ~ 1,200만원)</p>
-                          <label className="inline-flex items-center gap-2 text-sm">
-                            <span className="text-black/50">공급가 기준</span>
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              value={form.monthlyBudget ? formatWon(form.monthlyBudget) : ''}
-                              onChange={(event) => handleBudgetInputChange(event.target.value)}
-                              placeholder="예: 4,400,000"
-                              className="w-[180px] rounded-lg border border-black/12 bg-white px-3 py-2 text-right font-semibold text-[#0B0F0E] outline-none focus:border-[#21c1a2]"
-                            />
-                            <span className="text-black/60">원</span>
-                          </label>
-                        </div>
-
-                        <input
-                          type="range"
-                          min={1500000}
-                          max={12000000}
-                          step={100000}
-                          value={form.monthlyBudget ?? 4400000}
-                          onChange={(event) => setBudget(Number(event.target.value))}
-                          className="mt-4 h-2 w-full cursor-pointer accent-[#21c1a2]"
-                        />
-                        <div className="mt-2 flex justify-between text-xs text-black/45">
-                          <span>150만원</span>
-                          <span>600만원</span>
-                          <span>1,200만원</span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {currentStep.key === 'goal' ? (
-                    <div className="grid gap-3 md:grid-cols-3">
-                      {[
-                        { value: 'brand' as GoalType, label: '브랜딩 강화', desc: '신뢰/전문성 중심' },
-                        { value: 'lead' as GoalType, label: '문의 전환', desc: '상담/리드 중심' },
-                        { value: 'balanced' as GoalType, label: '균형 운영', desc: '브랜딩+전환 병행' }
-                      ].map((option) => {
-                        const selected = form.goal === option.value;
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => updateForm('goal', option.value)}
-                            className={`rounded-xl border px-4 py-5 text-left transition-colors ${
-                              selected
-                                ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                            }`}
-                          >
-                            <p className="text-[18px] font-semibold text-[#0B0F0E]">{option.label}</p>
-                            <p className="mt-1 text-sm text-black/58">{option.desc}</p>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-
-                  {currentStep.key === 'mix' ? (
-                    <div className="grid gap-3 md:grid-cols-3">
-                      {[
-                        { value: 'long' as MixType, label: '롱폼 중심', desc: '설득형 본편 강화' },
-                        { value: 'short' as MixType, label: '숏폼 중심', desc: '노출량/빈도 강화' },
-                        { value: 'balanced' as MixType, label: '균형 믹스', desc: '롱폼+숏폼 동시 운용' }
-                      ].map((option) => {
-                        const selected = form.mix === option.value;
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => updateForm('mix', option.value)}
-                            className={`rounded-xl border px-4 py-5 text-left transition-colors ${
-                              selected
-                                ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                            }`}
-                          >
-                            <p className="text-[18px] font-semibold text-[#0B0F0E]">{option.label}</p>
-                            <p className="mt-1 text-sm text-black/58">{option.desc}</p>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-
-                  {currentStep.key === 'term' ? (
-                    <div className="space-y-4">
-                      {anniversaryBenefit.active ? (
-                        <div className="rounded-xl border border-[#21c1a2]/35 bg-[#e9fbf7] px-4 py-3 text-sm font-semibold text-[#0f4e45]">
-                          {anniversaryBenefit.title} · {anniversaryBenefit.body}
-                        </div>
-                      ) : null}
-                      <div className="grid gap-3 md:grid-cols-4">
-                        {[
-                          { value: 3 as TermMonths, label: '3개월', desc: '정가', rate: '0%' },
-                          { value: 6 as TermMonths, label: '6개월', desc: '운영 안정화', rate: '최대 4%' },
-                          { value: 9 as TermMonths, label: '9개월', desc: '확장 추천', rate: '최대 7%' },
-                          { value: 12 as TermMonths, label: '12개월', desc: '장기 파트너', rate: '최대 10%', bonus: '12+1 혜택' }
-                        ].map((option) => {
-                          const selected = form.term === option.value;
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => updateForm('term', option.value)}
-                              className={`rounded-xl border px-4 py-5 text-left transition-colors ${
-                                selected
-                                  ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                  : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                              }`}
-                            >
-                              {option.bonus ? (
-                                <span className="inline-flex rounded-full bg-[#0B0F0E] px-2 py-0.5 text-[11px] font-semibold text-[#b7ff00]">
-                                  {option.bonus}
-                                </span>
-                              ) : null}
-                              <p className="mt-2 text-[24px] font-bold tracking-tight text-[#0B0F0E]">{option.label}</p>
-                              <p className="mt-1 text-sm text-black/58">{option.desc}</p>
-                              <p className="mt-2 text-xs font-semibold text-[#21c1a2]">{option.rate}</p>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {currentStep.key === 'addons' ? (
-                    <div className="space-y-4">
-                      <div className="rounded-xl border border-[#21c1a2]/35 bg-[#e9fbf7] p-4">
-                        <p className="text-[16px] font-semibold text-[#0B0F0E]">운영대행 기본 견적 먼저 확인해 보세요</p>
-                        <p className="mt-1 text-sm text-black/62">
-                          옵션 없이도 바로 금액을 확인할 수 있고, 생성 후 수량/옵션은 다시 수정 가능합니다.
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {!shouldShowAddOnOptions ? (
-                            <button
-                              type="button"
-                              onClick={() => setExpandAddOnOptions(true)}
-                              className="rounded-lg border border-[#21c1a2]/45 bg-white px-3.5 py-2 text-sm font-semibold text-[#0f4e45] transition-colors hover:bg-[#f4fffc]"
-                            >
-                              추가 옵션 선택하기
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={clearAddOns}
-                              className="rounded-lg border border-black/15 bg-white px-3.5 py-2 text-sm font-semibold text-black/65 transition-colors hover:bg-black/[0.03]"
-                            >
-                              추가 옵션 없이 계산하기
-                            </button>
-                          )}
-                          <span className="inline-flex items-center rounded-lg border border-[#21c1a2]/30 bg-white px-3.5 py-2 text-sm font-semibold text-[#0f4e45]">
-                            선택된 추가 옵션 {selectedAddOnCount}개
-                          </span>
-                        </div>
-                      </div>
-
-                      {shouldShowAddOnOptions ? (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => toggleAddOn('consultingOnly')}
-                            className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                              form.addOns.consultingOnly
-                                ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                            }`}
-                          >
-                            <p className="text-[18px] font-semibold text-[#0B0F0E]">컨설팅 단독 상품</p>
-                            <p className="mt-1 text-sm text-black/60">
-                              사전 설문 + 1회 오프라인 컨설팅(2시간 이내) + 온라인 보고서 1회 제공
-                            </p>
-                          </button>
-
-                          {form.addOns.consultingOnly ? (
-                            <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
-                              <p className="text-[13px] font-semibold text-black/60">오프라인 컨설팅 지역</p>
-                              <p className="mt-1 text-xs leading-[1.6] text-black/52">
-                                계약 전 1회 컨설팅 비용 기준입니다. 계약 후 촬영 출장비는 지방 여부와 관계없이 별도 청구하지 않습니다.
-                              </p>
-                              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                                {[
-                                  { value: 'capital' as ConsultLocation, label: '서울·수도권 (15만원)' },
-                                  { value: 'other' as ConsultLocation, label: '그 외 지역 (25만원)' }
-                                ].map((option) => (
-                                  <button
-                                    key={option.value}
-                                    type="button"
-                                    onClick={() => updateForm('consultLocation', option.value)}
-                                    className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
-                                      (form.consultLocation ?? 'capital') === option.value
-                                        ? 'border-[#21c1a2] bg-[#21c1a2]/10 text-[#0B0F0E]'
-                                        : 'border-black/12 text-black/60 hover:bg-black/[0.03]'
-                                    }`}
-                                  >
-                                    {option.label}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          ) : null}
-
-                          <div className="grid gap-3 md:grid-cols-2">
-                            <button
-                              type="button"
-                              onClick={() => toggleAddOn('inhouseSetup')}
-                              className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                                form.addOns.inhouseSetup
-                                  ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                  : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                              }`}
-                            >
-                              <p className="text-[18px] font-semibold text-[#0B0F0E]">인하우스 팀 셋업/채용 대행</p>
-                              <p className="mt-1 text-sm text-black/60">
-                                월 50만원 · 면접 대행 + 팀 구성 + 장비/운영 솔루션 제공
-                              </p>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => toggleAddOn('practicalTraining')}
-                              className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                                form.addOns.practicalTraining
-                                  ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                  : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                              }`}
-                            >
-                              <p className="text-[18px] font-semibold text-[#0B0F0E]">영상 촬영/편집 실무 교육</p>
-                              <p className="mt-1 text-sm text-black/60">
-                                1개월 과정(총 8회) · 패키지 80만원
-                              </p>
-                            </button>
-                          </div>
-
-                          <div className="rounded-xl border border-black/10 bg-[#FAFAFA] p-4">
-                            <p className="text-[13px] font-semibold text-black/60">별도 협의 항목 (견적 미포함)</p>
-                            <div className="mt-3 space-y-3">
-                              <button
-                                type="button"
-                                onClick={() => toggleAddOn('drone')}
-                                className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                                  form.addOns.drone
-                                    ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                    : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                                }`}
-                              >
-                                <p className="text-[18px] font-semibold text-[#0B0F0E]">드론 촬영</p>
-                                <p className="mt-1 text-sm text-black/60">
-                                  촬영지/허가/비행 안전 조건에 따라 별도 협의 (견적 미포함)
-                                </p>
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => toggleAddOn('motion')}
-                                className={`w-full rounded-xl border px-5 py-4 text-left transition-colors ${
-                                  form.addOns.motion
-                                    ? 'border-[#21c1a2] bg-[#21c1a2]/10'
-                                    : 'border-black/10 hover:border-black/20 hover:bg-black/[0.02]'
-                                }`}
-                              >
-                                <p className="text-[18px] font-semibold text-[#0B0F0E]">고급 모션 그래픽</p>
-                                <p className="mt-1 text-sm text-black/60">
-                                  난이도/러닝타임 기준으로 별도 협의 (견적 미포함)
-                                </p>
-                              </button>
-                            </div>
-                          </div>
-                        </>
-                      ) : null}
-                    </div>
-                  ) : null}
-
-                  <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-4">
-                    <button
-                      type="button"
-                      onClick={goPrev}
-                      disabled={stepIndex === 0}
-                      className="rounded-lg border border-black/12 px-4 py-2.5 text-sm font-semibold text-black/60 transition-colors hover:bg-black/[0.03] disabled:cursor-not-allowed disabled:opacity-35"
-                    >
-                      이전
-                    </button>
-
-                    <div className="flex gap-2">
-                      {currentStep.key === 'addons' ? (
-                        <button
-                          type="button"
-                          onClick={generateQuote}
-                          disabled={isCalculating}
-                          className="rounded-lg bg-[#0B0F0E] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          {isCalculating
-                            ? '계산 중…'
-                            : selectedAddOnCount > 0
-                            ? '선택 옵션 포함 견적 생성'
-                            : '기본 견적 바로 생성'}
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={goNext}
-                          disabled={!canProceed}
-                          className="rounded-lg bg-[#0B0F0E] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          다음
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
+                <div className="grid gap-2 md:grid-cols-4">
+                  <button type="button" onClick={() => moveToContact('consult')} className="bg-[#101816] px-5 py-3 text-sm font-black text-white transition hover:bg-[#21c1a2] hover:text-[#101816]">
+                    이 플랜으로 상담 신청
+                  </button>
+                  <button type="button" onClick={() => moveToContact('payment')} className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black">
+                    카드 정기결제 등록 문의
+                  </button>
+                  <button type="button" onClick={downloadCsv} className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black">
+                    Excel용 CSV 저장
+                  </button>
+                  <button type="button" onClick={printPlan} className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black">
+                    PDF 저장용 인쇄
+                  </button>
+                  <button type="button" onClick={copySummary} className="md:col-span-4 border border-[#21c1a2]/50 bg-[#e8fbf7] px-5 py-3 text-sm font-black text-[#123c35] transition hover:border-[#21c1a2]">
+                    {copied ? '상담 메모 복사 완료' : '상담 메모 복사하기'}
+                  </button>
+                </div>
               )}
-            </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>

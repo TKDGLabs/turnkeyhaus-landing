@@ -118,11 +118,12 @@ export default function Page() {
     {
       "@context": "https://schema.org",
       "@type": "Service",
-      name: "브랜딩 콘텐츠 제작 및 유튜브 채널 운영대행",
+      name: "유튜브 월간 운영대행 및 인하우스 영상 시스템 구축 컨설팅",
       serviceType: [
-        "브랜딩 콘텐츠 제작",
-        "유튜브 채널 운영대행",
+        "유튜브 월간 운영대행",
         "채널 구조 진단",
+        "인하우스 영상 시스템 구축",
+        "영상 인재 실무평가 지원",
         "SEO/GEO 기반 콘텐츠 운영"
       ],
       provider: {
@@ -133,9 +134,9 @@ export default function Page() {
       areaServed: "KR",
       audience: [
         { "@type": "BusinessAudience", audienceType: "병원·의료 기관" },
-        { "@type": "BusinessAudience", audienceType: "법무·세무·회계·노무 등 전문 서비스" },
-        { "@type": "BusinessAudience", audienceType: "정부 기관·공공단체" },
-        { "@type": "BusinessAudience", audienceType: "커머스·온라인 서비스" }
+        { "@type": "BusinessAudience", audienceType: "변호사·로펌" },
+        { "@type": "BusinessAudience", audienceType: "세무·회계·노무 등 전문 서비스" },
+        { "@type": "BusinessAudience", audienceType: "고관여 브랜드·공공기관·기업" }
       ],
       description: content.seo.description,
       url: content.seo.siteUrl
@@ -274,6 +275,16 @@ export default function Page() {
             <p className="whitespace-pre-line break-keep text-[18px] leading-[1.9] text-black/74">{problemSupport}</p>
             <p className="whitespace-pre-line break-keep text-[17px] leading-[1.95] text-black/68">{problemDetail}</p>
 
+            {content.problem.items.length > 0 ? (
+              <ul className="grid gap-3 border-y border-black/12 py-5 text-[15px] leading-[1.8] text-black/72 md:grid-cols-3">
+                {content.problem.items.map((item) => (
+                  <li key={item} className="break-keep">
+                    - {item}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
             <figure className="overflow-hidden border border-black/10">
               <Image
                 src="/images/reality-illustration-optimized.jpg"
@@ -287,6 +298,113 @@ export default function Page() {
 
             <p className="border-t border-black/18 pt-5 text-[19px] font-semibold leading-[1.75] text-[#0B0F0E]">
               {content.problem.emphasis}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="services" className="border-b border-black/15 bg-[#fcfdfd]">
+        <div className={`${shell} py-16 md:py-24`}>
+          <div className="grid gap-10 md:grid-cols-[0.78fr_1.22fr] md:gap-14">
+            <div className="space-y-8 md:sticky md:top-28 md:self-start">
+              <SectionHeader
+                label={content.servicePillars.label}
+                title={content.servicePillars.h2}
+                lead={content.servicePillars.lead}
+              />
+            </div>
+
+            <div className="border-y border-black/15">
+              {content.servicePillars.cards.map((card, index) => (
+                <article
+                  key={card.title}
+                  className="grid gap-5 border-b border-black/10 py-7 last:border-b-0 md:grid-cols-[190px_1fr] md:gap-8"
+                >
+                  <div>
+                    <p className="text-[12px] font-semibold tracking-[0.12em] text-black/42">
+                      SERVICE {index + 1}
+                    </p>
+                    <p className="mt-2 break-keep text-[17px] font-semibold leading-[1.55] text-black/64">
+                      {card.title}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="break-keep text-[28px] font-semibold leading-[1.24] tracking-tight text-[#0B0F0E] md:text-[36px]">
+                      {card.headline}
+                    </h3>
+                    <p className="mt-4 max-w-[66ch] break-keep text-[16px] leading-[1.85] text-black/70">
+                      {card.body}
+                    </p>
+                    <ul className="mt-5 grid gap-2 border-t border-black/10 pt-4 text-[15px] leading-[1.75] text-black/68 sm:grid-cols-2">
+                      {card.bullets.map((bullet) => (
+                        <li key={bullet}>- {bullet}</li>
+                      ))}
+                    </ul>
+                    <ActionLink
+                      href={card.href}
+                      className="mt-5 inline-flex items-center border-b border-[#21c1a2] pb-1 text-[15px] font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197]"
+                    >
+                      {card.ctaLabel}
+                    </ActionLink>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="not-single" className="border-b border-black/15 bg-white">
+        <div className={`${shell} py-16 md:py-20`}>
+          <div className="grid gap-10 md:grid-cols-[0.72fr_1.28fr] md:gap-14">
+            <SectionHeader
+              label={content.exclusions.label}
+              title={content.exclusions.h2}
+              lead={content.exclusions.lead}
+            />
+
+            <div className="border-y border-black/15">
+              {content.exclusions.items.map((item) => (
+                <article key={item.title} className="border-b border-black/10 py-6 last:border-b-0">
+                  <h3 className="break-keep text-[23px] font-semibold leading-[1.35] tracking-tight text-[#0B0F0E]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 max-w-[74ch] break-keep text-[15px] leading-[1.85] text-black/68">
+                    {item.body}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="quality" className="border-b border-black/15 bg-[#fcfdfd]">
+        <div className={`${shell} grid gap-10 py-16 md:grid-cols-[0.76fr_1.24fr] md:gap-14 md:py-24`}>
+          <SectionHeader
+            label={content.videoQuality.label}
+            title={content.videoQuality.h2}
+            lead={content.videoQuality.lead}
+          />
+
+          <div className="space-y-8">
+            <div className="grid gap-x-8 gap-y-0 border-y border-black/15 sm:grid-cols-2">
+              {content.videoQuality.points.map((point, index) => (
+                <div
+                  key={point}
+                  className={`border-b border-black/10 py-4 ${
+                    index === content.videoQuality.points.length - 1 ? "border-b-0" : ""
+                  } ${index >= content.videoQuality.points.length - 2 ? "sm:border-b-0" : ""}`}
+                >
+                  <p className="break-keep text-[17px] font-semibold leading-[1.55] text-[#0B0F0E]">
+                    {point}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <p className="max-w-[70ch] break-keep border-l-2 border-[#21c1a2] pl-5 text-[16px] font-semibold leading-[1.85] text-black/72">
+              {content.videoQuality.note}
             </p>
           </div>
         </div>
@@ -419,6 +537,54 @@ export default function Page() {
         </div>
       </section>
 
+      <section id="report-sample" className="border-b border-black/15 bg-[#fcfdfd]">
+        <div className={`${shell} grid gap-10 py-16 md:grid-cols-[0.78fr_1.22fr] md:gap-14 md:py-24`}>
+          <SectionHeader
+            label={content.reportSample.label}
+            title={content.reportSample.h2}
+            lead={content.reportSample.lead}
+          />
+
+          <div className="space-y-7">
+            <dl className="divide-y divide-black/12 border-y border-black/15">
+              {content.reportSample.rows.map((row) => (
+                <div key={row.label} className="grid gap-3 py-4 md:grid-cols-[170px_1fr] md:gap-8">
+                  <dt className="text-[13px] font-semibold tracking-[0.08em] text-black/52">{row.label}</dt>
+                  <dd className="break-keep text-[16px] font-semibold leading-[1.7] text-[#0B0F0E]">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="break-keep text-[15px] leading-[1.85] text-black/68">{content.reportSample.note}</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="team" className="border-b border-black/15 bg-white">
+        <div className={`${shell} py-16 md:py-24`}>
+          <div className="grid gap-10 md:grid-cols-[0.74fr_1.26fr] md:gap-14">
+            <SectionHeader
+              label={content.leadership.label}
+              title={content.leadership.h2}
+              lead={content.leadership.lead}
+            />
+
+            <div className="border-y border-black/15">
+              {content.leadership.people.map((person) => (
+                <article key={person.name} className="grid gap-4 border-b border-black/10 py-6 last:border-b-0 md:grid-cols-[180px_1fr] md:gap-8">
+                  <div>
+                    <h3 className="text-[28px] font-semibold tracking-tight text-[#0B0F0E]">{person.name}</h3>
+                    <p className="mt-2 break-keep text-[13px] font-semibold leading-[1.55] text-black/52">
+                      {person.role}
+                    </p>
+                  </div>
+                  <p className="break-keep text-[16px] leading-[1.85] text-black/70">{person.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="portfolio" className="border-b border-black/15">
         <div className={`${shell} py-20 md:py-24`}>
           <SectionHeader
@@ -473,6 +639,12 @@ export default function Page() {
                   </div>
 
                   <dl className="divide-y divide-black/14 border-y border-black/14">
+                    {item.scope ? (
+                      <div className="grid grid-cols-[96px_1fr] items-start gap-4 py-3.5 text-[15px]">
+                        <dt className="font-medium text-black/58">담당 범위</dt>
+                        <dd className="text-right font-semibold leading-[1.6] text-[#0B0F0E]">{item.scope}</dd>
+                      </div>
+                    ) : null}
                     <div className="grid grid-cols-[96px_1fr] items-center gap-4 py-3.5 text-[15px]">
                       <dt className="font-medium text-black/58">구독자 변화</dt>
                       <dd className="text-right font-semibold text-[#0B0F0E]">{item.result}</dd>
@@ -483,9 +655,109 @@ export default function Page() {
                     </div>
                   </dl>
 
+                  {(item.before || item.action || item.after || item.proof) ? (
+                    <div className="grid gap-3 border-t border-black/10 pt-4 text-[14px] leading-[1.75] text-black/70 sm:grid-cols-2">
+                      {item.before ? (
+                        <div>
+                          <p className="text-[11px] font-semibold tracking-[0.12em] text-black/42">BEFORE</p>
+                          <p className="mt-1 break-keep">{item.before}</p>
+                        </div>
+                      ) : null}
+                      {item.action ? (
+                        <div>
+                          <p className="text-[11px] font-semibold tracking-[0.12em] text-black/42">ACTION</p>
+                          <p className="mt-1 break-keep">{item.action}</p>
+                        </div>
+                      ) : null}
+                      {item.after ? (
+                        <div>
+                          <p className="text-[11px] font-semibold tracking-[0.12em] text-black/42">AFTER</p>
+                          <p className="mt-1 break-keep">{item.after}</p>
+                        </div>
+                      ) : null}
+                      {item.proof ? (
+                        <div>
+                          <p className="text-[11px] font-semibold tracking-[0.12em] text-black/42">PROOF</p>
+                          <p className="mt-1 break-keep">{item.proof}</p>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                  <Link
+                    href={`/cases/${item.caseSlug}`}
+                    className={`inline-flex w-fit items-center border-b border-[#21c1a2] pb-1 text-[15px] font-semibold text-[#21c1a2] transition-colors hover:text-[#1db197] ${focusRing}`}
+                  >
+                    케이스 스터디 보기
+                  </Link>
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="pilot" className="border-b border-black/15 bg-white">
+        <div className={`${shell} py-20 md:py-24`}>
+          <div className="grid gap-10 md:grid-cols-[0.78fr_1.22fr] md:gap-14">
+            <div className="space-y-6 md:sticky md:top-28 md:self-start">
+              <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
+              <p className="max-w-[44ch] break-keep text-[17px] font-semibold leading-[1.85] text-[#0B0F0E]">
+                {content.pricing.emphasis}
+              </p>
+            </div>
+
+            <div className="border-y border-black/15">
+              {content.pricing.levels.map((level, index) => (
+                <article key={level.title} className="grid gap-5 border-b border-black/10 py-7 last:border-b-0 md:grid-cols-[150px_1fr] md:gap-8">
+                  <div>
+                    <p className="text-[12px] font-semibold tracking-[0.12em] text-black/42">
+                      OPTION {index + 1}
+                    </p>
+                    <p className="mt-2 text-[26px] font-semibold tracking-tight text-[#0B0F0E]">
+                      {level.priceBand}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-[26px] font-semibold tracking-tight text-[#0B0F0E]">{level.title}</h3>
+                    <ul className="mt-4 grid gap-2 text-[15px] leading-[1.75] text-black/70 sm:grid-cols-2">
+                      {level.bullets.map((bullet) => (
+                        <li key={bullet}>- {bullet}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 break-keep border-t border-black/10 pt-4 text-[14px] font-semibold leading-[1.7] text-black/58">
+                      {level.target}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="risk" className="border-b border-black/15 bg-[#0B0F0E] text-white">
+        <div className={`${shell} py-16 md:py-24`}>
+          <div className="grid gap-10 md:grid-cols-[0.86fr_1.14fr] md:gap-14">
+            <SectionHeader
+              label={content.riskManagement.label}
+              title={content.riskManagement.h2}
+              lead={content.riskManagement.lead}
+              dark
+            />
+
+            <div className="space-y-7">
+              <ul className="divide-y divide-white/14 border-y border-white/18">
+                {content.riskManagement.items.map((item) => (
+                  <li key={item} className="break-keep py-4 text-[16px] font-semibold leading-[1.75] text-white/84">
+                    - {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="break-keep border border-white/16 p-5 text-[14px] leading-[1.85] text-white/68">
+                {content.riskManagement.note}
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -530,14 +802,14 @@ export default function Page() {
               <div className="space-y-3">
                 <h3 className="text-[29px] font-semibold tracking-tight text-[#0B0F0E]">진단 안내</h3>
                 <p className="text-base leading-[1.9] text-black/68">
-                  접수 후 3~4영업일 안에 연락드리며, 현재 구조에서 먼저 손봐야 할 우선순위를 정리해드립니다.
+                  접수 후 24시간 내 먼저 연락드리고, 현재 구조에서 바로 손봐야 할 3가지를 짧게 정리해드립니다.
                 </p>
               </div>
 
               <ul className="space-y-2 text-sm leading-[1.85] text-black/72">
-                <li>- 포지셔닝/화법 점검</li>
-                <li>- 롱폼·숏폼 역할 재정의</li>
-                <li>- CTA 동선 보완 포인트</li>
+                <li>- 제목/썸네일 문제 1개</li>
+                <li>- 주제 구조 문제 1개</li>
+                <li>- 상담/내원 CTA 문제 1개</li>
               </ul>
 
               <div className="flex flex-wrap gap-3 border-t border-black/12 pt-4">
@@ -658,7 +930,7 @@ export default function Page() {
           
           <div className="flex flex-wrap gap-4 font-semibold text-black/60 md:text-right md:justify-end">
             <Link href="/store" className="hover:text-[#21c1a2] text-[#21c1a2] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]">
-              서비스 상품/결제
+              운영 플랜 신청
             </Link>
             <Link href="/terms" className="hover:text-[#21c1a2] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]">
               이용약관

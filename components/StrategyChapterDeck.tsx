@@ -30,16 +30,16 @@ const chapters: ChapterItem[] = [
   },
   {
     chapter: "CHAPTER 2",
-    title: "'가이드'가 아닌 '경험과 공감'",
+    title: "고객 질문 기반 콘텐츠 설계",
     summary: "고객이 실제로 던지는 질문으로 콘텐츠 문장을 다시 씁니다.",
     image: "/images/positioning.png",
-    alt: "경험과 공감 중심 포지셔닝 화면",
+    alt: "고객 질문 기반 콘텐츠 설계 화면",
     points: [
       "현장 질문을 기준으로 후킹 문장 재정의",
       "정보 나열형 문장을 설득형 흐름으로 교체",
       "브랜드 고유의 화법을 유지하면서 이해 가능한 표현으로 변환"
     ],
-    accent: "찐 경험과 찐 공감"
+    accent: "고객 질문"
   },
   {
     chapter: "CHAPTER 3",
@@ -55,7 +55,7 @@ const chapters: ChapterItem[] = [
     accent: "소통 중심"
   },
   {
-    chapter: "CHAPTER 5",
+    chapter: "CHAPTER 4",
     title: "업로드 패턴 설계 (Calendar)",
     summary: "롱폼·숏폼 스케줄을 분리해 검색 노출을 누적합니다.",
     image: "/images/operation.png",

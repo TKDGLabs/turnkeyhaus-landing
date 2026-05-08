@@ -11,23 +11,23 @@ export type StoreProduct = {
 export const STORE_PRODUCTS: StoreProduct[] = [
   {
     id: "tier-1",
-    name: "구조 세팅형 (월 운영 시작)",
-    summary: "채널 구조 진단 + 월간 편성/제작 운영",
-    price: 3_800_000,
+    name: "운영 진단 리포트",
+    summary: "현재 채널 + 경쟁 채널 3개 + 주제 20개 + 3개월 검증 운영표",
+    price: 490_000,
     galaxiaItemCode: "TKDH001"
   },
   {
     id: "tier-2",
-    name: "구조 성장형 (월 운영 확장)",
-    summary: "세팅형 포함 + 성과 고도화 루프 강화",
-    price: 4_800_000,
+    name: "Managed Starter 운영 착수금",
+    summary: "3개월 운영 시작 전 업종/촬영환경 확인 후 계약 범위에 맞춰 정산되는 착수금",
+    price: 1_500_000,
     galaxiaItemCode: "TKDH002"
   },
   {
     id: "tier-3",
-    name: "단건 기획/촬영 프로젝트",
-    summary: "캠페인성 단건 콘텐츠 제작",
-    price: 1_500_000,
+    name: "인하우스 시스템 구축 진단",
+    summary: "장비·인력·워크플로우·템플릿·채용 실무평가 기준을 확인하는 프로젝트 사전 진단",
+    price: 500_000,
     galaxiaItemCode: "TKDH003"
   }
 ];

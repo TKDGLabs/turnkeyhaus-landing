@@ -73,7 +73,7 @@ export default function AuthPage() {
 
     if (!supabase) {
       setError(
-        "현재 회원 기능을 확인 중입니다. 급한 결제는 결제 페이지에서 바로 진행해 주세요."
+        "현재 계정 기능을 확인 중입니다. 운영 플랜 신청은 상담 폼 또는 카카오톡으로도 남길 수 있습니다."
       );
       return;
     }
@@ -144,7 +144,7 @@ export default function AuthPage() {
         return;
       }
 
-      setNotice("회원가입이 완료되었습니다. 결제 페이지로 이동합니다.");
+      setNotice("회원가입이 완료되었습니다. 운영 플랜 신청 페이지로 이동합니다.");
       router.replace(safeNextPath);
       router.refresh();
     } finally {
@@ -156,9 +156,9 @@ export default function AuthPage() {
     <main className="mx-auto w-full max-w-[760px] px-5 py-14 text-[#0B0F0E] sm:px-6 md:py-20">
       <div className="mb-10 space-y-4 border-b border-black/10 pb-7">
         <p className="text-xs font-semibold tracking-[0.14em] text-black/48">[ 계정 관리 ]</p>
-        <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">결제용 계정 관리</h1>
+        <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">운영 플랜 신청용 계정 관리</h1>
         <p className="max-w-[72ch] break-keep text-[16px] leading-[1.8] text-black/68">
-          계정은 선택 사항입니다. 결제는 바로 진행할 수 있고, 계정을 만들면 담당자 정보와 결제 내역을 다음 상담 때 더 빠르게 확인할 수 있습니다.
+          계정은 선택 사항입니다. 계정을 만들면 담당자 정보와 결제 내역을 다음 상담 때 더 빠르게 확인할 수 있습니다.
         </p>
       </div>
 
@@ -294,9 +294,9 @@ export default function AuthPage() {
 
         <div className="mt-5 border-t border-black/10 pt-4 text-[13px] leading-[1.7] text-black/58">
           <p>
-            결제가 급하신 경우{" "}
+            운영 플랜 신청이 급하신 경우{" "}
             <Link href={safeNextPath} className={`font-semibold text-[#21c1a2] hover:text-[#1db197] ${focusRing}`}>
-              결제 페이지로 바로 이동
+              신청 페이지로 바로 이동
             </Link>
             할 수 있습니다.
           </p>

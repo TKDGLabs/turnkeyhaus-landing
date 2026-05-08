@@ -69,13 +69,27 @@ const footerValue = (label: string) =>
 
 const geoKeywords = [
   "유튜브 채널 운영대행",
-  "브랜딩 콘텐츠 제작",
+  "전문직 유튜브 운영대행",
+  "인천 유튜브 대행",
+  "수도권 유튜브 대행",
   "유튜브 SEO",
   "GEO",
-  "병원 마케팅",
-  "로펌 마케팅",
-  "정부 기관 콘텐츠 운영",
-  "커머스 콘텐츠 운영"
+  "병원 유튜브 마케팅",
+  "로펌 유튜브 마케팅",
+  "세무사 유튜브 마케팅",
+  "노무사 유튜브 마케팅",
+  "기업 유튜브 운영대행",
+  "공공기관 유튜브 운영대행",
+  "B2B 유튜브 운영대행",
+  "전문직 채널 진단",
+  "인하우스 영상팀 구축",
+  "영상 PD 채용 실무평가",
+  "유튜브 월간 운영대행",
+  "고관여 브랜드 유튜브 운영",
+  "부천 유튜브 대행",
+  "김포 유튜브 대행",
+  "송도 유튜브 대행",
+  "청라 유튜브 대행"
 ];
 
 const structuredData = [
@@ -86,7 +100,7 @@ const structuredData = [
     legalName: content.footer.companyName,
     alternateName: "TKDG Labs",
     url: "https://www.turnkey.haus",
-    description: "브랜딩 콘텐츠 제작 및 유튜브 채널 운영대행",
+    description: content.seo.description,
     logo: `${content.seo.siteUrl}/logo.png`,
     founder: {
       "@type": "Person",
@@ -98,9 +112,16 @@ const structuredData = [
       "@type": "OfferCatalog",
       name: "Turnkeyhaus 운영 서비스",
       itemListElement: [
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "브랜딩 콘텐츠 제작" } },
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "유튜브 채널 운영대행" } },
-        { "@type": "Offer", itemOffered: { "@type": "Service", name: "채널 구조 진단 및 전환 설계" } }
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "유튜브 월간 운영대행" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "병원·의료기관 유튜브 운영대행" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "변호사·로펌 유튜브 운영대행" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "세무·노무·회계 유튜브 운영대행" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "기업·공공기관 유튜브 운영대행" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "인천·수도권 유튜브 운영대행" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "인하우스 영상 제작 시스템 구축 컨설팅" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "영상 인재 실무평가 지원" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "24시간 3포인트 채널 진단" } },
+        { "@type": "Offer", itemOffered: { "@type": "Service", name: "운영 진단 리포트" } }
       ]
     },
     contactPoint: {
