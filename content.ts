@@ -84,10 +84,21 @@ export type VideoQualityProof = {
   note: string;
 };
 
+export type PresenterOpsProof = {
+  label: string;
+  h2: string;
+  lead: string;
+  points: string[];
+  note: string;
+};
+
 export type LeadershipProfile = {
   name: string;
+  englishName: string;
   role: string;
   body: string;
+  image: ImageAsset;
+  responsibilities: string[];
 };
 
 export type ReportSample = {
@@ -157,6 +168,7 @@ export type Content = {
   heroValue: {
     headline: string;
     body: string;
+    trustBadges: string[];
     primaryCta: CtaLink;
     secondaryCta: CtaLink;
   };
@@ -170,6 +182,7 @@ export type Content = {
     items: string[];
     emphasis: string;
   };
+  presenterOps: PresenterOpsProof;
   exclusions: {
     label: string;
     h2: string;
@@ -347,6 +360,12 @@ export const content: Content = {
   heroValue: {
     headline: "전문직·고관여 브랜드의\n유튜브 운영팀을\n통째로 맡습니다.",
     body: "턴키하우스는 전문직·고관여 브랜드를 위한 외부 유튜브 운영팀입니다.\n채널 기획·대본·촬영·편집·썸네일·업로드·성과 리포트까지 월간 운영 단위로 맡고, 필요하면 사내 영상 제작 시스템과 영상 인재 실무평가까지 함께 구축합니다.",
+    trustBadges: [
+      "2016년부터 유튜브 PD 현장 경험",
+      "방송인 매니지먼트 기반 출연자 운영",
+      "Sony FX 시네마 라인 멀티캠 촬영",
+      "자연스러운 피부 보정·색보정 포함"
+    ],
     primaryCta: { label: "운영 플랜 확인하기", href: "#pilot" },
     secondaryCta: { label: "채널 구조 진단 받기", href: "#contact" }
   },
@@ -364,6 +383,21 @@ export const content: Content = {
       "처음부터 장기계약을 강요하기보다 진단과 3개월 검증 운영으로 불안을 낮춰야 합니다."
     ],
     emphasis: "문제는 영상 제작 능력만이 아니라, 매달 같은 기준으로 운영하고 개선할 팀이 있느냐입니다."
+  },
+  presenterOps: {
+    label: "[ 출연자 운영 ]",
+    h2: "바쁜 전문가가\n편하게 말할 수 있어야\n채널이 오래 갑니다.",
+    lead:
+      "전문직·고관여 유튜브의 병목은 편집보다 출연자인 경우가 많습니다.\n의사, 변호사, 세무사, 대표는 본업이 바쁘고 말 한마디의 리스크도 큽니다.\n턴키하우스는 촬영 전 질문지, 당일 동선, 발화 톤, 검수 흐름을 먼저 정리해 적은 시간으로도 안정적인 콘텐츠가 나오게 운영합니다.",
+    points: [
+      "촬영 전 질문지·대본 사전 정리",
+      "출연자별 말투와 캐릭터에 맞춘 진행",
+      "촬영 당일 동선·컨디션 관리",
+      "말실수·표현 리스크를 고려한 편집 구조",
+      "바쁜 대표·전문직을 위한 Confirm-Only 운영"
+    ],
+    note:
+      "2016년부터 유튜브 현장에서 일해온 PD가 전문가의 시간을 줄이고, 메시지를 정리해 매달 쌓이는 채널 자산으로 만듭니다."
   },
   exclusions: {
     label: "[ 운영 원칙 ]",
@@ -552,18 +586,18 @@ export const content: Content = {
     ]
   },
   studioProof: {
-    label: "[ 운영 기반 ]",
-    h2: "작업 과정을 매달 기록하고\n운영 리포트로 공유합니다.",
+    label: "[ 운영 체계 ]",
+    h2: "촬영 전에 먼저,\n운영 기준을 맞춥니다.",
     operationTitle: "운영 시스템",
     operationSystem: [
-      "월간 기획 회의 및 편성표 공유",
+      "월간 콘텐츠 캘린더와 우선순위 확정",
       "촬영 전 대본·질문 리스트 사전 확정",
-      "촬영 후 편집본/썸네일 A-B 점검",
-      "월간 성과 리뷰 리포트 제공"
+      "편집본/썸네일 검수 기준 사전 공유",
+      "다음 업로드에 반영할 개선 포인트 기록"
     ],
     crewTitle: "전담 구조",
     crewLead:
-      "업종이 달라도 촬영 당일보다 사전 준비 시간이 더 중요합니다.\n그래서 역할을 분리해 운영합니다.",
+      "업종이 달라도 성과는 현장보다 준비 과정에서 갈립니다.\n월간 편성, 대본, 검수 기준을 먼저 정하고 촬영합니다.",
     crewCards: [
       {
         role: "Account Lead",
@@ -579,7 +613,7 @@ export const content: Content = {
         headline: "SEO·발견성 운영 설계",
         bullets: [
           "검색 키워드 맵 설계",
-          "월간 성과 리포트 운영",
+          "콘텐츠별 역할과 유입 경로 점검",
           "콘텐츠 자산화 전략 수립"
         ]
       },
@@ -605,7 +639,7 @@ export const content: Content = {
     crewNote: "",
     closing: "",
     images: [
-      { src: "/images/business-analyst-presenting-data-dashboard.png", alt: "운영 리포트 기반 데이터 분석 시각 이미지" }
+      { src: "/images/business-analyst-presenting-data-dashboard.png", alt: "월간 운영 기준과 콘텐츠 데이터를 정리하는 시각 이미지" }
     ]
   },
   reportSample: {
@@ -630,21 +664,39 @@ export const content: Content = {
     people: [
       {
         name: "채동우",
+        englishName: "Chae Dong woo",
         role: "Strategy & Account Lead / TKDG Labs 대표",
         body:
-          "2016년부터 유튜브 콘텐츠 기획·제작·운영 현장에서 일해온 유튜브 네이티브 PD입니다. 방송인 매니지먼트와 브랜드 콘텐츠 제작 경험을 바탕으로 전문직·고관여 브랜드의 채널 전략, 촬영 운영, 성과 리포트, 고객 커뮤니케이션을 총괄합니다."
+          "2016년부터 유튜브 콘텐츠 기획·제작·운영 현장에서 일해온 유튜브 네이티브 PD입니다. 방송인 매니지먼트와 브랜드 콘텐츠 제작 경험을 바탕으로 전문직·고관여 브랜드의 채널 전략, 촬영 운영, 성과 리포트, 고객 커뮤니케이션을 총괄합니다.",
+        image: {
+          src: "/images/member-chae-dongwoo.jpg",
+          alt: "채동우 Strategy & Account Lead 프로필 사진"
+        },
+        responsibilities: ["채널 진단", "운영 전략", "고객 커뮤니케이션", "촬영 운영 설계", "월간 리포트 최종 검수"]
       },
       {
         name: "양현",
+        englishName: "Yang Hyun",
         role: "Channel Producer / Turnkeyhaus Lead",
         body:
-          "콘텐츠 캘린더, 대본·질문지, 촬영 구성, 업로드 구조를 설계합니다. 출연자의 전문지식이 시청자가 이해할 수 있는 콘텐츠로 바뀌도록 주제와 흐름을 정리합니다."
+          "콘텐츠 캘린더, 대본·질문지, 촬영 구성, 업로드 구조를 설계합니다. 출연자의 전문지식이 시청자가 이해할 수 있는 콘텐츠로 바뀌도록 주제와 흐름을 정리합니다.",
+        image: {
+          src: "/images/member-yang-hyun.jpg",
+          alt: "양현 Channel Producer 프로필 사진"
+        },
+        responsibilities: ["콘텐츠 캘린더", "대본·질문지", "촬영 구성", "업로드 구조", "운영 플로우"]
       },
       {
         name: "손현우",
+        englishName: "Son Hyunwoo",
         role: "Visual Production Lead / Pic_sta Lead",
         body:
-          "촬영, 조명, 인물 연출, 멀티캠 구성, 사진·영상 후반 품질을 관리합니다. 시네마캠 기반 촬영과 자연스러운 피부 보정으로 전문직 출연자의 신뢰감 있는 화면을 만듭니다."
+          "촬영, 조명, 인물 연출, 멀티캠 구성, 사진·영상 후반 품질을 관리합니다. 시네마캠 기반 촬영과 자연스러운 피부 보정으로 전문직 출연자의 신뢰감 있는 화면을 만듭니다.",
+        image: {
+          src: "/images/member-son-hyunwoo.jpg",
+          alt: "손현우 Visual Production Lead 프로필 사진"
+        },
+        responsibilities: ["촬영·조명", "멀티캠 구성", "인물 연출", "피부·색보정", "후반 품질 관리"]
       }
     ]
   },
@@ -896,6 +948,22 @@ export const content: Content = {
       {
         q: "계약 전에 무엇을 준비하면 되나요?",
         a: "현재 채널 링크, 업종/서비스 특징, 이번 분기 목표, 내부 리소스(출연자·담당자·촬영 공간 유무)만 정리해 주시면 1차 제안과 우선순위를 빠르게 드릴 수 있습니다."
+      },
+      {
+        q: "방송국 출신 제작사와 무엇이 다른가요?",
+        a: "턴키하우스는 방송용 영상 한 편보다 매달 발견되고 축적되는 유튜브 채널 운영에 초점을 둡니다. 2016년부터 유튜브 콘텐츠 현장에서 쌓은 경험을 바탕으로 주제 설계, 촬영, 업로드, SEO, CTA, 월간 리포트까지 함께 봅니다."
+      },
+      {
+        q: "출연자가 촬영에 익숙하지 않아도 괜찮나요?",
+        a: "괜찮습니다. 촬영 전 질문지와 발화 흐름을 먼저 정리하고, 당일에는 출연자의 컨디션과 말투에 맞춰 진행합니다. 바쁜 전문가가 적은 시간으로도 안정적으로 촬영할 수 있도록 현장 운영을 설계합니다."
+      },
+      {
+        q: "영상 퀄리티는 어느 정도인가요?",
+        a: "Sony FX 시네마 라인 기반 멀티캠 촬영, 인물 조명, 자연스러운 피부 보정, 색보정, 썸네일 디자인을 운영 범위 안에서 함께 관리합니다. 영상미는 기본으로 확보하고, 차이는 운영 구조에서 만듭니다."
+      },
+      {
+        q: "피부 보정이나 인물 보정도 가능한가요?",
+        a: "가능합니다. 전문직 콘텐츠의 신뢰감을 해치지 않는 선에서 자연스러운 피부 보정과 색보정을 적용합니다. 과한 보정보다는 전문성과 호감도가 함께 보이는 기준을 우선합니다."
       }
     ]
   },
@@ -907,17 +975,17 @@ export const content: Content = {
   },
   contact: {
     label: "[ 채널 구조 진단 ]",
-    h2: "채널 링크를 보내주시면\n24시간 내 3가지만 먼저 짚어드립니다.",
-    lead: "제목/썸네일 문제 1개, 주제 구조 문제 1개, 문의 CTA 문제 1개를 먼저 보내드립니다.\n정밀 진단 리포트가 필요한 경우 이후 유료 진단 또는 3개월 검증 운영으로 이어갑니다.",
+    h2: "채널 링크만 남겨주세요.\n운영 가능 여부부터 확인합니다.",
+    lead: "접수 후 24시간 내 1차 연락을 드리고, 현재 채널에서 먼저 손볼 우선순위를 짧게 안내합니다.\n정밀한 실행안이 필요한 경우 유료 진단 또는 3개월 검증 운영으로 이어집니다.",
     midCtaEyebrow: "채널 진단",
-    midCtaTitle: "24시간 안에 먼저 볼 3가지 문제를 정리해 드립니다.",
+    midCtaTitle: "현재 채널에서 먼저 손볼 지점을 정리해 드립니다.",
     panelTitle: "상담 예약하기",
     panelBody: "현재 채널 링크와 목표를 남겨주시면\n전문직 전환 구조 관점으로 먼저 확인합니다.",
     panelHint: "Google Form은 임베드 URL만 사용합니다. (forms.gle 공유 링크 직접 사용 금지)",
     googleFormEmbedUrl:
       "https://docs.google.com/forms/d/e/1FAIpQLScnyuTnc051RnX8yaGNlPW6TSOe9INyaV-Gp8lc8xqUSL6kQg/viewform?embedded=true",
     googleFormShareUrl: "https://forms.gle/L58BK4pc3gEq81iM9",
-    primaryCtaLabel: "24시간 3포인트 진단 받기",
+    primaryCtaLabel: "채널 구조 진단 받기",
     phoneDisplay: "0507-1463-3664",
     phoneHref: "tel:050714633664",
     quickCallLabel: "전화 상담",

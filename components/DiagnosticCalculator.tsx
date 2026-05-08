@@ -291,14 +291,9 @@ function escapeHtml(value: string) {
   });
 }
 
-function csvCell(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
 export default function DiagnosticCalculator() {
   const [currentStep, setCurrentStep] = useState(0);
   const [state, setState] = useState<FormState>(initialState);
-  const [copied, setCopied] = useState(false);
 
   const plan = useMemo(() => planDefinitions[buildPlanId(state)], [state]);
   const summary = useMemo(() => buildSummary(state, plan), [state, plan]);
@@ -326,7 +321,6 @@ export default function DiagnosticCalculator() {
   function reset() {
     setState(initialState);
     setCurrentStep(0);
-    setCopied(false);
   }
 
   function toggleGoal(id: GoalId) {
@@ -352,18 +346,8 @@ export default function DiagnosticCalculator() {
     });
   }
 
-  async function copySummary() {
-    try {
-      await navigator.clipboard.writeText(summary);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-    }
-  }
-
-  function moveToContact(intent: 'consult' | 'payment') {
-    const payload = `${summary}\n\n요청 유형: ${intent === 'payment' ? '카드 정기결제 등록 문의' : '이 플랜으로 상담 신청'}`;
+  function moveToContact() {
+    const payload = `${summary}\n\n요청 유형: 이 플랜으로 상담 신청`;
     window.sessionStorage.setItem('turnkeyhaus:plan-recommendation', payload);
     if (navigator.clipboard) {
       void navigator.clipboard.writeText(payload).catch(() => undefined);
@@ -376,21 +360,6 @@ export default function DiagnosticCalculator() {
     }
 
     window.location.href = '/#contact';
-  }
-
-  function downloadCsv() {
-    const rows = summary.split('\n').map((line) => {
-      const [label, ...value] = line.split(': ');
-      return [label, value.join(': ')];
-    });
-    const csv = rows.map((row) => row.map(csvCell).join(',')).join('\n');
-    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `turnkeyhaus-plan-${new Date().toISOString().slice(0, 10)}.csv`;
-    anchor.click();
-    URL.revokeObjectURL(url);
   }
 
   function printPlan() {
@@ -453,12 +422,12 @@ export default function DiagnosticCalculator() {
                   : 'border-black/10 bg-white hover:border-black/30'
               }`}
             >
-              <span className="mb-4 inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/15 text-xs font-black">
+              <span className="mb-4 inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/15 text-xs font-semibold">
                 {active ? '✓' : '+'}
               </span>
-              <strong className="block text-lg font-black leading-tight text-[#111816]">{option.title}</strong>
+              <strong className="block break-keep text-[17px] font-semibold leading-[1.48] tracking-tight text-[#111816]">{option.title}</strong>
               <span className="mt-3 block text-sm leading-6 text-black/60">{option.description}</span>
-              {option.meta ? <span className="mt-4 block text-xs font-bold text-[#16a88e]">{option.meta}</span> : null}
+              {option.meta ? <span className="mt-4 block text-xs font-semibold text-[#16a88e]">{option.meta}</span> : null}
             </button>
           );
         })}
@@ -483,12 +452,12 @@ export default function DiagnosticCalculator() {
                   : 'border-black/10 bg-white hover:border-black/30'
               }`}
             >
-              <span className="mb-4 inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/15 text-xs font-black">
+              <span className="mb-4 inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/15 text-xs font-semibold">
                 {active ? '✓' : '+'}
               </span>
-              <strong className="block text-lg font-black leading-tight text-[#111816]">{option.title}</strong>
+              <strong className="block break-keep text-[17px] font-semibold leading-[1.48] tracking-tight text-[#111816]">{option.title}</strong>
               <span className="mt-3 block text-sm leading-6 text-black/60">{option.description}</span>
-              {option.meta ? <span className="mt-4 block text-xs font-bold text-[#16a88e]">{option.meta}</span> : null}
+              {option.meta ? <span className="mt-4 block text-xs font-semibold text-[#16a88e]">{option.meta}</span> : null}
             </button>
           );
         })}
@@ -524,27 +493,27 @@ export default function DiagnosticCalculator() {
     return (
       <div className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
         <div>
-          <p className="text-xs font-black tracking-[0.16em] text-[#16a88e]">추천 플랜</p>
-          <h3 className="mt-3 text-4xl font-black leading-tight text-[#101816] md:text-5xl">{plan.title}</h3>
-          <p className="mt-3 text-lg font-bold text-black/70">{plan.subtitle}</p>
+          <p className="text-xs font-semibold tracking-[0.16em] text-[#16a88e]">추천 플랜</p>
+          <h3 className="mt-3 text-[34px] font-semibold leading-[1.18] tracking-tight text-[#101816] md:text-[44px]">{plan.title}</h3>
+          <p className="mt-3 break-keep text-[17px] font-semibold leading-[1.75] text-black/68">{plan.subtitle}</p>
           <p className="mt-8 border-y border-black/10 py-6 text-base leading-8 text-black/70">{buildReason(state, plan)}</p>
 
           <div className="mt-7 grid gap-6 md:grid-cols-2">
             <div>
-              <p className="text-xs font-black tracking-[0.12em] text-black/45">예상 투자 범위</p>
-              <p className="mt-2 text-2xl font-black text-[#101816]">{plan.investmentRange}</p>
+              <p className="text-xs font-semibold tracking-[0.12em] text-black/45">예상 투자 범위</p>
+              <p className="mt-2 text-2xl font-semibold text-[#101816]">{plan.investmentRange}</p>
             </div>
             <div>
-              <p className="text-xs font-black tracking-[0.12em] text-black/45">결제 안내</p>
-              <p className="mt-2 text-base font-bold leading-7 text-black/70">{plan.paymentGuide}</p>
+              <p className="text-xs font-semibold tracking-[0.12em] text-black/45">결제 안내</p>
+              <p className="mt-2 text-base font-semibold leading-7 text-black/70">{plan.paymentGuide}</p>
             </div>
           </div>
 
           <div className="mt-8">
-            <p className="text-sm font-black text-[#101816]">기본 포함 범위</p>
+            <p className="text-sm font-semibold text-[#101816]">기본 포함 범위</p>
             <ul className="mt-4 divide-y divide-black/10 border-y border-black/10">
               {plan.scope.map((item) => (
-                <li key={item} className="flex gap-3 py-3 text-sm font-bold text-black/68">
+                <li key={item} className="flex gap-3 py-3 text-sm font-semibold text-black/68">
                   <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#21c1a2]" />
                   {item}
                 </li>
@@ -553,7 +522,7 @@ export default function DiagnosticCalculator() {
           </div>
 
           <div className="mt-8 border border-[#21c1a2]/45 bg-[#e8fbf7] p-5">
-            <p className="text-sm font-black text-[#101816]">이 결과는 확정 견적이 아닙니다.</p>
+            <p className="text-sm font-semibold text-[#101816]">이 결과는 확정 견적이 아닙니다.</p>
             <p className="mt-2 text-sm leading-6 text-black/65">
               촬영 환경, 출연자 수, 검수/승인 구조, 업종별 표현 리스크를 확인한 뒤 운영 범위와 최종 금액을 확정합니다.
               결제 등록 전에 맞는 플랜인지 먼저 확인하는 이유가 여기에 있습니다.
@@ -562,10 +531,10 @@ export default function DiagnosticCalculator() {
         </div>
 
         <div className="border border-black/10 bg-white p-5 md:p-6">
-          <p className="text-sm font-black text-[#101816]">상담 전 확인할 항목</p>
+          <p className="text-sm font-semibold text-[#101816]">상담 전 확인할 항목</p>
           <div className="mt-5 space-y-6">
             <div>
-              <p className="mb-3 text-xs font-black tracking-[0.12em] text-black/45">희망 투자 범위</p>
+              <p className="mb-3 text-xs font-semibold tracking-[0.12em] text-black/45">희망 투자 범위</p>
               <div className="grid gap-2">
                 {investments.map((option) => (
                   <button
@@ -576,7 +545,7 @@ export default function DiagnosticCalculator() {
                       state.investment === option.id ? 'border-[#21c1a2] bg-[#e8fbf7]' : 'border-black/10 hover:border-black/30'
                     }`}
                   >
-                    <strong className="block text-sm font-black text-[#101816]">{option.title}</strong>
+                    <strong className="block text-sm font-semibold text-[#101816]">{option.title}</strong>
                     <span className="mt-1 block text-xs leading-5 text-black/55">{option.description}</span>
                   </button>
                 ))}
@@ -584,7 +553,7 @@ export default function DiagnosticCalculator() {
             </div>
 
             <div>
-              <p className="mb-3 text-xs font-black tracking-[0.12em] text-black/45">희망 결제 방식</p>
+              <p className="mb-3 text-xs font-semibold tracking-[0.12em] text-black/45">희망 결제 방식</p>
               <div className="grid gap-2">
                 {payments.map((option) => (
                   <button
@@ -595,7 +564,7 @@ export default function DiagnosticCalculator() {
                       state.payment === option.id ? 'border-[#21c1a2] bg-[#e8fbf7]' : 'border-black/10 hover:border-black/30'
                     }`}
                   >
-                    <strong className="block text-sm font-black text-[#101816]">{option.title}</strong>
+                    <strong className="block text-sm font-semibold text-[#101816]">{option.title}</strong>
                     <span className="mt-1 block text-xs leading-5 text-black/55">{option.description}</span>
                   </button>
                 ))}
@@ -604,12 +573,12 @@ export default function DiagnosticCalculator() {
           </div>
 
           <div className="mt-7 border-t border-black/10 pt-5">
-            <p className="text-xs font-black tracking-[0.12em] text-black/45">선택 요약</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-black/45">선택 요약</p>
             <dl className="mt-3 space-y-3 text-sm">
-              <div className="flex justify-between gap-4"><dt className="text-black/45">업종</dt><dd className="text-right font-bold">{getTitle(industries, state.industry)}</dd></div>
-              <div className="flex justify-between gap-4"><dt className="text-black/45">상태</dt><dd className="text-right font-bold">{getTitle(statuses, state.status)}</dd></div>
-              <div className="flex justify-between gap-4"><dt className="text-black/45">운영 방식</dt><dd className="text-right font-bold">{getTitle(models, state.model)}</dd></div>
-              <div className="flex justify-between gap-4"><dt className="text-black/45">월간 볼륨</dt><dd className="text-right font-bold">{getTitle(volumes, state.volume)}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-black/45">업종</dt><dd className="text-right font-semibold">{getTitle(industries, state.industry)}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-black/45">상태</dt><dd className="text-right font-semibold">{getTitle(statuses, state.status)}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-black/45">운영 방식</dt><dd className="text-right font-semibold">{getTitle(models, state.model)}</dd></div>
+              <div className="flex justify-between gap-4"><dt className="text-black/45">월간 볼륨</dt><dd className="text-right font-semibold">{getTitle(volumes, state.volume)}</dd></div>
             </dl>
           </div>
         </div>
@@ -621,17 +590,17 @@ export default function DiagnosticCalculator() {
     <section id="pricing" className="border-b border-black/10 bg-white px-4 py-24 md:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="max-w-3xl">
-          <p className="text-xs font-black tracking-[0.18em] text-black/45">[ 운영 플랜 추천기 ]</p>
-          <h2 className="mt-5 text-4xl font-black leading-tight tracking-[-0.04em] text-[#101816] md:text-6xl">
+          <p className="text-xs font-semibold tracking-[0.18em] text-black/45">[ 운영 플랜 추천기 ]</p>
+          <h2 className="mt-5 break-keep text-[34px] font-semibold leading-[1.18] tracking-tight text-[#101816] md:text-[52px]">
             우리 조직에 맞는
             <br />
             유튜브 운영 플랜을 확인하세요.
           </h2>
-          <p className="mt-6 text-lg leading-8 text-black/64">
+          <p className="mt-6 max-w-[62ch] break-keep text-[16px] font-medium leading-[1.9] text-black/64">
             업종, 채널 상태, 내부 리소스, 운영 목표를 선택하면 적합한 월간 운영 방식과 예상 투자 범위를 안내합니다.
             상담 신청 시 이 내용으로 운영 범위를 더 빠르게 맞출 수 있습니다.
           </p>
-          <div className="mt-7 border border-[#21c1a2]/40 bg-[#e8fbf7] px-5 py-4 text-sm font-bold leading-7 text-[#123c35]">
+          <div className="mt-7 max-w-[70ch] border border-[#21c1a2]/40 bg-[#e8fbf7] px-5 py-4 text-[14px] font-semibold leading-[1.8] text-[#123c35]">
             턴키하우스는 단건 촬영·편집만 진행하지 않습니다. 채널 성과는 기획, 제작, 업로드, 리포트가 함께 움직일 때 만들어지기 때문에 월간 운영 단위로만 플랜을 제안합니다.
           </div>
         </div>
@@ -639,8 +608,8 @@ export default function DiagnosticCalculator() {
         <div className="mt-14 grid gap-8 lg:grid-cols-[280px_1fr]">
           <aside className="h-fit border border-black/10 bg-white p-5 lg:sticky lg:top-24">
             <div className="mb-5 flex items-center justify-between">
-              <span className="text-xs font-black tracking-[0.14em] text-black/45">진행 단계</span>
-              <span className="text-xs font-black text-[#16a88e]">{progress}%</span>
+              <span className="text-xs font-semibold tracking-[0.14em] text-black/45">진행 단계</span>
+              <span className="text-xs font-semibold text-[#16a88e]">{progress}%</span>
             </div>
             <div className="h-1 bg-black/10">
               <div className="h-full bg-[#21c1a2] transition-all" style={{ width: `${progress}%` }} />
@@ -654,7 +623,7 @@ export default function DiagnosticCalculator() {
                     <button
                       type="button"
                       onClick={() => setCurrentStep(index)}
-                      className={`flex w-full items-center gap-3 border px-3 py-2 text-left text-sm font-bold transition ${
+                      className={`flex w-full items-center gap-3 border px-3 py-2 text-left text-sm font-semibold transition ${
                         active
                           ? 'border-[#21c1a2] bg-[#e8fbf7] text-[#101816]'
                           : done
@@ -673,65 +642,61 @@ export default function DiagnosticCalculator() {
             </ol>
 
             <div className="mt-6 border-t border-black/10 pt-5">
-              <p className="text-xs font-black tracking-[0.12em] text-black/45">현재 추천</p>
-              <p className="mt-2 text-xl font-black text-[#101816]">{plan.title}</p>
+              <p className="text-xs font-semibold tracking-[0.12em] text-black/45">현재 추천</p>
+              <p className="mt-2 text-xl font-semibold text-[#101816]">{plan.title}</p>
               <p className="mt-2 text-xs leading-5 text-black/55">선택값에 따라 추천 플랜이 실시간으로 바뀝니다.</p>
             </div>
           </aside>
 
           <div className="border border-black/10 bg-white p-5 md:p-8">
             <div className="border-b border-black/10 pb-6">
-              <p className="text-sm font-black tracking-[0.14em] text-[#16a88e]">STEP {currentStep + 1} / {steps.length}</p>
-              <h3 className="mt-3 text-3xl font-black tracking-[-0.03em] text-[#101816] md:text-4xl">{steps[currentStep].title}</h3>
+              <p className="text-sm font-semibold tracking-[0.14em] text-[#16a88e]">STEP {currentStep + 1} / {steps.length}</p>
+              <h3 className="mt-3 break-keep text-[28px] font-semibold leading-[1.24] tracking-tight text-[#101816] md:text-[36px]">{steps[currentStep].title}</h3>
               <p className="mt-4 text-base leading-7 text-black/58">{steps[currentStep].subtitle}</p>
             </div>
 
             <div className="py-8">{renderStep()}</div>
 
-            <div className="flex flex-col gap-3 border-t border-black/10 pt-6 md:flex-row md:items-center md:justify-between">
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={goPrev}
-                  disabled={currentStep === 0}
-                  className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black disabled:cursor-not-allowed disabled:opacity-35"
-                >
-                  이전
-                </button>
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black"
-                >
-                  다시 선택
-                </button>
-              </div>
-
+            <div className="border-t border-black/10 pt-6">
               {currentStep < steps.length - 1 ? (
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={goPrev}
+                      disabled={currentStep === 0}
+                      className="border border-black/15 px-5 py-3 text-sm font-semibold text-[#101816] transition hover:border-black disabled:cursor-not-allowed disabled:opacity-35"
+                    >
+                      이전
+                    </button>
+                    <button
+                      type="button"
+                      onClick={reset}
+                      className="border border-black/15 px-5 py-3 text-sm font-semibold text-[#101816] transition hover:border-black"
+                    >
+                      다시 선택
+                    </button>
+                  </div>
+
                 <button
                   type="button"
                   onClick={goNext}
                   disabled={!canProceed}
-                  className="bg-[#101816] px-6 py-3 text-sm font-black text-white transition hover:bg-[#21c1a2] hover:text-[#101816] disabled:cursor-not-allowed disabled:bg-black/20 disabled:text-black/40"
+                  className="bg-[#101816] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#21c1a2] hover:text-[#101816] disabled:cursor-not-allowed disabled:bg-black/20 disabled:text-black/40"
                 >
                   다음 단계
                 </button>
+                </div>
               ) : (
-                <div className="grid gap-2 md:grid-cols-4">
-                  <button type="button" onClick={() => moveToContact('consult')} className="bg-[#101816] px-5 py-3 text-sm font-black text-white transition hover:bg-[#21c1a2] hover:text-[#101816]">
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <button type="button" onClick={moveToContact} className="bg-[#101816] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#21c1a2] hover:text-[#101816]">
                     이 플랜으로 상담 신청
                   </button>
-                  <button type="button" onClick={() => moveToContact('payment')} className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black">
-                    카드 정기결제 등록 문의
+                  <button type="button" onClick={printPlan} className="border border-black/15 px-5 py-3 text-sm font-semibold text-[#101816] transition hover:border-black">
+                    PDF로 저장하기
                   </button>
-                  <button type="button" onClick={downloadCsv} className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black">
-                    Excel용 CSV 저장
-                  </button>
-                  <button type="button" onClick={printPlan} className="border border-black/15 px-5 py-3 text-sm font-black text-[#101816] transition hover:border-black">
-                    PDF 저장용 인쇄
-                  </button>
-                  <button type="button" onClick={copySummary} className="md:col-span-4 border border-[#21c1a2]/50 bg-[#e8fbf7] px-5 py-3 text-sm font-black text-[#123c35] transition hover:border-[#21c1a2]">
-                    {copied ? '상담 메모 복사 완료' : '상담 메모 복사하기'}
+                  <button type="button" onClick={reset} className="border border-black/15 px-5 py-3 text-sm font-semibold text-[#101816] transition hover:border-black">
+                    다시 시도
                   </button>
                 </div>
               )}

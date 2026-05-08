@@ -245,6 +245,14 @@ export default function Page() {
                 {content.heroValue.secondaryCta.label}
               </ActionLink>
             </div>
+
+            <ul className="grid gap-2 border-y border-black/12 py-4 text-[14px] font-semibold leading-[1.6] text-black/68 sm:grid-cols-2 lg:grid-cols-4">
+              {content.heroValue.trustBadges.map((badge) => (
+                <li key={badge} className="break-keep">
+                  {badge}
+                </li>
+              ))}
+            </ul>
           </div>
 
           <dl className="mt-8 grid gap-5 border-t border-black/15 pt-5 text-[#0B0F0E] sm:mt-12 sm:pt-6 sm:grid-cols-3">
@@ -298,6 +306,31 @@ export default function Page() {
 
             <p className="border-t border-black/18 pt-5 text-[19px] font-semibold leading-[1.75] text-[#0B0F0E]">
               {content.problem.emphasis}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="presenter-ops" className="border-b border-black/15 bg-[#fcfdfd]">
+        <div className={`${shell} grid gap-10 py-16 md:grid-cols-[0.76fr_1.24fr] md:gap-14 md:py-24`}>
+          <SectionHeader
+            label={content.presenterOps.label}
+            title={content.presenterOps.h2}
+            lead={content.presenterOps.lead}
+          />
+
+          <div className="space-y-8">
+            <div className="border-y border-black/15">
+              {content.presenterOps.points.map((point) => (
+                <div key={point} className="border-b border-black/10 py-4 last:border-b-0">
+                  <p className="break-keep text-[18px] font-semibold leading-[1.55] text-[#0B0F0E]">
+                    {point}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="max-w-[70ch] break-keep border-l-2 border-[#21c1a2] pl-5 text-[16px] font-semibold leading-[1.85] text-black/72">
+              {content.presenterOps.note}
             </p>
           </div>
         </div>
@@ -570,14 +603,33 @@ export default function Page() {
 
             <div className="border-y border-black/15">
               {content.leadership.people.map((person) => (
-                <article key={person.name} className="grid gap-4 border-b border-black/10 py-6 last:border-b-0 md:grid-cols-[180px_1fr] md:gap-8">
-                  <div>
+                <article key={person.name} className="grid gap-5 border-b border-black/10 py-7 last:border-b-0 md:grid-cols-[150px_180px_1fr] md:gap-8">
+                  <figure className="relative aspect-[4/5] overflow-hidden border border-black/10 bg-[#f7f7f7]">
+                    <Image
+                      src={person.image.src}
+                      alt={person.image.alt}
+                      fill
+                      className="object-cover object-top"
+                      sizes="(max-width: 768px) 100vw, 150px"
+                    />
+                  </figure>
+                  <div className="md:pt-1">
                     <h3 className="text-[28px] font-semibold tracking-tight text-[#0B0F0E]">{person.name}</h3>
+                    <p className="mt-1 text-[12px] font-semibold tracking-[0.12em] text-black/40">
+                      {person.englishName}
+                    </p>
                     <p className="mt-2 break-keep text-[13px] font-semibold leading-[1.55] text-black/52">
                       {person.role}
                     </p>
                   </div>
-                  <p className="break-keep text-[16px] leading-[1.85] text-black/70">{person.body}</p>
+                  <div>
+                    <p className="break-keep text-[16px] leading-[1.85] text-black/70">{person.body}</p>
+                    <ul className="mt-5 flex flex-wrap gap-x-3 gap-y-2 border-t border-black/10 pt-4 text-[13px] font-semibold leading-[1.55] text-black/62">
+                      {person.responsibilities.map((item) => (
+                        <li key={item}>#{item}</li>
+                      ))}
+                    </ul>
+                  </div>
                 </article>
               ))}
             </div>
@@ -800,16 +852,16 @@ export default function Page() {
           <div className="grid gap-8 md:grid-cols-[0.88fr_1.12fr] md:items-start">
             <div className="space-y-7 border-t border-black/18 pt-5">
               <div className="space-y-3">
-                <h3 className="text-[29px] font-semibold tracking-tight text-[#0B0F0E]">진단 안내</h3>
+                <h3 className="text-[29px] font-semibold tracking-tight text-[#0B0F0E]">먼저 확인하는 것</h3>
                 <p className="text-base leading-[1.9] text-black/68">
-                  접수 후 24시간 내 먼저 연락드리고, 현재 구조에서 바로 손봐야 할 3가지를 짧게 정리해드립니다.
+                  긴 리포트 전에, 상담으로 이어지지 않는 병목부터 빠르게 확인합니다.
                 </p>
               </div>
 
               <ul className="space-y-2 text-sm leading-[1.85] text-black/72">
-                <li>- 제목/썸네일 문제 1개</li>
-                <li>- 주제 구조 문제 1개</li>
-                <li>- 상담/내원 CTA 문제 1개</li>
+                <li>- 클릭 전환: 제목·썸네일</li>
+                <li>- 콘텐츠 구조: 주제·재생목록</li>
+                <li>- 문의 동선: 설명란·고정댓글·채널 홈</li>
               </ul>
 
               <div className="flex flex-wrap gap-3 border-t border-black/12 pt-4">
