@@ -1,10 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import { content } from "../content";
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -12,9 +12,17 @@ const containerVariants = {
   }
 };
 
-const cardVariants = {
+// 에러 해결 포인트: ease 값 뒤에 'as [number, number, number, number]'를 추가하여 타입을 고정했습니다.
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 40 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.7, 
+      ease: [0.16, 1, 0.3, 1] as [number, number, number, number] 
+    } 
+  }
 };
 
 export default function ModernServicesSection() {
@@ -24,7 +32,7 @@ export default function ModernServicesSection() {
     <section id="services" className="bg-[#f8f9fa] py-24 md:py-32">
       <div className="mx-auto w-full max-w-[1320px] px-5 sm:px-6 lg:px-10">
         
-        {/* 헤더 (스크롤 페이드업 효과) */}
+        {/* 헤더 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -45,7 +53,7 @@ export default function ModernServicesSection() {
           )}
         </motion.div>
 
-        {/* 벤토 그리드 레이아웃 */}
+        {/* 벤토 그리드 */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -54,10 +62,9 @@ export default function ModernServicesSection() {
           className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
         >
           {cards.map((card, index) => {
-            // 벤토 그리드 비대칭 디자인 (1번: 2칸 차지, 2번: 1칸 차지, 3번: 가로 전체 3칸 차지)
             let spanClass = "col-span-1";
             if (index === 0) spanClass = "md:col-span-2 lg:col-span-2";
-            if (index === 2) spanClass = "md:col-span-2 lg:col-span-3 lg:flex lg:gap-12"; // 마지막 카드는 가로로 넓게
+            if (index === 2) spanClass = "md:col-span-2 lg:col-span-3 lg:flex lg:gap-12";
 
             return (
               <motion.article
@@ -65,7 +72,6 @@ export default function ModernServicesSection() {
                 variants={cardVariants}
                 className={`group relative flex flex-col justify-between overflow-hidden rounded-[32px] bg-white p-8 shadow-sm ring-1 ring-black/5 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#21c1a2]/10 sm:p-10 ${spanClass}`}
               >
-                {/* 배경 포인트 컬러 (마우스 올리면 은은하게 빛남) */}
                 <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#21c1a2]/0 blur-3xl transition-colors duration-700 group-hover:bg-[#21c1a2]/5" />
 
                 <div className={index === 2 ? "lg:w-1/2" : ""}>
