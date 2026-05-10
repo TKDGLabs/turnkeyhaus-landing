@@ -1,114 +1,28 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { motion } from "framer-motion";
 import ContactCTA from "../components/ContactCTA";
 import StrategyChapterDeck from "../components/StrategyChapterDeck";
 import DiagnosticCalculator from "../components/DiagnosticCalculator";
 import { content } from "../content";
 import { getSortedInsights } from "../content/insights";
 
-const shell = "mx-auto w-full max-w-[1360px] px-5 sm:px-6 lg:px-10";
-const labelClass =
-  "inline-flex items-center rounded-[8px] border border-black/12 bg-white/75 px-3 py-1 text-[11px] font-black tracking-[0.14em] text-black/50 shadow-[0_8px_24px_rgba(16,20,19,0.04)]";
-const sectionTitle =
-  "whitespace-pre-line break-keep text-[34px] font-black leading-[1.08] tracking-normal text-[#0B0F0E] md:text-[56px]";
-const focusRing =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
-const softBand = "bg-[linear-gradient(180deg,#fbfaf6_0%,#f4f7f4_100%)]";
-const sectionPad = "py-16 md:py-24";
+// --- Design System Utilities ---
+const shell = "mx-auto w-full max-w-[1320px] px-6 lg:px-12";
+const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
-function isExternalLink(href: string) {
-  return href.startsWith("http://") || href.startsWith("https://");
-}
-
-function ActionLink({
-  href,
-  className,
-  children
-}: {
-  href: string;
-  className: string;
-  children: ReactNode;
-}) {
-  const mergedClass = `${className} ${focusRing}`;
-
-  if (isExternalLink(href)) {
-    return (
-      <a href={href} target="_blank" rel="noreferrer" className={mergedClass}>
-        {children}
-      </a>
-    );
+// 에러 없는 안정적이고 부드러운 페이드업 애니메이션
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.8, ease: "easeOut" } 
   }
-
-  return (
-    <Link href={href} className={mergedClass}>
-      {children}
-    </Link>
-  );
-}
-
-function SectionHeader({
-  label,
-  title,
-  lead,
-  dark = false
-}: {
-  label: string;
-  title: string;
-  lead?: string;
-  dark?: boolean;
-}) {
-  return (
-    <div className="space-y-5">
-      <span
-        className={
-          dark
-            ? "inline-flex items-center rounded-[8px] border border-white/20 bg-white/8 px-3 py-1 text-[11px] font-black tracking-[0.14em] text-white/70"
-            : labelClass
-        }
-      >
-        {label}
-      </span>
-      <h2 className={dark ? `${sectionTitle} text-white` : sectionTitle}>{title}</h2>
-      {lead ? (
-        <p
-          className={
-            dark
-              ? "max-w-[66ch] whitespace-pre-line break-keep text-base font-semibold leading-[1.9] text-white/72 md:text-lg"
-              : "max-w-[66ch] whitespace-pre-line break-keep text-base font-semibold leading-[1.9] text-black/64 md:text-lg"
-          }
-        >
-          {lead}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function IndexedRow({
-  index,
-  title,
-  body,
-  children
-}: {
-  index: number;
-  title: string;
-  body?: string;
-  children?: ReactNode;
-}) {
-  return (
-    <article className="group grid gap-5 border-t border-black/10 py-6 md:grid-cols-[120px_1fr] md:gap-8">
-      <div className="text-[12px] font-black tracking-[0.18em] text-black/28">0{index + 1}</div>
-      <div>
-        <h3 className="break-keep text-[25px] font-black leading-[1.22] tracking-normal text-[#0B0F0E] md:text-[34px]">
-          {title}
-        </h3>
-        {body ? <p className="mt-4 max-w-[72ch] break-keep text-[15px] font-semibold leading-[1.85] text-black/62">{body}</p> : null}
-        {children}
-      </div>
-    </article>
-  );
-}
+};
 
 const formatInteger = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n));
 
@@ -121,795 +35,618 @@ function formatViewsKorean(n: number) {
   return formatInteger(n);
 }
 
-function isGoogleFormEmbedUrl(url: string) {
-  return url.startsWith("https://docs.google.com/forms/d/e/") && url.includes("/viewform?embedded=true");
+function ActionLink({ href, className, children }: { href: string; className: string; children: ReactNode }) {
+  const isExternal = href.startsWith("http");
+  const mergedClass = `${className} ${focusRing} transition-all duration-300`;
+  if (isExternal) return <a href={href} target="_blank" rel="noreferrer" className={mergedClass}>{children}</a>;
+  return <Link href={href} className={mergedClass}>{children}</Link>;
 }
 
 export default function Page() {
   const insightPosts = getSortedInsights().slice(0, 4);
-  const formEmbedUrl = content.contact.googleFormEmbedUrl.trim();
-  const phoneHref = content.contact.phoneHref.trim();
-  const kakaoChatUrl = content.contact.kakaoChatUrl.trim();
-  const hasFormEmbedUrl = isGoogleFormEmbedUrl(formEmbedUrl);
-  const hasPhoneHref = phoneHref.startsWith("tel:");
-  const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
-  const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
-
   const totalSubscribers = content.portfolio.items.reduce((sum, item) => sum + item.subscriberCurrent, 0);
   const totalVideoViews = content.heroStats.totalVideoViews;
   const totalVideoViewsInMan = `${formatInteger(totalVideoViews / 10000)}만+`;
-  const homepageStructuredData = [
-    {
-      "@context": "https://schema.org",
-      "@type": "Service",
-      name: "유튜브 월간 운영대행 및 인하우스 영상 시스템 구축 컨설팅",
-      serviceType: [
-        "유튜브 월간 운영대행",
-        "채널 구조 진단",
-        "인하우스 영상 시스템 구축",
-        "영상 인재 실무평가 지원",
-        "SEO/GEO 기반 콘텐츠 운영"
-      ],
-      provider: {
-        "@type": "Organization",
-        name: content.brand.name,
-        url: content.seo.siteUrl
-      },
-      areaServed: "KR",
-      audience: [
-        { "@type": "BusinessAudience", audienceType: "병원·의료 기관" },
-        { "@type": "BusinessAudience", audienceType: "변호사·로펌" },
-        { "@type": "BusinessAudience", audienceType: "세무·회계·노무 등 전문 서비스" },
-        { "@type": "BusinessAudience", audienceType: "고관여 브랜드·공공기관·기업" }
-      ],
-      description: content.seo.description,
-      url: content.seo.siteUrl
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: content.faq.items.map((item) => ({
-        "@type": "Question",
-        name: item.q,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.a
-        }
-      }))
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      name: "턴키하우스 추천 질의 시나리오",
-      itemListElement: content.aiRecommendation.items.map((item, index) => ({
-        "@type": "ListItem",
-        position: index + 1,
-        name: item.prompt,
-        description: item.fit,
-        url: `${content.seo.siteUrl}/#fit`
-      }))
-    }
-  ];
 
   return (
-    <main className="bg-white pb-[88px] text-[#0B0F0E] md:pb-0">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageStructuredData) }} />
-
-      <header className="sticky top-0 z-40 border-b border-black/8 bg-white/88 backdrop-blur-xl">
-        <div className={`${shell} flex items-center justify-between gap-4 py-3.5`}>
-          <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
-            <Image src="/logo.png" alt="Turnkeyhaus" width={176} height={48} className="h-10 w-auto object-contain" priority />
+    <main className="bg-white text-[#0B0F0E] antialiased selection:bg-[#21c1a2]/30">
+      
+      {/* 1. Header (Clean & Sharp) */}
+      <header className="sticky top-0 z-50 border-b border-black/[0.04] bg-white/90 backdrop-blur-xl">
+        <div className={`${shell} flex h-20 items-center justify-between`}>
+          <Link href="#top" className="flex items-center">
+            <Image src="/logo.png" alt="Turnkeyhaus" width={160} height={44} className="h-9 w-auto object-contain" priority />
           </Link>
-
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-10 lg:flex">
             {content.nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`inline-flex h-9 items-center rounded-[8px] px-3 text-[13px] font-bold text-black/58 transition-colors hover:bg-black/[0.04] hover:text-black ${focusRing}`}
-              >
+              <Link key={item.href} href={item.href} className="text-[14px] font-semibold text-black/60 hover:text-black transition-colors">
                 {item.label}
               </Link>
             ))}
           </nav>
-
-          <ActionLink
-            href="https://sclu.io/share/bulk/file/bf2w8ioROJvw"
-            className="inline-flex h-10 items-center rounded-[8px] border border-[#21c1a2] bg-[#21c1a2] px-4 text-sm font-black text-[#07211d] transition-colors hover:bg-[#36d6b7]"
-          >
-            소개서 다운로드
+          <ActionLink href="#contact" className="rounded-full bg-[#0B0F0E] px-7 py-2.5 text-[14px] font-semibold text-white hover:bg-[#21c1a2] hover:text-[#0B0F0E]">
+            상담 예약하기
           </ActionLink>
         </div>
       </header>
 
-      <section id="top" className="overflow-hidden bg-white">
-        <div className="relative aspect-video w-full bg-white">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
-          >
-            <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
-          </video>
-        </div>
-
-        <div className={`${shell} py-10 md:py-16`}>
-          <div className="grid gap-10 lg:grid-cols-[1.06fr_0.94fr] lg:items-end">
-            <div className="max-w-[920px] space-y-6 text-[#0B0F0E] tk-reveal">
-              <p className="text-sm font-black tracking-[0.12em] text-[#149b83]">턴키하우스 by TKDG</p>
-              <h1 className="whitespace-pre-line break-keep text-[38px] font-black leading-[1.14] tracking-normal md:text-[72px] md:leading-[1.05]">
-                {content.heroValue.headline}
-              </h1>
+      {/* 2. Hero Section (World-Class Ad Agency Style) */}
+      <section id="top" className="pt-20 pb-24 lg:pt-32 lg:pb-32 bg-white">
+        <div className={shell}>
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-[1000px] mb-20">
+            <span className="inline-block border border-black/10 rounded-full px-4 py-1.5 text-[12px] font-bold tracking-[0.1em] text-black/50 mb-8">
+              TURNKEYHAUS BY TKDG
+            </span>
+            <h1 className="text-[44px] font-bold leading-[1.15] tracking-tight sm:text-[64px] lg:text-[84px] whitespace-pre-line mb-8 text-[#0B0F0E]">
+              {content.heroValue.headline}
+            </h1>
+            <p className="text-[18px] lg:text-[22px] leading-[1.8] text-black/60 font-medium whitespace-pre-line max-w-[38ch]">
+              {content.heroValue.body}
+            </p>
+            <div className="mt-12 flex flex-wrap gap-4">
+              <ActionLink href="#pilot" className="rounded-full bg-[#21c1a2] border border-[#21c1a2] px-8 py-4 text-[16px] font-bold text-[#0B0F0E] hover:bg-[#1db197]">
+                {content.heroValue.primaryCta.label}
+              </ActionLink>
+              <ActionLink href="#contact" className="rounded-full bg-white border border-black/15 px-8 py-4 text-[16px] font-bold text-[#0B0F0E] hover:bg-black/5">
+                {content.heroValue.secondaryCta.label}
+              </ActionLink>
             </div>
-            <div className="space-y-6 tk-reveal">
-              <p className="max-w-[60ch] whitespace-pre-line break-keep text-base font-semibold leading-[1.85] text-black/66 md:text-[19px] md:leading-[1.75]">
-                {content.heroValue.body}
+          </motion.div>
+
+          {/* Perfect 16:9 Cinematic Video Container */}
+          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2 }} className="w-full aspect-video relative overflow-hidden rounded-2xl bg-[#0B0F0E] border border-black/5 shadow-2xl">
+            <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover">
+              <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
+            </video>
+          </motion.div>
+
+          {/* Strict Stats Layout */}
+          <div className="mt-20 grid grid-cols-2 lg:grid-cols-4 gap-8 border-t border-black/10 pt-12">
+            {content.heroValue.trustBadges.map((badge) => (
+              <div key={badge} className="text-[14px] font-semibold text-black/60 leading-relaxed border-l-2 border-[#21c1a2] pl-4">
+                {badge}
+              </div>
+            ))}
+          </div>
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 bg-[#FAFAFA] rounded-2xl p-10 border border-black/5">
+            <div>
+              <p className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase mb-2">대표 사례</p>
+              <p className="text-3xl font-bold tracking-tight">{content.portfolio.items.length}개 채널</p>
+            </div>
+            <div>
+              <p className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase mb-2">현재 구독자 합산</p>
+              <p className="text-3xl font-bold tracking-tight">{formatInteger(totalSubscribers)}명</p>
+            </div>
+            <div>
+              <p className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase mb-2">전체 영상 누적 조회수</p>
+              <p className="text-3xl font-bold tracking-tight">약 {totalVideoViewsInMan}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Problem Section (Solid Dark Background) */}
+      <section id="problem" className="bg-[#0B0F0E] py-24 lg:py-32 text-white">
+        <div className={shell}>
+          <div className="grid gap-16 lg:grid-cols-[1fr_1fr]">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <span className="text-[13px] font-bold tracking-[0.15em] text-[#21c1a2] uppercase block mb-6">{content.problem.label}</span>
+              <h2 className="text-[36px] font-bold leading-[1.2] tracking-tight lg:text-[52px] whitespace-pre-line">
+                {content.problem.h2}
+              </h2>
+            </motion.div>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="space-y-8">
+              <p className="text-[18px] lg:text-[20px] font-medium leading-[1.8] text-white/80 whitespace-pre-line">
+                {content.problem.lead}
               </p>
-
-              <div className="flex flex-wrap gap-3 pt-1">
-                <ActionLink
-                  href={content.heroValue.primaryCta.href}
-                  className="inline-flex min-h-12 items-center rounded-[8px] border border-[#21c1a2] bg-[#21c1a2] px-5 text-sm font-black text-[#07211d] transition-colors hover:bg-[#36d6b7]"
-                >
-                  {content.heroValue.primaryCta.label}
-                </ActionLink>
-                <ActionLink
-                  href={content.heroValue.secondaryCta.href}
-                  className="inline-flex min-h-12 items-center rounded-[8px] border border-black/16 bg-white px-5 text-sm font-black text-black/78 transition-colors hover:bg-black/[0.04]"
-                >
-                  {content.heroValue.secondaryCta.label}
-                </ActionLink>
+              {content.problem.items.length > 0 && (
+                <ul className="space-y-4 border-t border-white/10 pt-8">
+                  {content.problem.items.map((item) => (
+                    <li key={item} className="text-[16px] font-medium text-white/70 flex items-start gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#21c1a2] shrink-0" />
+                      <span className="leading-relaxed">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="mt-8 bg-white/5 p-6 rounded-xl border border-white/10">
+                <p className="text-[18px] font-semibold text-[#21c1a2] leading-relaxed">{content.problem.emphasis}</p>
               </div>
-            </div>
-          </div>
-
-          <dl className="mt-10 grid gap-3 border-t border-black/12 pt-4 text-[#0B0F0E] sm:mt-14 sm:grid-cols-3 sm:pt-5">
-            <div className="rounded-[8px] border border-black/10 bg-[#fbfaf6] p-5 tk-reveal">
-              <dt className="text-xs font-black tracking-[0.14em] text-black/42">대표 사례</dt>
-              <dd className="mt-2 text-[34px] font-black tracking-normal">{content.portfolio.items.length}개 채널</dd>
-            </div>
-            <div className="rounded-[8px] border border-black/10 bg-[#fbfaf6] p-5 tk-reveal">
-              <dt className="text-xs font-black tracking-[0.14em] text-black/42">현재 구독자 합산</dt>
-              <dd className="mt-2 text-[34px] font-black tracking-normal">{formatInteger(totalSubscribers)}명</dd>
-            </div>
-            <div className="rounded-[8px] border border-black/10 bg-[#fbfaf6] p-5 tk-reveal">
-              <dt className="text-xs font-black tracking-[0.14em] text-black/42">전체 영상 누적 조회수</dt>
-              <dd className="mt-2 text-[34px] font-black tracking-normal">약 {totalVideoViewsInMan}</dd>
-            </div>
-          </dl>
-        </div>
-      </section>
-
-      <section id="problem" className={`border-y border-black/10 ${softBand}`}>
-        <div className={`${shell} grid gap-10 ${sectionPad} md:grid-cols-[0.86fr_1.14fr] md:gap-14`}>
-          <div className="space-y-6 md:sticky md:top-28 md:self-start tk-reveal">
-            <span className={labelClass}>{content.problem.label}</span>
-            <h2 className={`${sectionTitle} max-w-[13ch]`}>{content.problem.h2}</h2>
-          </div>
-
-          <div className="space-y-8 tk-reveal">
-            <p className="whitespace-pre-line break-keep text-[20px] font-black leading-[1.72] text-[#0B0F0E] md:text-[30px]">{problemSupport}</p>
-            <p className="whitespace-pre-line break-keep text-[16px] font-semibold leading-[1.9] text-black/62 md:text-[18px]">{problemDetail}</p>
-
-            <figure className="overflow-hidden rounded-[8px] border border-black/10 bg-white shadow-[0_24px_80px_rgba(16,20,19,0.08)]">
-              <Image
-                src="/images/reality-illustration-optimized.jpg"
-                alt="채널 진단과 운영 구조를 정리한 시각 자료"
-                width={1600}
-                height={1030}
-                className="h-auto w-full object-cover"
-                sizes="(max-width: 1024px) 100vw, 60vw"
-              />
-            </figure>
-
-            <p className="rounded-[8px] border border-[#21c1a2]/35 bg-[#eafff9] p-5 text-[18px] font-black leading-[1.7] text-[#073f35]">
-              {content.problem.emphasis}
-            </p>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      <section id="presenter-ops" className="border-b border-black/10 bg-white">
-        <div className={`${shell} grid gap-10 ${sectionPad} md:grid-cols-[0.74fr_1.26fr] md:gap-14`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.presenterOps.label} title={content.presenterOps.h2} lead={content.presenterOps.lead} />
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 tk-reveal">
-            {content.presenterOps.points.map((point, index) => (
-              <div key={point} className={`rounded-[8px] border border-black/10 p-5 ${index === 0 ? "sm:col-span-2 bg-[#101413] text-white" : "bg-[#fbfaf6]"}`}>
-                <p className={index === 0 ? "break-keep text-[22px] font-black leading-[1.45]" : "break-keep text-[18px] font-black leading-[1.55] text-[#0B0F0E]"}>
-                  {point}
-                </p>
+      {/* 4. Presenter Ops (Restored cleanly) */}
+      <section id="presenter-ops" className="py-24 lg:py-32 bg-[#FAFAFA]">
+        <div className={shell}>
+          <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.presenterOps.label}</span>
+              <h2 className="text-[32px] font-bold tracking-tight lg:text-[48px] leading-[1.2] whitespace-pre-line">{content.presenterOps.h2}</h2>
+              <p className="mt-6 text-[18px] text-black/60 font-medium leading-[1.8] whitespace-pre-line">{content.presenterOps.lead}</p>
+            </motion.div>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }}>
+              <div className="border-t border-black/10">
+                {content.presenterOps.points.map((point) => (
+                  <div key={point} className="border-b border-black/10 py-5">
+                    <p className="text-[18px] font-semibold text-[#0B0F0E]">{point}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-            <p className="rounded-[8px] border border-[#21c1a2]/30 bg-[#eafff9] p-5 break-keep text-[15px] font-bold leading-[1.8] text-black/66 sm:col-span-2">
-              {content.presenterOps.note}
-            </p>
+              <p className="mt-8 border-l-2 border-[#21c1a2] pl-6 text-[16px] font-medium leading-[1.8] text-black/70 max-w-[70ch]">
+                {content.presenterOps.note}
+              </p>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      <section id="services" className={`border-b border-black/10 ${softBand}`}>
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="grid gap-10 md:grid-cols-[0.76fr_1.24fr] md:gap-14">
-            <div className="space-y-8 md:sticky md:top-28 md:self-start tk-reveal">
-              <SectionHeader label={content.servicePillars.label} title={content.servicePillars.h2} lead={content.servicePillars.lead} />
+      {/* 5. Services Section (Structured Grid) */}
+      <section id="services" className="py-24 lg:py-32 bg-white">
+        <div className={shell}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-20 grid lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:items-end">
+            <div>
+              <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.servicePillars.label}</span>
+              <h2 className="text-[36px] lg:text-[52px] font-bold tracking-tight leading-[1.2]">{content.servicePillars.h2}</h2>
             </div>
-
-            <div className="grid gap-4 tk-reveal">
-              {content.servicePillars.cards.map((card, index) => (
-                <article
-                  key={card.title}
-                  className={`group rounded-[8px] border border-black/10 bg-white p-6 shadow-[0_18px_64px_rgba(16,20,19,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_90px_rgba(16,20,19,0.10)] md:p-7 ${
-                    index === 0 ? "md:grid md:grid-cols-[220px_1fr] md:gap-8" : ""
-                  }`}
-                >
-                  <div>
-                    <p className="text-[12px] font-black tracking-[0.16em] text-[#149b83]">SERVICE {index + 1}</p>
-                    <p className="mt-2 break-keep text-[15px] font-black leading-[1.55] text-black/42">{card.title}</p>
-                  </div>
-                  <div className="mt-5 md:mt-0">
-                    <h3 className="break-keep text-[28px] font-black leading-[1.16] tracking-normal text-[#0B0F0E] md:text-[38px]">{card.headline}</h3>
-                    <p className="mt-4 max-w-[68ch] break-keep text-[16px] font-semibold leading-[1.85] text-black/64">{card.body}</p>
-                    <ul className="mt-5 grid gap-2 border-t border-black/10 pt-4 text-[15px] font-semibold leading-[1.72] text-black/62 sm:grid-cols-2">
-                      {card.bullets.map((bullet) => (
-                        <li key={bullet}>- {bullet}</li>
-                      ))}
-                    </ul>
-                    <ActionLink
-                      href={card.href}
-                      className="mt-5 inline-flex items-center border-b-2 border-[#21c1a2] pb-1 text-[15px] font-black text-[#149b83] transition-colors hover:text-[#0B0F0E]"
-                    >
-                      {card.ctaLabel}
-                    </ActionLink>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="not-single" className="border-b border-black/10 bg-white">
-        <div className={`${shell} grid gap-10 ${sectionPad} md:grid-cols-[0.72fr_1.28fr] md:gap-14`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.exclusions.label} title={content.exclusions.h2} lead={content.exclusions.lead} />
-          </div>
-
-          <div className="grid gap-4 tk-reveal">
-            {content.exclusions.items.map((item, index) => (
-              <IndexedRow key={item.title} index={index} title={item.title} body={item.body} />
+            <p className="text-[18px] text-black/60 font-medium leading-[1.8]">{content.servicePillars.lead}</p>
+          </motion.div>
+          
+          <div className="grid gap-6 lg:grid-cols-3">
+            {content.servicePillars.cards.map((card, idx) => (
+              <motion.article 
+                key={card.title} 
+                initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: idx * 0.1 }}
+                className={`bg-[#FAFAFA] rounded-2xl p-10 border border-black/5 flex flex-col justify-between hover:bg-white hover:shadow-xl hover:border-black/10 transition-all duration-300 ${idx === 0 ? 'lg:col-span-3 lg:grid lg:grid-cols-2 lg:gap-16' : ''}`}
+              >
+                <div>
+                  <span className="text-[12px] font-bold text-[#21c1a2] uppercase tracking-widest block mb-4">Service 0{idx + 1}</span>
+                  <h3 className="text-[28px] font-bold tracking-tight mb-4">{card.headline}</h3>
+                  <p className="text-[16px] text-black/60 font-medium leading-[1.8] mb-8">{card.body}</p>
+                </div>
+                <div className={`${idx === 0 ? 'lg:border-l lg:border-t-0 lg:pl-16 lg:pt-0' : 'border-t border-black/10 pt-8'}`}>
+                  <ul className="space-y-3 mb-8">
+                    {card.bullets.map(b => (
+                      <li key={b} className="text-[15px] font-semibold text-black/70 flex items-start gap-3">
+                        <span className="mt-2 h-1.5 w-1.5 bg-[#21c1a2] rounded-full shrink-0" />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                  <ActionLink href={card.href} className="inline-flex items-center text-[15px] font-bold text-[#0B0F0E] hover:text-[#21c1a2] transition-colors">
+                    {card.ctaLabel} <span className="ml-2">→</span>
+                  </ActionLink>
+                </div>
+              </motion.article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="quality" className={`border-b border-black/10 ${softBand}`}>
-        <div className={`${shell} grid gap-10 ${sectionPad} md:grid-cols-[0.76fr_1.24fr] md:gap-14`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.videoQuality.label} title={content.videoQuality.h2} lead={content.videoQuality.lead} />
-          </div>
-
-          <div className="space-y-6 tk-reveal">
-            <div className="grid gap-3 sm:grid-cols-2">
-              {content.videoQuality.points.map((point) => (
-                <div key={point} className="rounded-[8px] border border-black/10 bg-white p-5">
-                  <p className="break-keep text-[17px] font-black leading-[1.55] text-[#0B0F0E]">{point}</p>
+      {/* 6. Exclusions (Not Single) */}
+      <section id="not-single" className="py-24 lg:py-32 bg-[#FAFAFA]">
+        <div className={shell}>
+          <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.exclusions.label}</span>
+              <h2 className="text-[32px] font-bold tracking-tight lg:text-[48px] leading-[1.2] whitespace-pre-line">{content.exclusions.h2}</h2>
+              <p className="mt-6 text-[18px] text-black/60 font-medium leading-[1.8] whitespace-pre-line">{content.exclusions.lead}</p>
+            </motion.div>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="border-t border-black/10">
+              {content.exclusions.items.map((item) => (
+                <div key={item.title} className="border-b border-black/10 py-8">
+                  <h3 className="text-[22px] font-bold text-[#0B0F0E] mb-3">{item.title}</h3>
+                  <p className="text-[16px] text-black/60 font-medium leading-[1.8]">{item.body}</p>
                 </div>
               ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Quality & Approach & Strategy Deck */}
+      <section id="approach" className="py-24 lg:py-32 bg-white">
+        <div className={shell}>
+          <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr] mb-32">
+             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.videoQuality.label}</span>
+              <h2 className="text-[32px] font-bold tracking-tight lg:text-[48px] leading-[1.2] whitespace-pre-line">{content.videoQuality.h2}</h2>
+              <p className="mt-6 text-[18px] text-black/60 font-medium leading-[1.8] whitespace-pre-line">{content.videoQuality.lead}</p>
+            </motion.div>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }}>
+              <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 mb-8">
+                {content.videoQuality.points.map((point) => (
+                  <div key={point} className="border-b border-black/10 py-4"><p className="font-semibold">{point}</p></div>
+                ))}
+              </div>
+              <p className="border-l-2 border-[#21c1a2] pl-6 text-[16px] font-medium leading-[1.8] text-black/70">{content.videoQuality.note}</p>
+            </motion.div>
+          </div>
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <div className="mb-16">
+              <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.strategyFrame.label}</span>
+              <h2 className="text-[32px] font-bold tracking-tight lg:text-[48px] leading-[1.2] whitespace-pre-line">{content.strategyFrame.h2}</h2>
+              <p className="mt-6 text-[18px] text-black/60 font-medium leading-[1.8]">{content.approach.lead}</p>
             </div>
-
-            <p className="rounded-[8px] border border-[#21c1a2]/30 bg-[#eafff9] p-5 break-keep text-[15px] font-bold leading-[1.82] text-black/68">
-              {content.videoQuality.note}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section id="approach" className="border-b border-black/10 bg-white">
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.strategyFrame.label} title={content.strategyFrame.h2} lead={content.approach.lead} />
-          </div>
-          <div className="tk-reveal">
             <StrategyChapterDeck />
-          </div>
-          <p className="mt-8 max-w-[860px] whitespace-pre-line break-keep rounded-[8px] bg-[#101413] p-6 text-base font-black leading-[1.85] text-white tk-reveal">
-            {content.approach.keyline}
-          </p>
+            <p className="mt-12 text-center text-[18px] font-bold text-[#0B0F0E] whitespace-pre-line">{content.approach.keyline}</p>
+          </motion.div>
         </div>
       </section>
 
-      <section id="professional" className={`border-b border-black/10 ${softBand}`}>
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.professionalTargets.label} title={content.professionalTargets.h2} lead={content.professionalTargets.lead} />
-          </div>
+      {/* 8. Professional Targets (Industry Focus) */}
+      <section id="professional" className="py-24 lg:py-32 bg-[#FAFAFA]">
+        <div className={shell}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-20 text-center max-w-3xl mx-auto">
+            <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.professionalTargets.label}</span>
+            <h2 className="text-[36px] font-bold tracking-tight lg:text-[52px] leading-[1.2] whitespace-pre-line mb-6">{content.professionalTargets.h2}</h2>
+            <p className="text-[18px] text-black/60 font-medium leading-[1.8] whitespace-pre-line">{content.professionalTargets.lead}</p>
+          </motion.div>
 
-          <div className="mt-12 grid gap-4 md:grid-cols-2">
-            {content.professionalTargets.cards.map((card, index) => (
-              <article key={card.title} className="group overflow-hidden rounded-[8px] border border-black/10 bg-white shadow-[0_18px_64px_rgba(16,20,19,0.06)] transition duration-300 hover:-translate-y-1 tk-reveal">
-                <figure>
-                  <div className="relative aspect-[4/3] overflow-hidden bg-[#f0f4f1]">
-                    {card.image ? (
-                      <Image
-                        src={card.image.src}
-                        alt={card.image.alt}
-                        fill
-                        className="object-cover transition duration-700 group-hover:scale-[1.04]"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
+          <div className="space-y-12">
+            {content.professionalTargets.cards.map((card, idx) => (
+              <motion.article key={card.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="grid lg:grid-cols-2 gap-12 bg-white rounded-2xl border border-black/5 overflow-hidden">
+                <div className={`relative aspect-[4/3] lg:aspect-auto ${idx % 2 === 1 ? 'lg:order-2' : ''}`}>
+                   {card.image ? (
+                      <Image src={card.image.src} alt={card.image.alt} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
                     ) : (
-                      <div className="relative h-full w-full bg-[linear-gradient(145deg,#f3fffb_0%,#e9f9f4_52%,#f7fbfa_100%)] p-6 md:p-8">
-                        <div className="relative flex h-full flex-col justify-between">
-                          <p className="text-[11px] font-black tracking-[0.14em] text-black/48">{card.imageFallback?.eyebrow ?? "MODEL PREVIEW"}</p>
-                          <div className="space-y-2">
-                            {(card.imageFallback?.lines ?? ["이미지 자료 준비 중"]).map((line) => (
-                              <p key={line} className="text-[18px] font-black leading-[1.45] tracking-normal text-[#0B0F0E] md:text-[22px]">
-                                {line}
-                              </p>
-                            ))}
-                          </div>
+                      <div className="h-full w-full bg-[#F9FAFB] p-10 flex flex-col justify-end border-l border-black/5">
+                        <p className="text-[12px] font-bold text-black/40 uppercase mb-4">{card.imageFallback?.eyebrow}</p>
+                        <div className="space-y-2">
+                          {card.imageFallback?.lines.map(line => <p key={line} className="text-2xl font-bold">{line}</p>)}
                         </div>
                       </div>
                     )}
+                </div>
+                <div className="p-10 lg:p-16 flex flex-col justify-center">
+                  <h3 className="text-[32px] font-bold tracking-tight mb-4">{card.title}</h3>
+                  <p className="text-[18px] text-black/60 font-medium leading-[1.8] mb-6">{card.oneLiner}</p>
+                  <div className="flex flex-wrap gap-2 mb-8">
+                    {card.tags?.map(tag => <span key={tag} className="bg-black/5 px-3 py-1 rounded-md text-[13px] font-bold text-black/60">#{tag}</span>)}
                   </div>
-                </figure>
-
-                <div className="space-y-5 p-6">
-                  <h3 className="break-keep text-[28px] font-black leading-[1.2] tracking-normal text-[#0B0F0E]">{card.title}</h3>
-                  <p className="break-keep text-base font-semibold leading-[1.82] text-black/64">{card.oneLiner}</p>
-
-                  <div className="flex flex-wrap gap-x-3 gap-y-2">
-                    {(card.tags ?? []).map((tag) => (
-                      <span key={tag} className="text-[13px] font-black tracking-[0.03em] text-[#149b83]">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <ul className="space-y-2 border-t border-black/10 pt-4 text-[15px] font-semibold leading-[1.75] text-black/62">
-                    {card.bullets.map((bullet) => (
-                      <li key={bullet}>- {bullet}</li>
-                    ))}
+                  <ul className="space-y-3 mb-10 border-t border-black/10 pt-8">
+                    {card.bullets.map(b => <li key={b} className="text-[15px] font-medium text-black/70 flex items-start gap-3"><span className="mt-2 h-1.5 w-1.5 bg-black/20 rounded-full shrink-0" />{b}</li>)}
                   </ul>
-
-                  <ActionLink
-                    href={card.href}
-                    className="inline-flex items-center border-b-2 border-[#21c1a2] pb-1 text-[15px] font-black text-[#149b83] transition-colors hover:text-[#0B0F0E]"
-                  >
+                  <ActionLink href={card.href} className="text-[15px] font-bold border-b-2 border-black/10 pb-1 hover:border-[#21c1a2] transition-colors w-fit">
                     {card.ctaLabel}
                   </ActionLink>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="proof" className="border-b border-black/10 bg-white">
-        <div className={`${shell} grid gap-12 ${sectionPad} md:grid-cols-[1.05fr_0.95fr] md:items-start`}>
-          <figure className="overflow-hidden rounded-[8px] border border-black/10 shadow-[0_24px_80px_rgba(16,20,19,0.08)] tk-reveal">
-            <Image
-              src={content.studioProof.images[0]?.src ?? "/images/showreel-cover-optimized.jpg"}
-              alt={content.studioProof.images[0]?.alt ?? "Turnkeyhaus 운영 리포트 시각 자료"}
-              width={1400}
-              height={840}
-              className="h-full w-full object-cover"
-              sizes="(max-width: 1024px) 100vw, 52vw"
-            />
-          </figure>
-
-          <div className="space-y-8 text-[#0B0F0E] tk-reveal">
-            <SectionHeader label={content.studioProof.label} title={content.studioProof.h2} lead={content.studioProof.crewLead} />
-
-            <ul className="space-y-3 rounded-[8px] border border-black/10 bg-[#fbfaf6] p-5">
-              {content.studioProof.operationSystem.map((item) => (
-                <li key={item} className="text-sm font-semibold leading-[1.8] text-black/64">
-                  - {item}
-                </li>
-              ))}
-            </ul>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              {content.studioProof.crewCards.map((crew) => (
-                <div key={crew.role} className="rounded-[8px] border border-black/10 bg-white p-4">
-                  <p className="text-xs font-black tracking-[0.12em] text-[#149b83]">{crew.role}</p>
-                  <p className="mt-2 break-keep text-[17px] font-black leading-[1.45] text-[#0B0F0E]">{crew.headline}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="report-sample" className={`border-b border-black/10 ${softBand}`}>
-        <div className={`${shell} grid gap-10 ${sectionPad} md:grid-cols-[0.78fr_1.22fr] md:gap-14`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.reportSample.label} title={content.reportSample.h2} lead={content.reportSample.lead} />
-          </div>
-
-          <div className="space-y-7 tk-reveal">
-            <dl className="overflow-hidden rounded-[8px] border border-black/10 bg-white">
-              {content.reportSample.rows.map((row) => (
-                <div key={row.label} className="grid gap-3 border-b border-black/10 p-5 last:border-b-0 md:grid-cols-[170px_1fr] md:gap-8">
-                  <dt className="text-[13px] font-black tracking-[0.08em] text-black/42">{row.label}</dt>
-                  <dd className="break-keep text-[16px] font-black leading-[1.7] text-[#0B0F0E]">{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className="break-keep text-[15px] font-semibold leading-[1.85] text-black/64">{content.reportSample.note}</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="team" className="border-b border-black/10 bg-white">
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="grid gap-10 md:grid-cols-[0.74fr_1.26fr] md:gap-14">
-            <div className="tk-reveal">
-              <SectionHeader label={content.leadership.label} title={content.leadership.h2} lead={content.leadership.lead} />
-            </div>
-
-            <div className="grid gap-4 tk-reveal">
-              {content.leadership.people.map((person) => (
-                <article key={person.name} className="grid gap-5 rounded-[8px] border border-black/10 bg-[#fbfaf6] p-5 md:grid-cols-[150px_180px_1fr] md:gap-8">
-                  <figure className="relative aspect-[4/5] overflow-hidden rounded-[8px] border border-black/10 bg-[#f7f7f7]">
-                    <Image src={person.image.src} alt={person.image.alt} fill className="object-cover object-top" sizes="(max-width: 768px) 100vw, 150px" />
-                  </figure>
-                  <div className="md:pt-1">
-                    <h3 className="text-[28px] font-black tracking-normal text-[#0B0F0E]">{person.name}</h3>
-                    <p className="mt-1 text-[12px] font-black tracking-[0.12em] text-black/36">{person.englishName}</p>
-                    <p className="mt-2 break-keep text-[13px] font-black leading-[1.55] text-[#149b83]">{person.role}</p>
-                  </div>
-                  <div>
-                    <p className="break-keep text-[16px] font-semibold leading-[1.85] text-black/64">{person.body}</p>
-                    <ul className="mt-5 flex flex-wrap gap-x-3 gap-y-2 border-t border-black/10 pt-4 text-[13px] font-black leading-[1.55] text-black/54">
-                      {person.responsibilities.map((item) => (
-                        <li key={item}>#{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="portfolio" className={`border-b border-black/10 ${softBand}`}>
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.portfolio.label} title={content.portfolio.h2} lead={content.portfolio.lead} />
-          </div>
-
-          <div className="mt-12 grid gap-5">
-            {content.portfolio.items.map((item) => (
-              <article key={item.title} className="grid gap-7 rounded-[8px] border border-black/10 bg-white p-5 shadow-[0_18px_64px_rgba(16,20,19,0.06)] md:grid-cols-[1.02fr_0.98fr] md:gap-8 md:p-6 tk-reveal">
-                <div className="relative aspect-video overflow-hidden rounded-[8px] border border-black/10 bg-black">
-                  {item.youtubeId ? (
-                    <iframe
-                      src={`https://www.youtube.com/embed/${item.youtubeId}?rel=0&modestbranding=1`}
-                      title={item.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="strict-origin-when-cross-origin"
-                      className="absolute inset-0 h-full w-full border-0"
-                    />
-                  ) : (
-                    <Image src={item.imageSrc} alt={`${item.title} 대표 이미지`} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 55vw" />
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-7">
-                  <div className="space-y-4">
-                    <h3 className="break-keep text-[32px] font-black leading-[1.14] tracking-normal text-[#0B0F0E]">{item.title}</h3>
-                    <p className="text-[13px] font-black tracking-[0.08em] text-black/46">
-                      클라이언트: <span className="tracking-[0.02em] text-black/70">{item.clientName}</span>
-                    </p>
-                    <p className="max-w-[58ch] break-keep text-[17px] font-semibold leading-[1.82] text-black/66">{item.oneLiner}</p>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-black/10 pt-3">
-                      <span className="text-[12px] font-black tracking-[0.1em] text-black/42">키워드</span>
-                      {item.tags.map((tag) => (
-                        <span key={tag} className="text-[13px] font-black tracking-[0.03em] text-[#149b83]">
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <dl className="overflow-hidden rounded-[8px] border border-black/10">
-                    {item.scope ? (
-                      <div className="grid grid-cols-[96px_1fr] items-start gap-4 border-b border-black/10 p-3.5 text-[15px]">
-                        <dt className="font-bold text-black/46">담당 범위</dt>
-                        <dd className="text-right font-black leading-[1.6] text-[#0B0F0E]">{item.scope}</dd>
-                      </div>
-                    ) : null}
-                    <div className="grid grid-cols-[96px_1fr] items-center gap-4 border-b border-black/10 p-3.5 text-[15px]">
-                      <dt className="font-bold text-black/46">구독자 변화</dt>
-                      <dd className="text-right font-black text-[#0B0F0E]">{item.result}</dd>
-                    </div>
-                    <div className="grid grid-cols-[96px_1fr] items-center gap-4 p-3.5 text-[15px]">
-                      <dt className="font-bold text-black/46">최고 조회수</dt>
-                      <dd className="text-right font-black text-[#149b83]">{formatViewsKorean(item.maxVideoViews)}회</dd>
-                    </div>
-                  </dl>
-
-                  {(item.before || item.action || item.after || item.proof) ? (
-                    <div className="grid gap-3 border-t border-black/10 pt-4 text-[14px] font-semibold leading-[1.75] text-black/62 sm:grid-cols-2">
-                      {item.before ? (
-                        <div>
-                          <p className="text-[11px] font-black tracking-[0.12em] text-black/36">BEFORE</p>
-                          <p className="mt-1 break-keep">{item.before}</p>
-                        </div>
-                      ) : null}
-                      {item.action ? (
-                        <div>
-                          <p className="text-[11px] font-black tracking-[0.12em] text-black/36">ACTION</p>
-                          <p className="mt-1 break-keep">{item.action}</p>
-                        </div>
-                      ) : null}
-                      {item.after ? (
-                        <div>
-                          <p className="text-[11px] font-black tracking-[0.12em] text-black/36">AFTER</p>
-                          <p className="mt-1 break-keep">{item.after}</p>
-                        </div>
-                      ) : null}
-                      {item.proof ? (
-                        <div>
-                          <p className="text-[11px] font-black tracking-[0.12em] text-black/36">PROOF</p>
-                          <p className="mt-1 break-keep">{item.proof}</p>
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : null}
-
-                  <Link
-                    href={`/cases/${item.caseSlug}`}
-                    className={`inline-flex w-fit items-center border-b-2 border-[#21c1a2] pb-1 text-[15px] font-black text-[#149b83] transition-colors hover:text-[#0B0F0E] ${focusRing}`}
-                  >
-                    케이스 스터디 보기
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="pilot" className="border-b border-black/10 bg-white">
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="grid gap-10 md:grid-cols-[0.78fr_1.22fr] md:gap-14">
-            <div className="space-y-6 md:sticky md:top-28 md:self-start tk-reveal">
-              <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
-              <p className="max-w-[46ch] break-keep rounded-[8px] border border-[#21c1a2]/30 bg-[#eafff9] p-5 text-[16px] font-black leading-[1.85] text-[#073f35]">
-                {content.pricing.emphasis}
-              </p>
-            </div>
-
-            <div className="grid gap-4 tk-reveal">
-              {content.pricing.levels.map((level, index) => (
-                <article key={level.title} className="grid gap-5 rounded-[8px] border border-black/10 bg-[#fbfaf6] p-6 md:grid-cols-[150px_1fr] md:gap-8">
-                  <div>
-                    <p className="text-[12px] font-black tracking-[0.12em] text-black/36">OPTION {index + 1}</p>
-                    <p className="mt-2 text-[26px] font-black tracking-normal text-[#149b83]">{level.priceBand}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-[26px] font-black tracking-normal text-[#0B0F0E]">{level.title}</h3>
-                    <ul className="mt-4 grid gap-2 text-[15px] font-semibold leading-[1.75] text-black/62 sm:grid-cols-2">
-                      {level.bullets.map((bullet) => (
-                        <li key={bullet}>- {bullet}</li>
-                      ))}
-                    </ul>
-                    <p className="mt-4 break-keep border-t border-black/10 pt-4 text-[14px] font-black leading-[1.7] text-black/54">{level.target}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="risk" className="border-b border-black/10 bg-[#101413] text-white">
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="grid gap-10 md:grid-cols-[0.86fr_1.14fr] md:gap-14">
-            <div className="tk-reveal">
-              <SectionHeader label={content.riskManagement.label} title={content.riskManagement.h2} lead={content.riskManagement.lead} dark />
-            </div>
-
-            <div className="space-y-7 tk-reveal">
-              <ul className="grid gap-3 sm:grid-cols-2">
-                {content.riskManagement.items.map((item) => (
-                  <li key={item} className="break-keep rounded-[8px] border border-white/12 bg-white/[0.055] p-5 text-[16px] font-black leading-[1.7] text-white/84">
-                    {item}
+      {/* 9. Proof & Report Sample */}
+      <section id="proof" className="py-24 lg:py-32 bg-white">
+        <div className={shell}>
+          <div className="grid gap-16 lg:grid-cols-[1.1fr_0.9fr] items-center mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="relative aspect-video lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border border-black/5">
+               <Image src={content.studioProof.images[0]?.src ?? "/images/showreel-cover-optimized.jpg"} alt="Proof" fill className="object-cover" />
+            </motion.div>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }}>
+              <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.studioProof.label}</span>
+              <h2 className="text-[32px] font-bold tracking-tight lg:text-[48px] leading-[1.2] whitespace-pre-line mb-6">{content.studioProof.h2}</h2>
+              <p className="text-[18px] text-black/60 font-medium leading-[1.8] whitespace-pre-line mb-8">{content.studioProof.crewLead}</p>
+              
+              <ul className="space-y-3 border-y border-black/10 py-6 mb-8">
+                {content.studioProof.operationSystem.map((item) => (
+                  <li key={item} className="text-[15px] font-semibold text-black/70 flex items-center gap-3">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#21c1a2] shrink-0"/> {item}
                   </li>
                 ))}
               </ul>
-              <p className="break-keep rounded-[8px] border border-white/14 bg-white/[0.045] p-5 text-[14px] font-semibold leading-[1.85] text-white/68">
-                {content.riskManagement.note}
-              </p>
-            </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                {content.studioProof.crewCards.map((crew) => (
+                  <div key={crew.role} className="bg-[#FAFAFA] p-5 rounded-xl border border-black/5">
+                    <p className="text-[11px] font-bold text-black/40 uppercase mb-2">{crew.role}</p>
+                    <p className="text-[16px] font-bold">{crew.headline}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </div>
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-[#FAFAFA] rounded-3xl p-10 lg:p-16 border border-black/5">
+            <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+              <div>
+                <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.reportSample.label}</span>
+                <h2 className="text-[32px] font-bold tracking-tight leading-[1.2] whitespace-pre-line mb-6">{content.reportSample.h2}</h2>
+                <p className="text-[16px] text-black/60 font-medium leading-[1.8] whitespace-pre-line">{content.reportSample.lead}</p>
+              </div>
+              <div>
+                <dl className="divide-y divide-black/10 border-y border-black/10">
+                  {content.reportSample.rows.map((row) => (
+                    <div key={row.label} className="grid grid-cols-[120px_1fr] sm:grid-cols-[160px_1fr] gap-4 py-5 items-center">
+                      <dt className="text-[13px] font-bold text-black/40 tracking-wide">{row.label}</dt>
+                      <dd className="text-[16px] font-semibold">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-6 text-[14px] font-medium text-black/50">{content.reportSample.note}</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      <section id="fit" className={`border-b border-black/10 ${softBand}`}>
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.aiRecommendation.label} title={content.aiRecommendation.h2} lead={content.aiRecommendation.lead} />
-          </div>
-
-          <div className="mt-10 grid gap-4">
-            {content.aiRecommendation.items.map((item) => (
-              <article key={item.prompt} className="rounded-[8px] border border-black/10 bg-white p-6 shadow-[0_18px_64px_rgba(16,20,19,0.06)] tk-reveal">
-                <p className="text-xs font-black tracking-[0.1em] text-[#149b83]">자주 들어온 의뢰 유형</p>
-                <h3 className="mt-2 break-keep text-[25px] font-black leading-[1.25] tracking-normal text-[#0B0F0E]">{item.prompt}</h3>
-                <p className="mt-3 break-keep text-[16px] font-semibold leading-[1.85] text-black/66">{item.fit}</p>
-                <ul className="mt-4 grid gap-2 border-t border-black/10 pt-4 text-[15px] font-semibold leading-[1.8] text-black/62 sm:grid-cols-3">
-                  {item.reasons.map((reason) => (
-                    <li key={reason}>- {reason}</li>
-                  ))}
-                </ul>
-              </article>
+      {/* 10. Team Section (Clean, Professional, Functional) */}
+      <section id="team" className="py-24 lg:py-32 bg-white">
+        <div className={shell}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-20 grid lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:items-end">
+            <div>
+              <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.leadership.label}</span>
+              <h2 className="text-[36px] lg:text-[52px] font-bold tracking-tight leading-[1.2]">{content.leadership.h2}</h2>
+            </div>
+            <p className="text-[18px] text-black/60 font-medium leading-[1.8]">{content.leadership.lead}</p>
+          </motion.div>
+          
+          <div className="grid gap-8 lg:grid-cols-3">
+            {content.leadership.people.map((person, idx) => (
+              <motion.article key={person.name} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: idx * 0.1 }} className="group border border-black/10 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300">
+                <div className="flex p-6 border-b border-black/10 gap-6 items-center bg-[#FAFAFA]">
+                  <div className="relative h-20 w-20 rounded-full overflow-hidden shrink-0 border border-black/10">
+                     <Image src={person.image.src} alt={person.name} fill className="object-cover" />
+                  </div>
+                  <div>
+                    <h3 className="text-[22px] font-bold">{person.name}</h3>
+                    <p className="text-[13px] font-bold text-[#21c1a2] mt-1">{person.role}</p>
+                  </div>
+                </div>
+                <div className="p-8 bg-white h-full">
+                  <p className="text-[15px] font-medium text-black/70 leading-[1.8] mb-8">{person.body}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {person.responsibilities.map(r => (
+                      <span key={r} className="bg-black/5 px-2.5 py-1 rounded text-[12px] font-bold text-black/60">#{r}</span>
+                    ))}
+                  </div>
+                </div>
+              </motion.article>
             ))}
           </div>
-
-          <p className="mt-7 max-w-[860px] rounded-[8px] bg-[#101413] p-5 text-[16px] font-black leading-[1.8] text-white tk-reveal">{content.aiRecommendation.note}</p>
         </div>
       </section>
 
+      {/* 11. Portfolio Section (Clear Data & Impact) */}
+      <section id="portfolio" className="py-24 lg:py-32 bg-[#FAFAFA]">
+        <div className={shell}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-20 text-center max-w-3xl mx-auto">
+            <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.portfolio.label}</span>
+            <h2 className="text-[36px] font-bold tracking-tight lg:text-[52px] leading-[1.2] whitespace-pre-line mb-6">{content.portfolio.h2}</h2>
+            <p className="text-[18px] text-black/60 font-medium leading-[1.8]">{content.portfolio.lead}</p>
+          </motion.div>
+          
+          <div className="space-y-8">
+            {content.portfolio.items.map((item, i) => (
+              <motion.article key={item.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
+                className="bg-white rounded-2xl border border-black/5 p-8 lg:p-12 shadow-sm grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:items-center hover:border-black/15 transition-colors"
+              >
+                <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black">
+                  {item.youtubeId ? (
+                    <iframe src={`https://www.youtube.com/embed/${item.youtubeId}?modestbranding=1&rel=0`} className="absolute inset-0 h-full w-full border-0" />
+                  ) : (
+                    <Image src={item.imageSrc} alt={item.title} fill className="object-cover" />
+                  )}
+                </div>
+                <div>
+                  <div className="mb-6">
+                    <span className="text-[12px] font-bold tracking-widest text-[#21c1a2] uppercase block mb-3">Client: {item.clientName}</span>
+                    <h3 className="text-[32px] font-bold tracking-tight leading-tight">{item.title}</h3>
+                  </div>
+                  <p className="text-[17px] font-medium text-black/70 leading-[1.8] mb-8">{item.oneLiner}</p>
+                  
+                  <div className="grid grid-cols-2 gap-6 bg-[#FAFAFA] p-6 rounded-xl border border-black/5 mb-8">
+                    <div>
+                      <p className="text-[11px] font-bold text-black/40 uppercase mb-2">구독자 변화</p>
+                      <p className="text-[20px] font-bold">{item.result}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold text-black/40 uppercase mb-2">최고 조회수</p>
+                      <p className="text-[20px] font-bold text-[#21c1a2]">{formatViewsKorean(item.maxVideoViews)}회</p>
+                    </div>
+                  </div>
+                  
+                  {item.scope && (
+                    <div className="mb-8">
+                       <p className="text-[13px] font-bold text-black/40 uppercase mb-2">담당 범위</p>
+                       <p className="text-[15px] font-semibold text-[#0B0F0E]">{item.scope}</p>
+                    </div>
+                  )}
+
+                  <ActionLink href={`/cases/${item.caseSlug}`} className="text-[15px] font-bold border-b-2 border-black/10 pb-1 hover:border-[#21c1a2]">
+                    케이스 스터디 보기
+                  </ActionLink>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 12. Pilot & Pricing (Clear Tables) */}
+      <section id="pilot" className="py-24 lg:py-32 bg-white">
+        <div className={shell}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-20 grid lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:items-end">
+            <div>
+              <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.pricing.label}</span>
+              <h2 className="text-[36px] lg:text-[52px] font-bold tracking-tight leading-[1.2] whitespace-pre-line">{content.pricing.h2}</h2>
+            </div>
+            <p className="text-[18px] text-[#21c1a2] font-bold leading-[1.8]">{content.pricing.emphasis}</p>
+          </motion.div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {content.pricing.levels.map((level, i) => (
+              <div key={level.title} className="bg-[#FAFAFA] border border-black/5 rounded-2xl p-10 flex flex-col justify-between">
+                <div>
+                  <p className="text-[11px] font-bold tracking-widest text-black/40 uppercase mb-4">Option 0{i + 1}</p>
+                  <p className="text-[28px] font-bold text-[#0B0F0E] mb-2">{level.priceBand}</p>
+                  <h3 className="text-[20px] font-bold mb-8">{level.title}</h3>
+                  <ul className="space-y-4 border-t border-black/10 pt-8 mb-10">
+                    {level.bullets.map(b => (
+                      <li key={b} className="text-[14px] font-semibold text-black/70 flex items-start gap-3">
+                        <span className="mt-2 h-1 w-1 bg-black/30 rounded-full shrink-0"/> {b}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-white p-5 rounded-xl border border-black/5">
+                  <p className="text-[13px] font-bold text-[#21c1a2]">{level.target}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 13. Risk Management */}
+      <section id="risk" className="py-24 lg:py-32 bg-[#0B0F0E] text-white">
+        <div className={shell}>
+          <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
+             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+              <span className="text-[12px] font-bold tracking-[0.15em] text-white/40 uppercase block mb-4">{content.riskManagement.label}</span>
+              <h2 className="text-[32px] font-bold tracking-tight lg:text-[48px] leading-[1.2] whitespace-pre-line">{content.riskManagement.h2}</h2>
+              <p className="mt-6 text-[18px] text-white/70 font-medium leading-[1.8] whitespace-pre-line">{content.riskManagement.lead}</p>
+            </motion.div>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }}>
+              <ul className="space-y-6 border-y border-white/10 py-10 mb-8">
+                {content.riskManagement.items.map(item => (
+                  <li key={item} className="text-[16px] font-semibold text-white flex items-center gap-4">
+                    <span className="h-1.5 w-1.5 bg-[#21c1a2] rounded-full shrink-0" /> {item}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[15px] font-medium text-white/50 leading-[1.8] p-6 bg-white/5 rounded-xl">{content.riskManagement.note}</p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* 14. Fit & Recommendations */}
+      <section id="fit" className="py-24 lg:py-32 bg-[#FAFAFA]">
+        <div className={shell}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-20 text-center max-w-3xl mx-auto">
+            <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.aiRecommendation.label}</span>
+            <h2 className="text-[36px] font-bold tracking-tight lg:text-[52px] leading-[1.2] whitespace-pre-line mb-6">{content.aiRecommendation.h2}</h2>
+            <p className="text-[18px] text-black/60 font-medium leading-[1.8] whitespace-pre-line">{content.aiRecommendation.lead}</p>
+          </motion.div>
+
+          <div className="space-y-6 max-w-4xl mx-auto">
+            {content.aiRecommendation.items.map((item, i) => (
+              <motion.div key={item.prompt} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: i * 0.1 }} className="bg-white p-8 lg:p-10 rounded-2xl border border-black/5 shadow-sm">
+                <p className="text-[11px] font-bold text-[#21c1a2] tracking-widest uppercase mb-4">Case 0{i + 1}</p>
+                <h3 className="text-[22px] font-bold text-[#0B0F0E] mb-4">{item.prompt}</h3>
+                <p className="text-[16px] font-medium text-black/60 mb-6 pb-6 border-b border-black/5">{item.fit}</p>
+                <ul className="space-y-3">
+                  {item.reasons.map(reason => <li key={reason} className="text-[14px] font-semibold text-black/70">· {reason}</li>)}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+          <p className="mt-12 text-center text-[16px] font-bold text-[#0B0F0E]">{content.aiRecommendation.note}</p>
+        </div>
+      </section>
+
+      {/* 15. Diagnostic Calculator Component */}
       <DiagnosticCalculator />
 
-      <section id="contact" className="border-b border-black/10 bg-white">
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="mb-10 tk-reveal">
-            <SectionHeader label={content.contact.label} title={content.contact.h2} lead={content.contact.lead} />
+      {/* 16. Contact Section */}
+      <section id="contact" className="py-24 lg:py-32 bg-white border-b border-black/5">
+        <div className={shell}>
+          <div className="mb-16">
+            <span className="text-[12px] font-bold tracking-[0.15em] text-black/40 uppercase block mb-4">{content.contact.label}</span>
+            <h2 className="text-[36px] font-bold tracking-tight lg:text-[52px] leading-[1.2] whitespace-pre-line mb-6">{content.contact.h2}</h2>
+            <p className="text-[18px] text-black/60 font-medium leading-[1.8]">{content.contact.lead}</p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-[0.88fr_1.12fr] md:items-start">
-            <div className="space-y-7 rounded-[8px] border border-black/10 bg-[#fbfaf6] p-6 tk-reveal">
-              <div className="space-y-3">
-                <h3 className="text-[29px] font-black tracking-normal text-[#0B0F0E]">먼저 확인하는 것</h3>
-                <p className="text-base font-semibold leading-[1.9] text-black/62">긴 리포트 전에, 상담으로 이어지지 않는 병목부터 빠르게 확인합니다.</p>
-              </div>
-
-              <ul className="space-y-2 text-sm font-semibold leading-[1.85] text-black/64">
-                <li>- 클릭 전환: 제목·썸네일</li>
-                <li>- 콘텐츠 구조: 주제·재생목록</li>
-                <li>- 문의 동선: 설명란·고정댓글·채널 홈</li>
+          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="bg-[#FAFAFA] rounded-2xl p-10 lg:p-12 border border-black/5 h-fit">
+              <h3 className="text-[24px] font-bold mb-4">먼저 확인하는 것</h3>
+              <p className="text-[16px] font-medium text-black/60 mb-8 leading-[1.8]">긴 리포트 전에, 상담으로 이어지지 않는 병목부터 빠르게 확인합니다.</p>
+              <ul className="space-y-4 mb-12">
+                {["클릭 전환: 제목·썸네일", "콘텐츠 구조: 주제·재생목록", "문의 동선: 설명란·고정댓글·채널 홈"].map(txt => (
+                  <li key={txt} className="text-[15px] font-semibold text-[#0B0F0E] flex items-center gap-3"><span className="h-1.5 w-1.5 bg-[#21c1a2] rounded-full"/>{txt}</li>
+                ))}
               </ul>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a href={content.contact.phoneHref} className="flex-1 text-center bg-white border border-black/15 py-4 rounded-xl text-[15px] font-bold hover:bg-black/5 transition-colors">{content.contact.phoneDisplay}</a>
+                <a href={content.contact.kakaoChatUrl} className="flex-1 text-center bg-[#21c1a2] text-[#0B0F0E] py-4 rounded-xl text-[15px] font-bold hover:bg-[#1db197] transition-colors">{content.contact.kakaoCtaLabel}</a>
+              </div>
+            </div>
+            
+            <div className="rounded-2xl border border-black/10 overflow-hidden h-[700px] shadow-sm bg-[#FAFAFA]">
+              <iframe src={content.contact.googleFormEmbedUrl} className="w-full h-full border-0" loading="lazy" title="Contact Form" />
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <div className="flex flex-wrap gap-3 border-t border-black/10 pt-4">
-                {hasPhoneHref ? (
-                  <a
-                    href={phoneHref}
-                    className={`inline-flex items-center rounded-[8px] border border-black/16 bg-white px-5 py-3 text-sm font-black text-black transition-colors hover:bg-black/5 ${focusRing}`}
-                  >
-                    {content.contact.quickCallLabel} {content.contact.phoneDisplay}
-                  </a>
-                ) : null}
-
-                {hasKakaoChatUrl ? (
-                  <a
-                    href={kakaoChatUrl}
-                    className={`inline-flex items-center rounded-[8px] border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-black text-black transition-colors hover:bg-[#1db197] ${focusRing}`}
-                  >
-                    {content.contact.kakaoCtaLabel}
-                  </a>
-                ) : null}
+      {/* 17. FAQ & Blog */}
+      <section className="py-24 lg:py-32 bg-[#FAFAFA]">
+        <div className={shell}>
+          <div className="grid gap-24 lg:grid-cols-[1fr_1fr]">
+            
+            {/* FAQ Area */}
+            <div id="faq">
+              <h2 className="text-[28px] font-bold tracking-tight mb-12">{content.faq.h2}</h2>
+              <div className="divide-y divide-black/10 border-y border-black/10">
+                {content.faq.items.map((item) => (
+                  <details key={item.q} className="group py-6">
+                    <summary className="flex cursor-pointer items-center justify-between list-none text-[18px] font-bold text-[#0B0F0E]">
+                      {item.q}
+                      <span className="text-[#21c1a2] group-open:-rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <p className="mt-5 text-[15px] text-black/60 font-medium leading-[1.8] whitespace-pre-line">{item.a}</p>
+                  </details>
+                ))}
               </div>
             </div>
 
-            <div id="contact-form" className="overflow-hidden rounded-[8px] border border-black/10 bg-white shadow-[0_24px_80px_rgba(16,20,19,0.08)] tk-reveal">
-              {hasFormEmbedUrl ? (
-                <iframe
-                  src={formEmbedUrl}
-                  className="h-[clamp(760px,80vh,980px)] w-full"
-                  loading="lazy"
-                  title={content.contact.iframeTitle}
-                  referrerPolicy="strict-origin-when-cross-origin"
-                />
-              ) : (
-                <div className="grid h-[clamp(760px,80vh,980px)] place-items-center p-6 text-center text-sm leading-relaxed text-black/60">
-                  Google Form 임베드 URL이 아직 설정되지 않았습니다.
-                  <br />
-                  README의 안내대로 임베드 URL을 입력해 주세요.
+            {/* Blog Area */}
+            <div id="blog">
+              <h2 className="text-[28px] font-bold tracking-tight mb-6">{content.blog.h2}</h2>
+              <p className="text-[16px] text-black/50 font-medium mb-12">{content.blog.lead}</p>
+              
+              {insightPosts.length > 0 && (
+                <div className="space-y-6">
+                  {insightPosts.map((post) => (
+                    <Link key={post.slug} href={`/insights/${post.slug}`} className="block bg-white p-6 rounded-xl border border-black/5 hover:border-[#21c1a2] transition-colors shadow-sm">
+                       <p className="text-[12px] font-bold text-black/40 mb-2">{post.publishedAt}</p>
+                       <h3 className="text-[18px] font-bold mb-2">{post.title}</h3>
+                       <p className="text-[14px] text-black/60 font-medium line-clamp-2">{post.description}</p>
+                    </Link>
+                  ))}
+                  <div className="pt-6 border-t border-black/10">
+                    <ActionLink href="/insights" className="text-[15px] font-bold text-[#0B0F0E] hover:text-[#21c1a2]">전체 인사이트 보기 →</ActionLink>
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      </section>
 
-      <section id="faq" className={`border-b border-black/10 ${softBand}`}>
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.faq.label} title={content.faq.h2} />
-          </div>
-
-          <div className="mt-10 overflow-hidden rounded-[8px] border border-black/10 bg-white tk-reveal">
-            {content.faq.items.map((item) => (
-              <details key={item.q} className="group border-b border-black/10 p-5 last:border-b-0">
-                <summary className={`cursor-pointer list-none pr-8 text-[19px] font-black tracking-normal text-[#0B0F0E] ${focusRing}`}>
-                  {item.q}
-                  <span className="ml-2 text-[#149b83] transition-transform group-open:rotate-45">+</span>
-                </summary>
-                <p className="mt-3 max-w-[78ch] whitespace-pre-line break-keep text-sm font-semibold leading-[1.9] text-black/62 md:text-base">{item.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="blog" className="border-b border-black/10 bg-white">
-        <div className={`${shell} ${sectionPad}`}>
-          <div className="tk-reveal">
-            <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
-          </div>
-
-          {insightPosts.length > 0 ? (
-            <div className="mt-10 grid gap-4 md:grid-cols-2">
-              {insightPosts.map((post) => (
-                <article key={post.slug} className="rounded-[8px] border border-black/10 bg-[#fbfaf6] p-6 transition duration-300 hover:-translate-y-1 tk-reveal">
-                  <div className="text-sm font-black text-black/42">{post.publishedAt}</div>
-                  <div className="mt-5 space-y-3">
-                    <h3 className="break-keep text-[25px] font-black leading-[1.25] tracking-normal text-[#0B0F0E]">{post.title}</h3>
-                    <p className="break-keep text-sm font-semibold leading-[1.85] text-black/62">{post.description}</p>
-                  </div>
-                  <Link
-                    href={`/insights/${post.slug}`}
-                    className={`mt-6 inline-flex w-fit items-center border-b-2 border-[#21c1a2] pb-1 text-sm font-black text-[#149b83] transition-colors hover:text-[#0B0F0E] ${focusRing}`}
-                  >
-                    읽기
-                  </Link>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-8 text-sm text-black/60">인사이트 글을 추가하면 이 영역에 자동으로 반영됩니다.</p>
-          )}
-
-          <div className="mt-8">
-            <Link
-              href="/insights"
-              className={`inline-flex items-center rounded-[8px] border border-black/16 bg-white px-5 py-3 text-sm font-black text-black transition-colors hover:bg-black/5 ${focusRing}`}
-            >
-              {content.blog.ctaLabel}
-            </Link>
           </div>
         </div>
       </section>
 
       <ContactCTA />
 
-      <footer className="border-t border-black/10 bg-white text-black/62">
-        <div className={`${shell} flex flex-col gap-8 py-10 text-xs md:flex-row md:justify-between`}>
-          <div className="space-y-1">
-            <div className="text-sm font-black text-[#0B0F0E]">{content.footer.companyName}</div>
-            {content.footer.lines.map((line) => (
-              <div key={line.label}>
-                {line.label}: {line.value}
-              </div>
-            ))}
+      {/* Footer */}
+      <footer className="bg-white py-16 border-t border-black/10">
+        <div className={`${shell} flex flex-col md:flex-row justify-between items-start gap-12`}>
+          <div>
+            <p className="font-bold text-[18px] mb-6">{content.footer.companyName}</p>
+            <div className="space-y-2 text-[13px] text-black/50 font-medium">
+              {content.footer.lines.map((line) => (
+                <p key={line.label}>{line.label}: {line.value}</p>
+              ))}
+            </div>
           </div>
-
-          <div className="flex flex-wrap gap-4 font-black text-black/54 md:justify-end md:text-right">
-            <Link href="/store" className={`text-[#149b83] transition-colors hover:text-[#0B0F0E] ${focusRing}`}>
-              운영 플랜 신청
-            </Link>
-            <Link href="/terms" className={`transition-colors hover:text-[#149b83] ${focusRing}`}>
-              이용약관
-            </Link>
-            <Link href="/privacy" className={`transition-colors hover:text-[#149b83] ${focusRing}`}>
-              개인정보처리방침
-            </Link>
-            <Link href="/refund" className={`transition-colors hover:text-[#149b83] ${focusRing}`}>
-              환불 정책
-            </Link>
+          <div className="flex flex-wrap gap-6 text-[13px] font-bold text-black/50">
+            <Link href="/store" className="hover:text-[#21c1a2] transition-colors">운영 플랜 신청</Link>
+            <Link href="/terms" className="hover:text-[#21c1a2] transition-colors">이용약관</Link>
+            <Link href="/privacy" className="hover:text-[#21c1a2] transition-colors">개인정보처리방침</Link>
+            <Link href="/refund" className="hover:text-[#21c1a2] transition-colors">환불 정책</Link>
           </div>
         </div>
       </footer>
