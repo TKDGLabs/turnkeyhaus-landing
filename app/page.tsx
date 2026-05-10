@@ -14,11 +14,15 @@ import { getSortedInsights } from "../content/insights";
 const shell = "mx-auto w-full max-w-[1320px] px-6 lg:px-12";
 const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
+// 에러 해결 포인트: transition의 ease 값 뒤에 'as const'를 붙여 타입을 고정했습니다.
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+  transition: { 
+    duration: 0.8, 
+    ease: [0.16, 1, 0.3, 1] as [number, number, number, number] 
+  }
 };
 
 // --- 공통 컴포넌트 ---
@@ -141,7 +145,7 @@ export default function Page() {
               <motion.div 
                 key={card.title} 
                 {...fadeUp} 
-                transition={{ delay: idx * 0.1 }}
+                transition={{ ...fadeUp.transition, delay: idx * 0.1 }}
                 className={`group rounded-[32px] bg-white p-10 shadow-sm transition-all hover:shadow-2xl hover:-translate-y-2 ${idx === 0 ? 'md:col-span-2' : ''}`}
               >
                 <p className="text-xs font-black text-[#21c1a2]">SERVICE 0{idx + 1}</p>
@@ -168,7 +172,12 @@ export default function Page() {
           
           <div className="grid gap-12 lg:grid-cols-3">
             {content.leadership.people.map((person, idx) => (
-              <motion.div key={person.name} {...fadeUp} transition={{ delay: idx * 0.1 }} className="group">
+              <motion.div 
+                key={person.name} 
+                {...fadeUp} 
+                transition={{ ...fadeUp.transition, delay: idx * 0.1 }} 
+                className="group"
+              >
                 <div className="relative aspect-[3/4] overflow-hidden rounded-[40px] bg-[#f8f9fa]">
                   <Image src={person.image.src} alt={person.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
@@ -221,7 +230,10 @@ export default function Page() {
         <div className={`${shell} flex flex-col items-center justify-between gap-8 lg:flex-row`}>
           <div className="text-center lg:text-left">
             <p className="font-black text-lg">{content.brand.name}</p>
-            <p className="mt-2 text-xs text-black/30">{content.footer.lines[3].value}</p>
+            {/* 안전을 위해 lines가 있을 때만 접근하도록 수정 */}
+            {content.footer.lines && content.footer.lines[3] && (
+              <p className="mt-2 text-xs text-black/30">{content.footer.lines[3].value}</p>
+            )}
           </div>
           <div className="flex gap-8 text-xs font-bold text-black/40">
             <Link href="/terms" className="hover:text-black">이용약관</Link>
