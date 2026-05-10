@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import ContactCTA from "../components/ContactCTA";
 import StrategyChapterDeck from "../components/StrategyChapterDeck";
 import DiagnosticCalculator from "../components/DiagnosticCalculator";
@@ -14,13 +14,13 @@ import { getSortedInsights } from "../content/insights";
 const shell = "mx-auto w-full max-w-[1320px] px-6 lg:px-12";
 const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
-// 에러 없는 안정적이고 부드러운 페이드업 애니메이션
-const fadeUp = {
+// 🚨 에러 완벽 해결: Variants 타입 명시 및 ease 값을 'as const'로 쐐기 박음
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: { 
     opacity: 1, 
     y: 0, 
-    transition: { duration: 0.8, ease: "easeOut" } 
+    transition: { duration: 0.8, ease: "easeOut" as const } 
   }
 };
 
@@ -157,7 +157,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 4. Presenter Ops (Restored cleanly) */}
+      {/* 4. Presenter Ops */}
       <section id="presenter-ops" className="py-24 lg:py-32 bg-[#FAFAFA]">
         <div className={shell}>
           <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
@@ -182,7 +182,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 5. Services Section (Structured Grid) */}
+      {/* 5. Services Section */}
       <section id="services" className="py-24 lg:py-32 bg-white">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-20 grid lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:items-end">
@@ -224,7 +224,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 6. Exclusions (Not Single) */}
+      {/* 6. Exclusions */}
       <section id="not-single" className="py-24 lg:py-32 bg-[#FAFAFA]">
         <div className={shell}>
           <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr]">
@@ -245,7 +245,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 7. Quality & Approach & Strategy Deck */}
+      {/* 7. Quality & Approach */}
       <section id="approach" className="py-24 lg:py-32 bg-white">
         <div className={shell}>
           <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr] mb-32">
@@ -276,7 +276,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 8. Professional Targets (Industry Focus) */}
+      {/* 8. Professional Targets */}
       <section id="professional" className="py-24 lg:py-32 bg-[#FAFAFA]">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-20 text-center max-w-3xl mx-auto">
