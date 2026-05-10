@@ -245,14 +245,6 @@ export default function Page() {
                 {content.heroValue.secondaryCta.label}
               </ActionLink>
             </div>
-
-            <ul className="grid gap-2 border-y border-black/12 py-4 text-[14px] font-semibold leading-[1.6] text-black/68 sm:grid-cols-2 lg:grid-cols-4">
-              {content.heroValue.trustBadges.map((badge) => (
-                <li key={badge} className="break-keep">
-                  {badge}
-                </li>
-              ))}
-            </ul>
           </div>
 
           <dl className="mt-8 grid gap-5 border-t border-black/15 pt-5 text-[#0B0F0E] sm:mt-12 sm:pt-6 sm:grid-cols-3">
@@ -282,16 +274,6 @@ export default function Page() {
           <div className="space-y-9">
             <p className="whitespace-pre-line break-keep text-[18px] leading-[1.9] text-black/74">{problemSupport}</p>
             <p className="whitespace-pre-line break-keep text-[17px] leading-[1.95] text-black/68">{problemDetail}</p>
-
-            {content.problem.items.length > 0 ? (
-              <ul className="grid gap-3 border-y border-black/12 py-5 text-[15px] leading-[1.8] text-black/72 md:grid-cols-3">
-                {content.problem.items.map((item) => (
-                  <li key={item} className="break-keep">
-                    - {item}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
 
             <figure className="overflow-hidden border border-black/10">
               <Image
