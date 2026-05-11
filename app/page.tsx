@@ -122,7 +122,7 @@ export default function Page() {
         </div>
       </header>
 
-      {/* 🚀 2. 모바일 영상 잘림 현상 완벽 해결: 모바일은 16:9 비율 유지, PC는 풀스크린 */}
+      {/* 2. 100% 간섭 없는 풀스크린 시네마틱 비디오 */}
       <section className="relative w-full bg-black overflow-hidden aspect-video md:aspect-auto md:h-[100svh] md:min-h-[600px]">
         <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover object-center">
           <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
@@ -394,7 +394,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 11. 팀 소개 (운영 리드) */}
+      {/* 11. 팀 소개 */}
       <section id="team" className="py-16 md:py-24 lg:py-32 bg-white">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20 text-center max-w-3xl mx-auto">
@@ -414,10 +414,13 @@ export default function Page() {
                     <h3 className="text-[24px] md:text-[28px] font-bold text-[#0B0F0E]">
                       {person.name} <span className="text-[12px] md:text-[13px] text-black/30 font-bold ml-1.5 md:ml-2 uppercase tracking-widest">{person.englishName}</span>
                     </h3>
+                    <p className="text-[#21c1a2] text-[13px] md:text-[14px] font-bold uppercase tracking-widest mt-2 md:mt-3">
+                      {person.responsibilities.slice(0, 2).join(' · ')}
+                    </p>
                   </div>
                   <p className="text-[14px] md:text-[15px] font-medium leading-[1.8] md:leading-[1.85] text-black/60 mb-6 md:mb-8 flex-1">{person.body}</p>
                   <ul className="flex flex-wrap gap-2 mt-auto">
-                    {person.responsibilities.slice(0, 2).map(r => (
+                    {person.responsibilities.slice(0,3).map(r => (
                       <li key={r} className="bg-white border border-black/5 text-black/50 text-[11px] md:text-[12px] font-bold px-2.5 py-1 md:px-3 md:py-1.5 rounded-full">#{r}</li>
                     ))}
                   </ul>
@@ -475,19 +478,19 @@ export default function Page() {
       </section>
 
       {/* 14. 계산기 */}
-      <section className="bg-white py-16 md:py-24 border-b border-black/5">
+      <section className="bg-[#FAFAFA] py-16 md:py-24 border-b border-black/5">
         <DiagnosticCalculator />
       </section>
 
       {/* 15. 연락처 및 폼 */}
-      <section id="contact" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA]">
+      <section id="contact" className="py-16 md:py-24 lg:py-32 bg-white">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16 max-w-3xl">
             <SectionHeader label={content.contact.label} title={content.contact.h2} lead={content.contact.lead} />
           </motion.div>
 
           <div className="grid gap-12 md:gap-16 lg:grid-cols-[0.88fr_1.12fr] items-start">
-            <div className="space-y-6 md:space-y-8 border-t border-black/10 pt-6 md:pt-8 bg-white p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl border border-black/5 shadow-sm">
+            <div className="space-y-6 md:space-y-8 border-t border-black/10 pt-6 md:pt-8 bg-[#FAFAFA] p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl border border-black/5 shadow-sm">
               <div className="space-y-2 md:space-y-3">
                 <h3 className="text-[24px] md:text-[28px] font-bold text-[#0B0F0E] mb-3 md:mb-4">먼저 확인하는 것</h3>
                 <p className="text-[15px] md:text-[16px] font-medium leading-[1.8] md:leading-[1.9] text-black/60">긴 리포트 전에, 상담으로 이어지지 않는 병목부터 빠르게 확인합니다.</p>
@@ -499,6 +502,7 @@ export default function Page() {
               </ul>
               
               <div className="flex flex-col xl:flex-row gap-3 md:gap-4 pt-5 md:pt-6 border-t border-black/5">
+                {/* 🚨 지시사항 반영: 전화번호 텍스트 제거하고 라벨만 출력되게 수정 */}
                 {hasPhoneHref && (
                   <a href={phoneHref} className={`flex-1 text-center bg-white border border-black/15 py-3.5 md:py-4 rounded-full text-[14px] md:text-[15px] font-bold hover:bg-black/5 transition-colors ${focusRing}`}>
                     {content.contact.quickCallLabel}
@@ -512,7 +516,7 @@ export default function Page() {
               </div>
             </div>
             
-            <div id="contact-form" className="rounded-2xl md:rounded-3xl overflow-hidden bg-white border border-black/5 h-[600px] md:h-[760px] shadow-sm">
+            <div id="contact-form" className="rounded-2xl md:rounded-3xl overflow-hidden bg-[#FAFAFA] border border-black/5 h-[600px] md:h-[760px] shadow-sm">
               {hasFormEmbedUrl ? (
                 <iframe src={formEmbedUrl} className="w-full h-full border-0" loading="lazy" title={content.contact.iframeTitle} referrerPolicy="strict-origin-when-cross-origin" />
               ) : (
@@ -524,7 +528,7 @@ export default function Page() {
       </section>
 
       {/* 16. FAQ & 블로그 */}
-      <section className="py-16 md:py-24 lg:py-32 bg-white">
+      <section className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA]">
         <div className={shell}>
           <div className="grid gap-16 md:gap-24 lg:grid-cols-[1fr_1fr]">
             
@@ -537,7 +541,7 @@ export default function Page() {
                       {item.q}
                       <span className="text-[#21c1a2] group-open:-rotate-180 transition-transform">▼</span>
                     </summary>
-                    <p className="mt-4 md:mt-6 text-[15px] md:text-[16px] text-black/60 font-medium leading-[1.8] md:leading-[1.9] whitespace-pre-line bg-[#FAFAFA] p-5 md:p-6 rounded-xl md:rounded-2xl border border-black/5">{item.a}</p>
+                    <p className="mt-4 md:mt-6 text-[15px] md:text-[16px] text-black/60 font-medium leading-[1.8] md:leading-[1.9] whitespace-pre-line bg-white p-5 md:p-6 rounded-xl md:rounded-2xl border border-black/5">{item.a}</p>
                   </details>
                 ))}
               </div>
@@ -548,7 +552,7 @@ export default function Page() {
               {insightPosts.length > 0 && (
                 <div className="mt-8 md:mt-12 space-y-4 md:space-y-6">
                   {insightPosts.map((post) => (
-                    <Link key={post.slug} href={`/insights/${post.slug}`} className={`block bg-[#FAFAFA] p-6 md:p-8 rounded-xl md:rounded-2xl border border-black/5 hover:border-[#21c1a2] hover:bg-white transition-colors shadow-sm ${focusRing}`}>
+                    <Link key={post.slug} href={`/insights/${post.slug}`} className={`block bg-white p-6 md:p-8 rounded-xl md:rounded-2xl border border-black/5 hover:border-[#21c1a2] transition-colors shadow-sm ${focusRing}`}>
                        <p className="text-[12px] md:text-[13px] font-bold tracking-widest text-black/40 mb-2 md:mb-3 uppercase">{post.publishedAt}</p>
                        <h3 className="text-[20px] md:text-[22px] font-bold mb-2 md:mb-3 text-[#0B0F0E]">{post.title}</h3>
                        <p className="text-[14px] md:text-[15px] text-black/50 font-medium leading-[1.8] line-clamp-2">{post.description}</p>
