@@ -11,14 +11,20 @@ import DiagnosticCalculator from "../components/DiagnosticCalculator";
 import { content } from "../content";
 import { getSortedInsights } from "../content/insights";
 
+// --- 스타일 유틸리티 ---
 const shell = "mx-auto w-full max-w-[1320px] px-5 sm:px-6 lg:px-10";
 const labelClass = "inline-flex items-center border border-black/15 px-3 py-1 text-[11px] font-bold tracking-[0.12em] text-black/55 uppercase";
 const sectionTitle = "whitespace-pre-line break-keep text-[28px] sm:text-[32px] font-bold leading-[1.25] tracking-tight text-[#0B0F0E] md:text-[48px]";
 const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
+// 애니메이션 설정
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" as const } }
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.8, ease: "easeOut" as const } 
+  }
 };
 
 function isExternalLink(href: string) {
@@ -33,6 +39,7 @@ function ActionLink({ href, className, children }: { href: string; className: st
   return <Link href={href} className={mergedClass}>{children}</Link>;
 }
 
+// 공통 Section Header
 function SectionHeader({ label, title, lead, dark = false }: { label: string; title: string; lead?: string; dark?: boolean; }) {
   return (
     <div className="space-y-4 md:space-y-6">
@@ -73,16 +80,24 @@ export default function Page() {
   const hasPhoneHref = phoneHref.startsWith("tel:");
   const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
   
+  // 🚨 지시사항 반영 (에러 원인 완벽 복구): 문제 섹션 텍스트 분리 변수 복원
+  const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
+
   const totalSubscribers = content.portfolio.items.reduce((sum, item) => sum + item.subscriberCurrent, 0);
   const totalVideoViews = content.heroStats.totalVideoViews;
   const totalVideoViewsInMan = `${formatInteger(totalVideoViews / 10000)}만+`;
 
+  // ✨ 영상 높이를 벗어나면 메뉴바가 스르륵 등장 (모바일/PC 반응형 감지)
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight * 0.8) setIsScrolled(true);
-      else setIsScrolled(false);
+      // 뷰포트 높이의 80%를 넘어가면 등장
+      if (window.scrollY > window.innerHeight * 0.8) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll);
@@ -92,41 +107,51 @@ export default function Page() {
   return (
     <main className="bg-white text-[#0B0F0E] antialiased pb-20 md:pb-0">
       
-      {/* 1. 스마트 헤더 */}
-      <header className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}>
+      {/* 1. 스마트 헤더 (스크롤 반응형) */}
+      <header 
+        className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${
+          isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
         <div className={`${shell} flex h-[60px] md:h-20 items-center justify-between`}>
           <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
             <Image src="/logo.png" alt="Turnkeyhaus" width={140} height={38} className="h-6 md:h-8 w-auto object-contain" priority />
           </Link>
+
           <nav className="hidden items-center gap-8 lg:flex">
             {content.nav.map((item) => (
-              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-black transition-colors ${focusRing}`}>{item.label}</Link>
+              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-black transition-colors ${focusRing}`}>
+                {item.label}
+              </Link>
             ))}
           </nav>
+
           <ActionLink href="https://sclu.io/share/bulk/file/bf2w8ioROJvw" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
             소개서 다운로드
           </ActionLink>
         </div>
       </header>
 
-      {/* 2. 100% 간섭 없는 풀스크린 시네마틱 비디오 */}
+      {/* 2. 100% 간섭 없는 풀스크린 시네마틱 비디오 (모바일/PC 맞춤 커버) */}
       <section className="relative h-[100svh] min-h-[500px] w-full bg-black overflow-hidden">
         <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover object-center">
           <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
         </video>
       </section>
 
-      {/* 3. Hero 텍스트 영역 */}
+      {/* 3. Hero 텍스트 영역 (영상 지나고 하얀 바탕에서 등장) */}
       <section id="top" className="bg-white py-16 md:py-24 lg:py-32">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-[1000px] space-y-6 md:space-y-8 text-[#0B0F0E]">
             <p className="text-[12px] md:text-[13px] font-bold tracking-[0.2em] text-[#21c1a2] uppercase">턴키하우스 by TKDG</p>
+            {/* 모바일 텍스트 짤림 방지 배율 조정 */}
             <h1 className="whitespace-pre-line break-keep text-[32px] sm:text-[48px] font-bold leading-[1.25] tracking-tight md:text-[64px] lg:text-[76px]">
               {content.heroValue.headline}
             </h1>
             <p className="max-w-[58ch] whitespace-pre-line break-keep text-[16px] sm:text-[18px] leading-[1.7] text-black/60 md:text-[22px] font-medium">
               {content.heroValue.body}
             </p>
+
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4 md:pt-6">
               <ActionLink href={content.heroValue.primaryCta.href} className="inline-flex justify-center items-center rounded-full bg-[#21c1a2] px-8 py-3.5 md:py-4 text-[15px] md:text-[16px] font-bold text-[#07211d] hover:bg-[#1db197] transition-transform hover:scale-105 w-full sm:w-auto text-center">
                 {content.heroValue.primaryCta.label}
@@ -137,6 +162,7 @@ export default function Page() {
             </div>
           </motion.div>
           
+          {/* 통계 바 */}
           <div className="mt-16 md:mt-24 grid gap-6 md:gap-8 border-t border-black/10 pt-10 md:pt-16 sm:grid-cols-3 bg-[#FAFAFA] rounded-2xl md:rounded-3xl p-8 md:p-10 border border-black/5">
             <div className="space-y-2 md:space-y-3 text-center sm:text-left">
               <dt className="text-[12px] md:text-[13px] font-bold tracking-[0.14em] text-black/40 uppercase">대표 사례</dt>
@@ -154,7 +180,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 4. 포트폴리오 (사례 요약 + 모바일 CTA 추가) */}
+      {/* 4. 포트폴리오 (설득 네러티브: 증거를 전진 배치) */}
       <section id="portfolio" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20">
@@ -180,17 +206,27 @@ export default function Page() {
                     <p className="text-[12px] md:text-[13px] font-bold text-[#21c1a2] uppercase tracking-widest mb-3 md:mb-4">클라이언트: {item.clientName}</p>
                     <p className="text-[15px] md:text-[17px] leading-[1.8] text-black/70 font-medium">{item.oneLiner}</p>
                   </div>
+
                   <dl className="grid grid-cols-2 gap-4 md:gap-6 bg-[#FAFAFA] border border-black/5 rounded-xl p-5 md:p-6">
-                    <div><dt className="text-[11px] font-bold text-black/40 uppercase mb-1 md:mb-2">구독자 변화</dt><dd className="text-[18px] md:text-[20px] font-bold text-[#0B0F0E]">{item.result}</dd></div>
-                    <div><dt className="text-[11px] font-bold text-black/40 uppercase mb-1 md:mb-2">최고 조회수</dt><dd className="text-[18px] md:text-[20px] font-bold text-[#21c1a2]">{formatViewsKorean(item.maxVideoViews)}회</dd></div>
+                    <div>
+                      <dt className="text-[11px] font-bold text-black/40 uppercase mb-1 md:mb-2">구독자 변화</dt>
+                      <dd className="text-[18px] md:text-[20px] font-bold text-[#0B0F0E]">{item.result}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-[11px] font-bold text-black/40 uppercase mb-1 md:mb-2">최고 조회수</dt>
+                      <dd className="text-[18px] md:text-[20px] font-bold text-[#21c1a2]">{formatViewsKorean(item.maxVideoViews)}회</dd>
+                    </div>
                   </dl>
-                  {/* 모바일 피로도 감소를 위해 홈에서는 상세설명 숨김 처리 (클릭유도) */}
-                  <div className="hidden md:grid gap-4 md:gap-6 border-t border-black/5 pt-5 md:pt-6 text-[13px] md:text-[14px] font-medium leading-[1.75] text-black/60 sm:grid-cols-2">
-                    {item.before && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">BEFORE</p><p className="break-keep">{item.before}</p></div>)}
-                    {item.action && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">ACTION</p><p className="break-keep">{item.action}</p></div>)}
-                    {item.after && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">AFTER</p><p className="break-keep">{item.after}</p></div>)}
-                    {item.proof && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">운영 포인트</p><p className="break-keep">{item.proof}</p></div>)}
-                  </div>
+
+                  {(item.before || item.action || item.after || item.proof) && (
+                    <div className="grid gap-4 md:gap-6 border-t border-black/5 pt-5 md:pt-6 text-[13px] md:text-[14px] font-medium leading-[1.75] text-black/60 sm:grid-cols-2">
+                      {item.before && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">BEFORE</p><p className="break-keep">{item.before}</p></div>)}
+                      {item.action && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">ACTION</p><p className="break-keep">{item.action}</p></div>)}
+                      {item.after && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">AFTER</p><p className="break-keep">{item.after}</p></div>)}
+                      {item.proof && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">운영 포인트</p><p className="break-keep">{item.proof}</p></div>)}
+                    </div>
+                  )}
+
                   <ActionLink href={`/cases/${item.caseSlug}`} className="inline-block mt-2 md:mt-4 text-[14px] md:text-[15px] font-bold border-b-2 border-black/10 pb-1 hover:border-[#21c1a2] hover:text-[#21c1a2] transition-colors">
                     케이스 스터디 상세 보기 →
                   </ActionLink>
@@ -199,14 +235,13 @@ export default function Page() {
             ))}
           </div>
 
-          {/* 🚀 사례 섹션 끝부분 중간 CTA 삽입 */}
           <div className="mt-12 md:mt-16 text-center">
              <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-8 py-4 text-[15px] font-bold text-black shadow-sm hover:bg-black/5 transition-colors">무료 3포인트 진단 신청</ActionLink>
           </div>
         </div>
       </section>
 
-      {/* 5. 요금제 (3개 메인 + 2개 서브 구조) */}
+      {/* 5. 요금제 (운영 플랜) */}
       <section id="pilot" className="py-16 md:py-24 lg:py-32 bg-white">
         <div className={`${shell} grid gap-10 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]`}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="lg:sticky lg:top-32 lg:self-start space-y-4 md:space-y-6">
@@ -217,7 +252,10 @@ export default function Page() {
           <div className="border-t border-black/10">
             {content.pricing.levels.slice(0, 3).map((level, index) => (
               <motion.article key={level.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="grid gap-4 md:gap-6 border-b border-black/10 py-8 md:py-10 lg:grid-cols-[180px_1fr]">
-                <div><p className="text-[24px] md:text-[28px] font-bold tracking-tight text-[#0B0F0E] mb-2">{level.priceBand}</p></div>
+                <div>
+                  <p className="text-[11px] md:text-[12px] font-bold tracking-widest text-black/40 mb-1 md:mb-2 uppercase">OPTION 0{index + 1}</p>
+                  <p className="text-[24px] md:text-[28px] font-bold tracking-tight text-[#0B0F0E]">{level.priceBand}</p>
+                </div>
                 <div>
                   <h3 className="text-[22px] md:text-[26px] font-bold tracking-tight text-[#0B0F0E] mb-4 md:mb-6">{level.title}</h3>
                   <ul className="grid gap-3 md:gap-4 text-[14px] md:text-[15px] font-medium leading-[1.7] md:leading-[1.75] text-black/70 sm:grid-cols-2">
@@ -239,7 +277,6 @@ export default function Page() {
               ))}
             </div>
 
-            {/* 🚀 요금제 섹션 끝부분 중간 CTA 삽입 */}
             <div className="mt-12 text-center md:text-left">
                <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-8 py-4 text-[15px] font-bold text-black shadow-sm hover:bg-black/5 transition-colors">채널 링크 보내고 1차 진단 받기</ActionLink>
             </div>
@@ -247,7 +284,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 6. 하지 않는 일 */}
+      {/* 6. 하지 않는 일 (신뢰 확보) */}
       <section id="not-single" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
         <div className={`${shell} grid gap-10 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]`}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
@@ -271,33 +308,29 @@ export default function Page() {
             <span className={labelClass}>{content.problem.label}</span>
             <h2 className={`${sectionTitle}`}>{content.problem.h2}</h2>
           </motion.div>
+
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="space-y-6 md:space-y-10">
             <p className="whitespace-pre-line break-keep text-[16px] md:text-[20px] leading-[1.8] md:leading-[1.9] text-black/80 font-medium">{problemSupport}</p>
             <p className="whitespace-pre-line break-keep text-[15px] md:text-[18px] leading-[1.8] md:leading-[1.95] text-black/60 font-medium">{problemDetail}</p>
-            <figure className="overflow-hidden rounded-xl md:rounded-2xl bg-white border border-black/5 mt-6 md:mt-8">
+            
+            <figure className="overflow-hidden rounded-xl md:rounded-2xl bg-[#FAFAFA] border border-black/5 mt-6 md:mt-8">
               <Image src="/images/reality-illustration-optimized.jpg" alt="채널 진단과 운영 구조" width={1600} height={1030} className="h-auto w-full object-cover" sizes="(max-width: 1024px) 100vw, 90vw" />
             </figure>
-            <p className="text-[18px] md:text-[22px] font-bold leading-[1.6] md:leading-[1.75] text-[#21c1a2]">{content.problem.emphasis}</p>
+            <p className="text-[18px] md:text-[22px] font-bold leading-[1.6] md:leading-[1.75] text-[#21c1a2]">
+              {content.problem.emphasis}
+            </p>
           </motion.div>
         </div>
       </section>
 
-      {/* 8. 전략 프레임 (간소화된 UI) */}
+      {/* 8. 전략 프레임 */}
       <section id="approach" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16">
             <SectionHeader label={content.strategyFrame.label} title={content.strategyFrame.h2} lead={content.approach.lead} />
           </motion.div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 border-t border-black/10 pt-12">
-            {content.strategyFrame.steps.map((step, index) => (
-              <div key={step.title} className="bg-white p-8 rounded-2xl border border-black/5 shadow-sm">
-                <p className="text-[12px] font-bold tracking-widest text-[#21c1a2] mb-3">STEP 0{index + 1}</p>
-                <h4 className="text-[20px] font-bold text-[#0B0F0E] mb-4">{step.title}</h4>
-                <p className="text-[15px] font-medium leading-[1.8] text-black/60">{step.detail}</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-12 md:mt-16 text-center text-[16px] md:text-[18px] font-bold leading-[1.8] md:leading-[1.9] text-[#21c1a2]">{content.approach.keyline}</p>
+          <StrategyChapterDeck />
+          <p className="mt-8 md:mt-12 text-center text-[16px] md:text-[18px] font-bold leading-[1.8] md:leading-[1.9] text-[#21c1a2]">{content.approach.keyline}</p>
         </div>
       </section>
 
@@ -313,6 +346,7 @@ export default function Page() {
                 ))}
               </div>
             </motion.div>
+
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="bg-[#FAFAFA] border border-black/5 p-8 md:p-12 rounded-2xl md:rounded-3xl">
               <SectionHeader label={content.presenterOps.label} title={content.presenterOps.h2} lead="전문직·고관여 유튜브의 병목은 편집보다 출연자인 경우가 많습니다. 의사, 변호사, 세무사, 대표는 본업이 바쁘고 말 한마디의 리스크도 큽니다." />
               <div className="mt-8 md:mt-10 space-y-4 md:space-y-6 border-t border-black/5 pt-6 md:pt-8">
@@ -332,6 +366,7 @@ export default function Page() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-16 md:mb-24 max-w-3xl">
             <SectionHeader label={content.professionalTargets.label} title={content.professionalTargets.h2} lead={content.professionalTargets.lead} />
           </motion.div>
+
           <div className="space-y-16 md:space-y-20">
             {content.professionalTargets.cards.map((card, index) => (
               <motion.article key={card.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="grid items-center gap-8 md:gap-12 lg:grid-cols-2">
@@ -349,7 +384,7 @@ export default function Page() {
                   <h3 className="text-[28px] md:text-[36px] font-bold tracking-tight text-[#0B0F0E]">{card.title}</h3>
                   <p className="text-[16px] md:text-[18px] leading-[1.8] md:leading-[1.9] text-black/70 font-medium">{card.oneLiner}</p>
                   <div className="flex flex-wrap gap-2 pt-1 md:pt-2">
-                    {(card.tags ?? []).map(tag => <span key={tag} className="bg-white border border-black/5 px-2.5 py-1 md:px-3 md:py-1.5 rounded-md text-[12px] md:text-[13px] font-bold text-black/60">#{tag}</span>)}
+                    {(card.tags ?? []).map(tag => <span key={tag} className="bg-[#FAFAFA] border border-black/5 px-2.5 py-1 md:px-3 md:py-1.5 rounded-md text-[12px] md:text-[13px] font-bold text-black/60">#{tag}</span>)}
                   </div>
                   <ul className="space-y-2.5 md:space-y-3 border-t border-black/10 pt-5 md:pt-6 text-[14px] md:text-[15px] font-medium text-black/70">
                     {card.bullets.map(b => <li key={b} className="flex gap-2.5 md:gap-3 items-start"><span className="mt-1.5 md:mt-2 h-1.5 w-1.5 bg-[#21c1a2] rounded-full shrink-0"/>{b}</li>)}
@@ -366,8 +401,8 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 11. 팀 소개 (실무 역할 중심) */}
-      <section id="team" className="py-16 md:py-24 lg:py-32 bg-white">
+      {/* 11. 팀 소개 (모바일 최적화: 2줄 설명 압축) */}
+      <section id="team" className="py-16 md:py-24 lg:py-32 bg-white border-y border-black/5">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20 text-center max-w-3xl mx-auto">
             <SectionHeader label={content.leadership.label} title={content.leadership.h2} lead={content.leadership.lead} />
@@ -378,7 +413,7 @@ export default function Page() {
               <motion.article key={person.name} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: idx * 0.1 }} 
                 className="group flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-[#FAFAFA] border border-black/5 shadow-sm hover:shadow-xl transition-all duration-500"
               >
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-white border-b border-black/5">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/5">
                   <Image src={person.image.src} alt={person.image.alt} fill className="object-cover object-top transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
                 <div className="p-6 md:p-8 lg:p-10 flex flex-col flex-1">
@@ -386,13 +421,11 @@ export default function Page() {
                     <h3 className="text-[24px] md:text-[28px] font-bold text-[#0B0F0E]">
                       {person.name} <span className="text-[12px] md:text-[13px] text-black/30 font-bold ml-1.5 md:ml-2 uppercase tracking-widest">{person.englishName}</span>
                     </h3>
-                    <p className="text-[#21c1a2] text-[13px] md:text-[14px] font-bold uppercase tracking-widest mt-2 md:mt-3">
-                      {person.responsibilities.slice(0, 2).join(' · ')}
-                    </p>
                   </div>
                   <p className="text-[14px] md:text-[15px] font-medium leading-[1.8] md:leading-[1.85] text-black/60 mb-6 md:mb-8 flex-1">{person.body}</p>
+                  
                   <ul className="flex flex-wrap gap-2 mt-auto">
-                    {person.responsibilities.slice(0,3).map(r => (
+                    {person.responsibilities.slice(0, 2).map(r => (
                       <li key={r} className="bg-white border border-black/5 text-black/50 text-[11px] md:text-[12px] font-bold px-2.5 py-1 md:px-3 md:py-1.5 rounded-full">#{r}</li>
                     ))}
                   </ul>
@@ -403,60 +436,13 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 12. 선택 기준 & CTA 추가 */}
-      <section id="fit" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-t border-black/5">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-16 md:mb-20 max-w-3xl mx-auto text-center">
-            <SectionHeader label={content.aiRecommendation.label} title={content.aiRecommendation.h2} lead={content.aiRecommendation.lead} />
-          </motion.div>
-
-          <div className="grid gap-6 md:gap-8 max-w-5xl mx-auto border-t border-black/10 pt-12 md:pt-16">
-            {content.aiRecommendation.items.map((item) => (
-              <motion.article key={item.prompt} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-white p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl border border-black/5 shadow-sm">
-                <p className="text-[11px] md:text-[12px] font-bold tracking-widest text-[#21c1a2] mb-2 md:mb-3 uppercase">자주 들어온 의뢰 유형</p>
-                <h3 className="text-[22px] md:text-[26px] font-bold tracking-tight text-[#0B0F0E] mb-3 md:mb-4">{item.prompt}</h3>
-                <p className="text-[16px] md:text-[18px] font-medium leading-[1.8] md:leading-[1.85] text-black/70 mb-6 md:mb-8 border-b border-black/5 pb-6 md:pb-8">{item.fit}</p>
-                <ul className="space-y-2.5 md:space-y-3">
-                  {item.reasons.map((reason) => (
-                    <li key={reason} className="text-[14px] md:text-[15px] font-semibold text-black/60 flex items-center gap-2.5 md:gap-3"><span className="h-1.5 w-1.5 bg-black/20 rounded-full shrink-0"/>{reason}</li>
-                  ))}
-                </ul>
-              </motion.article>
-            ))}
-          </div>
-
-          {/* 🚀 선택 기준 끝부분 중간 CTA 삽입 */}
-          <div className="mt-12 md:mt-16 text-center">
-             <p className="text-[16px] md:text-[18px] font-bold text-[#0B0F0E] mb-6">{content.aiRecommendation.note}</p>
-             <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-[#0B0F0E] border border-black/15 px-8 py-4 text-[15px] font-bold text-white shadow-sm hover:bg-[#21c1a2] hover:text-black transition-colors">카카오톡으로 채널 링크 보내기</ActionLink>
-          </div>
-        </div>
-      </section>
-
-      {/* 13. 리스크 관리 */}
-      <section id="risk" className="py-16 md:py-24 lg:py-32 bg-[#0B0F0E] text-white">
-        <div className={`${shell} grid gap-12 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]`}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <SectionHeader label={content.riskManagement.label} title={content.riskManagement.h2} lead={content.riskManagement.lead} dark />
-          </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="space-y-8 md:space-y-10">
-            <ul className="divide-y divide-white/10 border-y border-white/10">
-              {content.riskManagement.items.map((item) => (
-                <li key={item} className="py-5 md:py-6 text-[16px] md:text-[18px] font-bold leading-[1.7] md:leading-[1.75] text-white/90">{item}</li>
-              ))}
-            </ul>
-            <p className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-xl md:rounded-2xl text-[15px] md:text-[16px] leading-[1.8] md:leading-[1.85] text-white/60 font-medium">{content.riskManagement.note}</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 14. 계산기 */}
+      {/* 12. 계산기 */}
       <section className="bg-white py-16 md:py-24">
         <DiagnosticCalculator />
       </section>
 
-      {/* 15. 연락처 및 폼 */}
-      <section id="contact" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
+      {/* 13. 연락처 및 폼 */}
+      <section id="contact" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-t border-black/5">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16 max-w-3xl">
             <SectionHeader label={content.contact.label} title={content.contact.h2} lead={content.contact.lead} />
@@ -494,7 +480,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 16. FAQ & 블로그 */}
+      {/* 14. FAQ & 블로그 */}
       <section className="py-16 md:py-24 lg:py-32 bg-white">
         <div className={shell}>
           <div className="grid gap-16 md:gap-24 lg:grid-cols-[1fr_1fr]">
@@ -538,7 +524,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 🚀 모바일 전용 하단 고정 CTA */}
+      {/* 모바일 전용 하단 고정 CTA */}
       <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-black/10 p-3 md:hidden shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
          <div className="flex gap-2 max-w-[400px] mx-auto">
             {hasKakaoChatUrl && (
