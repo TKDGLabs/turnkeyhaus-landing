@@ -227,7 +227,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 5. 요금제 */}
+      {/* 5. 요금제 (🚨 하단 컨설팅/HR 박스 2개 완전히 제거됨) */}
       <section id="pilot" className="py-16 md:py-24 lg:py-32 bg-white">
         <div className={`${shell} grid gap-10 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]`}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="lg:sticky lg:top-32 lg:self-start space-y-4 md:space-y-6">
@@ -236,6 +236,7 @@ export default function Page() {
           </motion.div>
 
           <div className="border-t border-black/10">
+            {/* 핵심 3개 플랜만 노출 */}
             {content.pricing.levels.slice(0, 3).map((level, index) => (
               <motion.article key={level.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="grid gap-4 md:gap-6 border-b border-black/10 py-8 md:py-10 lg:grid-cols-[180px_1fr]">
                 <div>
@@ -253,15 +254,6 @@ export default function Page() {
                 </div>
               </motion.article>
             ))}
-            
-            <div className="grid sm:grid-cols-2 gap-6 pt-8">
-              {content.pricing.levels.slice(3).map((level) => (
-                <div key={level.title} className="bg-[#FAFAFA] border border-black/5 p-6 rounded-2xl">
-                  <h4 className="text-[18px] font-bold text-[#0B0F0E] mb-2">{level.title}</h4>
-                  <p className="text-[13px] font-medium text-black/60">{level.target}</p>
-                </div>
-              ))}
-            </div>
 
             <div className="mt-12 text-center md:text-left">
                <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-8 py-4 text-[15px] font-bold text-black shadow-sm hover:bg-black/5 transition-colors">채널 링크 보내고 1차 진단 받기</ActionLink>
@@ -414,13 +406,11 @@ export default function Page() {
                     <h3 className="text-[24px] md:text-[28px] font-bold text-[#0B0F0E]">
                       {person.name} <span className="text-[12px] md:text-[13px] text-black/30 font-bold ml-1.5 md:ml-2 uppercase tracking-widest">{person.englishName}</span>
                     </h3>
-                    <p className="text-[#21c1a2] text-[13px] md:text-[14px] font-bold uppercase tracking-widest mt-2 md:mt-3">
-                      {person.responsibilities.slice(0, 2).join(' · ')}
-                    </p>
                   </div>
                   <p className="text-[14px] md:text-[15px] font-medium leading-[1.8] md:leading-[1.85] text-black/60 mb-6 md:mb-8 flex-1">{person.body}</p>
+                  
                   <ul className="flex flex-wrap gap-2 mt-auto">
-                    {person.responsibilities.slice(0,3).map(r => (
+                    {person.responsibilities.slice(0, 2).map(r => (
                       <li key={r} className="bg-white border border-black/5 text-black/50 text-[11px] md:text-[12px] font-bold px-2.5 py-1 md:px-3 md:py-1.5 rounded-full">#{r}</li>
                     ))}
                   </ul>
@@ -500,9 +490,8 @@ export default function Page() {
                   <li key={txt} className="text-[15px] md:text-[16px] font-bold text-[#0B0F0E] flex items-center gap-2.5 md:gap-3"><span className="h-1.5 w-1.5 bg-[#21c1a2] rounded-full"/>{txt}</li>
                 ))}
               </ul>
-              
               <div className="flex flex-col xl:flex-row gap-3 md:gap-4 pt-5 md:pt-6 border-t border-black/5">
-                {/* 🚨 지시사항 반영: 전화번호 텍스트 제거하고 라벨만 출력되게 수정 */}
+                {/* 전화번호 텍스트 제거하고 라벨만 출력 */}
                 {hasPhoneHref && (
                   <a href={phoneHref} className={`flex-1 text-center bg-white border border-black/15 py-3.5 md:py-4 rounded-full text-[14px] md:text-[15px] font-bold hover:bg-black/5 transition-colors ${focusRing}`}>
                     {content.contact.quickCallLabel}
@@ -552,7 +541,7 @@ export default function Page() {
               {insightPosts.length > 0 && (
                 <div className="mt-8 md:mt-12 space-y-4 md:space-y-6">
                   {insightPosts.map((post) => (
-                    <Link key={post.slug} href={`/insights/${post.slug}`} className={`block bg-white p-6 md:p-8 rounded-xl md:rounded-2xl border border-black/5 hover:border-[#21c1a2] transition-colors shadow-sm ${focusRing}`}>
+                    <Link key={post.slug} href={`/insights/${post.slug}`} className={`block bg-white p-6 md:p-8 rounded-xl md:rounded-2xl border border-black/5 hover:border-[#21c1a2] hover:bg-white transition-colors shadow-sm ${focusRing}`}>
                        <p className="text-[12px] md:text-[13px] font-bold tracking-widest text-black/40 mb-2 md:mb-3 uppercase">{post.publishedAt}</p>
                        <h3 className="text-[20px] md:text-[22px] font-bold mb-2 md:mb-3 text-[#0B0F0E]">{post.title}</h3>
                        <p className="text-[14px] md:text-[15px] text-black/50 font-medium leading-[1.8] line-clamp-2">{post.description}</p>
