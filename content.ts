@@ -92,6 +92,12 @@ export type PresenterOpsProof = {
   note: string;
 };
 
+// 🚨 스펙 데이터 속성 추가
+export type SpecItem = {
+  category: string;
+  items: string[];
+};
+
 export type LeadershipProfile = {
   name: string;
   englishName: string;
@@ -99,6 +105,7 @@ export type LeadershipProfile = {
   body: string;
   image: ImageAsset;
   responsibilities: string[];
+  specs: SpecItem[];
 };
 
 export type ReportSample = {
@@ -323,8 +330,7 @@ export const content: Content = {
     canonical: "https://www.turnkey.haus",
     ogImagePath: "/og-image.jpg",
     title: "전문직·고관여 브랜드 유튜브 운영팀 | Turnkeyhaus",
-    description:
-      "전문직·고관여 브랜드의 외부 유튜브 운영팀입니다. 월간 채널 운영으로 시작해 사내 영상 제작 시스템과 영상 인재 실무평가까지 구축합니다.",
+    description: "전문직·고관여 브랜드의 외부 유튜브 운영팀입니다. 월간 채널 운영으로 시작해 사내 영상 제작 시스템과 영상 인재 실무평가까지 구축합니다.",
     keywords: [
       "유튜브 채널 운영대행",
       "전문직 유튜브 운영대행",
@@ -334,8 +340,7 @@ export const content: Content = {
       "B2B 유튜브 운영대행"
     ],
     openGraphTitle: "전문직·고관여 브랜드 유튜브 운영팀 | Turnkeyhaus",
-    openGraphDescription:
-      "외주 운영으로 시작해 내부팀이 스스로 운영할 수 있는 기준까지 만듭니다. 월간 운영, 인하우스 구축, 영상 인재 실무평가를 함께 제공합니다.",
+    openGraphDescription: "외주 운영으로 시작해 내부팀이 스스로 운영할 수 있는 기준까지 만듭니다. 월간 운영, 인하우스 구축, 영상 인재 실무평가를 함께 제공합니다.",
     locale: "ko_KR"
   },
   nav: [
@@ -360,29 +365,25 @@ export const content: Content = {
   problem: {
     label: "[ 문제 · 현실 점검 ]",
     h2: "영상 한 편보다\n운영팀이 필요한 이유",
-    lead:
-      "고신뢰·고관여 채널은 영상미보다 먼저\n고객이 안심하고 문의할 이유가 보여야 합니다.\n\n타깃 질문이 분산되어 있고,\n긴 영상과 쇼츠 역할이 섞여 있으며,\n문의·예약 흐름이 일관되지 않으면\n좋은 콘텐츠도 구매 결정까지 이어지지 않습니다.",
+    lead: "고신뢰·고관여 채널은 영상미보다 먼저\n고객이 안심하고 문의할 이유가 보여야 합니다.\n\n타깃 질문이 분산되어 있고,\n긴 영상과 쇼츠 역할이 섞여 있으며,\n문의·예약 흐름이 일관되지 않으면\n좋은 콘텐츠도 구매 결정까지 이어지지 않습니다.",
     items: [],
     emphasis: "문제는 영상 제작 능력만이 아니라, 매달 같은 기준으로 운영하고 개선할 팀이 있느냐입니다."
   },
   presenterOps: {
     label: "[ 출연자 운영 ]",
     h2: "바쁜 전문가도 적은 시간으로\n촬영할 수 있게 준비합니다.",
-    lead:
-      "촬영 전 질문지, 당일 진행 순서, 검수 흐름을 먼저 정리해 출연자가 본업에 집중하면서도 안정적으로 말할 수 있게 돕습니다.",
+    lead: "촬영 전 질문지, 당일 진행 순서, 검수 흐름을 먼저 정리해 출연자가 본업에 집중하면서도 안정적으로 말할 수 있게 돕습니다.",
     points: [
       "촬영 전 질문지와 대본을 먼저 정리합니다.",
       "출연자의 말투와 설명 방식에 맞춰 진행합니다.",
       "촬영 당일 동선과 컨디션까지 관리합니다."
     ],
-    note:
-      "전문직·고관여 유튜브의 병목은 편집보다 출연자인 경우가 많습니다. 의사, 변호사, 세무사, 대표는 본업이 바쁘고 말 한마디의 리스크도 큽니다."
+    note: "전문직·고관여 유튜브의 병목은 편집보다 출연자인 경우가 많습니다. 의사, 변호사, 세무사, 대표는 본업이 바쁘고 말 한마디의 리스크도 큽니다."
   },
   exclusions: {
     label: "[ 운영 원칙 ]",
     h2: "월간 운영에 맞는\n프로젝트에 집중합니다.",
-    lead:
-      "단발 제작보다 주제 기획, 촬영, 편집, 업로드, 리포트가 함께 연결되는 운영을 우선합니다.",
+    lead: "단발 제작보다 주제 기획, 촬영, 편집, 업로드, 리포트가 함께 연결되는 운영을 우선합니다.",
     items: [
       {
         title: "단건 촬영·편집만 별도로 진행하지 않습니다.",
@@ -401,8 +402,7 @@ export const content: Content = {
   videoQuality: {
     label: "[ 제작 품질 ]",
     h2: "보기 좋은 화면보다,\n오래 운영되는 기준을 만듭니다.",
-    lead:
-      "안정적인 인물 조명, 깨끗한 음성, 자연스러운 대화 흐름, 차분한 색감까지 월간 운영 범위 안에서 관리합니다.",
+    lead: "안정적인 인물 조명, 깨끗한 음성, 자연스러운 대화 흐름, 차분한 색감까지 월간 운영 범위 안에서 관리합니다.",
     points: [
       "안정적인 인물 조명과 깨끗한 음성",
       "대화 흐름이 자연스럽게 보이는 멀티캠 촬영",
@@ -414,8 +414,7 @@ export const content: Content = {
   servicePillars: {
     label: "[ 운영 서비스 ]",
     h2: "외부 운영팀부터\n내부팀 구축까지",
-    lead:
-      "턴키하우스는 유튜브를 대신 운영하는 데서 끝나지 않습니다.\n조직이 스스로 운영할 수 있는 기준까지 만들 수 있도록 3가지 방식으로 지원합니다.",
+    lead: "턴키하우스는 유튜브를 대신 운영하는 데서 끝나지 않습니다.\n조직이 스스로 운영할 수 있는 기준까지 만들 수 있도록 3가지 방식으로 지원합니다.",
     cards: [
       {
         title: "Turnkey Channel Ops",
@@ -468,8 +467,7 @@ export const content: Content = {
   signalInsights: {
     label: "[ 운영 신호 ]",
     h2: "상담 전환은\n이 지표에서 갈립니다.",
-    lead:
-      "조회수보다 먼저 봐야 할 건\n광고 의존도, 클릭률, 채널 세팅입니다.\n\n세 지표가 정리되면 상담 흐름이 안정됩니다.",
+    lead: "조회수보다 먼저 봐야 할 건\n광고 의존도, 클릭률, 채널 세팅입니다.\n\n세 지표가 정리되면 상담 흐름이 안정됩니다.",
     items: [
       {
         eyebrow: "광고 의존도",
@@ -521,8 +519,7 @@ export const content: Content = {
   professionalTargets: {
     label: "[ 업종별 적용 ]",
     h2: "전문직을 중심으로\n고관여 업종까지 확장합니다.",
-    lead:
-      "첫 번째 축은 병원·로펌·세무/노무/회계입니다.\n여기에 기업·공공기관처럼 의사결정 과정이 긴 업종을 더해, 검색·비교·문의·내부 결재까지 이어지는 채널 구조를 설계합니다.",
+    lead: "첫 번째 축은 병원·로펌·세무/노무/회계입니다.\n여기에 기업·공공기관처럼 의사결정 과정이 긴 업종을 더해, 검색·비교·문의·내부 결재까지 이어지는 채널 구조를 설계합니다.",
     cards: [
       {
         title: "병원·의원 유튜브",
@@ -573,29 +570,12 @@ export const content: Content = {
       "다음 업로드에 반영할 개선 포인트 기록"
     ],
     crewTitle: "전담 구조",
-    crewLead:
-      "업종이 달라도 성과는 현장보다 준비 과정에서 갈립니다.\n월간 편성, 대본, 검수 기준을 먼저 정하고 촬영합니다.",
+    crewLead: "업종이 달라도 성과는 현장보다 준비 과정에서 갈립니다.\n월간 편성, 대본, 검수 기준을 먼저 정하고 촬영합니다.",
     crewCards: [
-      {
-        role: "Account Lead",
-        headline: "브랜드 운영 구조 설계",
-        bullets: []
-      },
-      {
-        role: "Marketing Producer",
-        headline: "검색 유입 운영 설계",
-        bullets: []
-      },
-      {
-        role: "Video Director",
-        headline: "촬영 표준 운영",
-        bullets: []
-      },
-      {
-        role: "Creative Lead",
-        headline: "채널 디자인 구조",
-        bullets: []
-      }
+      { role: "Account Lead", headline: "브랜드 운영 구조 설계", bullets: [] },
+      { role: "Marketing Producer", headline: "검색 유입 운영 설계", bullets: [] },
+      { role: "Video Director", headline: "촬영 표준 운영", bullets: [] },
+      { role: "Creative Lead", headline: "채널 디자인 구조", bullets: [] }
     ],
     crewNote: "",
     closing: "",
@@ -606,8 +586,7 @@ export const content: Content = {
   reportSample: {
     label: "[ 리포트 샘플 ]",
     h2: "조회수 보고가 아니라\n다음 달 운영 기준을 남깁니다.",
-    lead:
-      "월간 리포트는 잘 나온 숫자를 나열하는 문서가 아닙니다.\n이번 달 콘텐츠가 어떤 역할을 했고, 다음 달에는 무엇을 고쳐야 하는지 내부 의사결정에 쓸 수 있게 정리합니다.",
+    lead: "월간 리포트는 잘 나온 숫자를 나열하는 문서가 아닙니다.\n이번 달 콘텐츠가 어떤 역할을 했고, 다음 달에는 무엇을 고쳐야 하는지 내부 의사결정에 쓸 수 있게 정리합니다.",
     rows: [
       { label: "업로드 기록", value: "지난달 업로드 콘텐츠와 포맷별 역할 정리" },
       { label: "콘텐츠 역할", value: "각 영상이 검색, 설명, 문의, 브랜드 인식 중 어떤 역할을 했는지 정리합니다." },
@@ -617,47 +596,50 @@ export const content: Content = {
     ],
     note: "리포트는 담당자가 바뀌어도 채널 운영 히스토리가 끊기지 않도록 남기는 운영 자산입니다."
   },
+  // 🚨 인물 상세 스펙 데이터(경력/학력/자격) 완전 복구
   leadership: {
     label: "[ 전담 리드 ]",
     h2: "담당자가 바뀌지 않는\n운영 구조를 만듭니다.",
-    lead:
-      "역할별 책임자를 고정해 채널 톤과 운영 히스토리가 끊기지 않도록 관리합니다.",
+    lead: "역할별 책임자를 고정해 채널 톤과 운영 히스토리가 끊기지 않도록 관리합니다.",
     people: [
       {
         name: "채동우",
         englishName: "Chae Dong woo",
         role: "Strategy & Account Lead / TKDG Labs 대표",
-        body:
-          "채널 진단, 운영 전략, 성과 리포트, 고객 커뮤니케이션을 총괄합니다. 2016년부터 유튜브 콘텐츠 기획·제작·운영 현장에서 일해왔습니다.",
-        image: {
-          src: "/images/member-chae-dongwoo.jpg",
-          alt: "채동우 프로필 사진"
-        },
-        responsibilities: ["채널 진단", "운영 전략", "고객 소통", "촬영 운영", "리포트 검수"]
+        body: "채널 진단, 운영 전략, 성과 리포트, 고객 커뮤니케이션을 총괄합니다. 2016년부터 유튜브 콘텐츠 기획·제작·운영 현장에서 일해왔습니다.",
+        image: { src: "/images/member-chae-dongwoo.jpg", alt: "채동우 프로필 사진" },
+        responsibilities: ["채널 진단", "운영 전략", "고객 소통", "촬영 운영", "리포트 검수"],
+        specs: [
+          { category: "경력", items: ["티케이디지랩스 대표이사", "비디에스 브랜딩디자인팀 과장", "뉴커런츠 제작팀장"] },
+          { category: "학력", items: ["서울영상고등학교 영상경영과", "명지전문대학 커뮤니케이션디자인과 중퇴", "국민대학교 기업융합법학과"] },
+          { category: "자격", items: ["사진기능사", "무인동력비행장치 4종"] }
+        ]
       },
       {
         name: "양현",
         englishName: "Yang Hyun",
         role: "Channel Producer / Turnkeyhaus Lead",
-        body:
-          "콘텐츠 기획, 질문지, 촬영 구성, 업로드 구조를 설계합니다. 전문 지식이 시청자에게 이해되는 흐름으로 정리합니다.",
-        image: {
-          src: "/images/member-yang-hyun.jpg",
-          alt: "양현 프로필 사진"
-        },
-        responsibilities: ["콘텐츠 기획", "질문지 구성", "촬영 기획", "업로드 관리", "운영 흐름"]
+        body: "콘텐츠 기획, 질문지, 촬영 구성, 업로드 구조를 설계합니다. 전문 지식이 시청자에게 이해되는 흐름으로 정리합니다.",
+        image: { src: "/images/member-yang-hyun.jpg", alt: "양현 프로필 사진" },
+        responsibilities: ["콘텐츠 기획", "질문지 구성", "촬영 기획", "업로드 관리", "운영 흐름"],
+        specs: [
+          { category: "경력", items: ["티케이디지랩스 마케팅 프로듀서", "오버프레임 프로덕션 운영", "엣디자인 유튜브 PD"] },
+          { category: "학력", items: ["서울영상고등학교 영상콘텐츠과", "간세이가쿠인대학교 미디어정보학과"] },
+          { category: "자격", items: ["멀티미디어콘텐츠제작전문가", "무인동력비행장치 4종"] }
+        ]
       },
       {
         name: "손현우",
         englishName: "Son Hyunwoo",
         role: "Visual Production Lead / Pic_sta Lead",
-        body:
-          "촬영, 조명, 멀티캠 구성, 인물 화면 톤을 관리합니다. 전문직 출연자가 안정적이고 신뢰감 있게 보이도록 촬영 품질을 잡습니다.",
-        image: {
-          src: "/images/member-son-hyunwoo.jpg",
-          alt: "손현우 프로필 사진"
-        },
-        responsibilities: ["촬영·조명", "멀티캠 구성", "인물 연출", "화면 보정", "품질 관리"]
+        body: "촬영, 조명, 멀티캠 구성, 인물 화면 톤을 관리합니다. 전문직 출연자가 안정적이고 신뢰감 있게 보이도록 촬영 품질을 잡습니다.",
+        image: { src: "/images/member-son-hyunwoo.jpg", alt: "손현우 프로필 사진" },
+        responsibilities: ["촬영·조명", "멀티캠 구성", "인물 연출", "화면 보정", "품질 관리"],
+        specs: [
+          { category: "경력", items: ["티케이디지랩스 제작실장", "제이포엔터테인먼트", "tvN·OCN 드라마 촬영팀"] },
+          { category: "학력", items: ["서울영상고등학교 영상콘텐츠과"] },
+          { category: "자격", items: ["영화예술인", "사진기능사", "무인동력비행장치 4종"] }
+        ]
       }
     ]
   },
@@ -937,7 +919,6 @@ export const content: Content = {
   contact: {
     label: "[ 채널 구조 진단 ]",
     h2: "채널 링크만 남겨주세요.\n운영 가능 여부부터 확인합니다.",
-    // 🚨 지시사항 반영: 24시간 -> 1영업일로 변경 & 깔끔한 줄바꿈(\n) 적용
     lead: "접수 후 가급적 1영업일 내 1차 연락을 드리고,\n현재 채널에서 먼저 손볼 우선순위를 짧게 안내합니다.\n정밀한 실행안이 필요한 경우 유료 진단 또는 3개월 검증 운영으로 이어집니다.",
     midCtaEyebrow: "채널 진단",
     midCtaTitle: "현재 채널에서 먼저 손볼 지점을 정리해 드립니다.",
