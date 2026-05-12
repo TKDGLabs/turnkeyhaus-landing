@@ -187,6 +187,7 @@ export type Content = {
     lead: string;
     items: string[];
     emphasis: string;
+    image: ImageAsset;
   };
   presenterOps: PresenterOpsProof;
   exclusions: {
@@ -308,13 +309,12 @@ export type Content = {
 };
 
 const images = {
-  studio1: { src: "/images/studio-1.jpg", alt: "Turnkeyhaus studio setup 1" },
-  studio2: { src: "/images/studio-2.jpg", alt: "Turnkeyhaus studio setup 2" },
-  law: { src: "/images/pro-law.jpg", alt: "고신뢰 서비스 채널 사례 이미지" },
-  med: { src: "/images/pro-med.jpg", alt: "고관여 브랜딩 채널 사례 이미지" },
-  tax: { src: "/images/pro-tax.jpg", alt: "상담 전환형 채널 사례 이미지" },
-  structure: { src: "/images/concept-brand.jpg", alt: "브랜드 구조 설계 이미지" },
-  different: { src: "/images/concept-different.jpg", alt: "차별화 개념 이미지" }
+  workflow: { src: "/-OsOh6wSRTM460hyo8rc_Dropshot.jpg", alt: "데스크 워크플로우 (운영 시스템)" },
+  tax: { src: "/-OsPAdjBwFB8DhWH3Nwb_Dropshot.jpg", alt: "세무사 유튜브 화이트보드 촬영" },
+  strategyPrep: { src: "/-OsP-s2ok4S7e5-DPzEq_Dropshot.jpg", alt: "전략 회의 및 촬영 준비" },
+  structure: { src: "/-OsOzifdISDcuu5yiPi2_Dropshot.jpg", alt: "기업 유튜브 태블릿 회의" },
+  law: { src: "/-OsOzm7uC2XvC54gxafU_Dropshot.jpg", alt: "로펌 유튜브 촬영 모니터링" },
+  med: { src: "/-OsOnmVqYPgLU469QE_c_Dropshot.jpg", alt: "병원 유튜브 운영 회의" }
 } as const;
 
 export const content: Content = {
@@ -366,20 +366,22 @@ export const content: Content = {
     h2: "영상 한 편보다\n운영팀이 필요한 이유",
     lead: "고신뢰·고관여 채널은 영상미보다 먼저\n고객이 안심하고 문의할 이유가 보여야 합니다.\n\n타깃 질문이 분산되어 있고,\n긴 영상과 쇼츠 역할이 섞여 있으며,\n문의·예약 흐름이 일관되지 않으면\n좋은 콘텐츠도 구매 결정까지 이어지지 않습니다.",
     items: [],
-    emphasis: "문제는 영상 제작 능력만이 아니라, 매달 같은 기준으로 운영하고 개선할 팀이 있느냐입니다."
+    emphasis: "문제는 영상 제작 능력만이 아니라, 매달 같은 기준으로 운영하고 개선할 팀이 있느냐입니다.",
+    image: images.strategyPrep
   },
+  // 🚨 텍스트 교체 (초록 문장 및 해시태그 제거 후 Bullet 포맷 통일)
   presenterOps: {
-    label: "[ 출연자 운영 ]",
-    h2: "바쁜 전문가도 적은 시간으로\n촬영할 수 있게 준비합니다.",
-    lead: "촬영 전 질문지, 당일 진행 순서, 검수 흐름을 먼저 정리해 출연자가 본업에 집중하면서도 안정적으로 말할 수 있게 돕습니다.",
+    label: "촬영 준비",
+    h2: "전문가가 편하게 말할 수 있도록\n촬영 전부터 정리합니다.",
+    lead: "질문지, 진행 순서, 검수 흐름을 먼저 맞춰 출연자는 핵심 설명에 집중할 수 있게 돕습니다.",
     points: [
-      "촬영 전 질문지와 대본을 먼저 정리합니다.",
-      "출연자의 말투와 설명 방식에 맞춰 진행합니다.",
-      "촬영 당일 동선과 컨디션까지 관리합니다."
+      "촬영 전 질문지와 대본 흐름 정리",
+      "출연자의 말투와 설명 방식에 맞춘 진행",
+      "촬영 당일 동선과 컨디션 관리",
+      "촬영 후 검수 기준과 수정 범위 정리"
     ],
-    note: "전문직·고관여 유튜브의 병목은 편집보다 출연자인 경우가 많습니다. 의사, 변호사, 세무사, 대표는 본업이 바쁘고 말 한마디의 리스크도 큽니다."
+    note: ""
   },
-  // 🚨 지시사항 반영: "안 합니다" 어조 톤다운 및 부드러운 긍정문 교체
   exclusions: {
     label: "[ 운영 원칙 ]",
     h2: "월간 운영에 맞는\n프로젝트에 집중합니다.",
@@ -399,17 +401,18 @@ export const content: Content = {
       }
     ]
   },
+  // 🚨 텍스트 교체 (보기 좋은 화면보다 -> 보기 좋은 화면은 기본)
   videoQuality: {
-    label: "[ 제작 품질 ]",
-    h2: "보기 좋은 화면보다,\n오래 운영되는 기준을 만듭니다.",
-    lead: "안정적인 인물 조명, 깨끗한 음성, 자연스러운 대화 흐름, 차분한 색감까지 월간 운영 범위 안에서 관리합니다.",
+    label: "제작 품질",
+    h2: "보기 좋은 화면은 기본,\n매달 같은 기준으로 관리합니다.",
+    lead: "조명, 음성, 구도, 색감, 썸네일까지 채널 톤이 흔들리지 않도록 관리합니다.",
     points: [
       "안정적인 인물 조명과 깨끗한 음성",
       "대화 흐름이 자연스럽게 보이는 멀티캠 촬영",
       "전문직 출연자에게 맞는 차분한 색감과 화면 톤",
-      "썸네일 디자인과 업로드 세팅까지 함께 관리"
+      "썸네일 디자인과 업로드 세팅까지 일관 관리"
     ],
-    note: "필요 시 Sony FX 시네마 라인 기반 멀티캠 촬영으로 진행합니다."
+    note: ""
   },
   servicePillars: {
     label: "[ 운영 서비스 ]",
@@ -442,7 +445,6 @@ export const content: Content = {
       }
     ]
   },
-  // 🚨 지시사항 반영: 장황했던 챕터 방식 버리고 직관적인 4단계 블록 문구 적용
   strategyFrame: {
     label: "[ 전략 설계 프레임 ]",
     h2: "매달 네 가지 기준을\n점검합니다.",
@@ -581,7 +583,7 @@ export const content: Content = {
     crewNote: "",
     closing: "",
     images: [
-      { src: "/images/business-analyst-presenting-data-dashboard.png", alt: "월간 운영 기준과 콘텐츠 데이터를 정리하는 시각 이미지" }
+      images.workflow
     ]
   },
   reportSample: {
