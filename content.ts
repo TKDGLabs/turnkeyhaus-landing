@@ -308,13 +308,14 @@ export type Content = {
   };
 };
 
+// 🚨 사진 깨짐 해결: 경로를 모두 /images/ 로 통일했습니다.
 const images = {
-  workflow: { src: "/-OsOh6wSRTM460hyo8rc_Dropshot.jpg", alt: "데스크 워크플로우 (운영 시스템)" },
-  tax: { src: "/-OsPAdjBwFB8DhWH3Nwb_Dropshot.jpg", alt: "세무사 유튜브 화이트보드 촬영" },
-  strategyPrep: { src: "/-OsP-s2ok4S7e5-DPzEq_Dropshot.jpg", alt: "전략 회의 및 촬영 준비" },
-  structure: { src: "/-OsOzifdISDcuu5yiPi2_Dropshot.jpg", alt: "기업 유튜브 태블릿 회의" },
-  law: { src: "/-OsOzm7uC2XvC54gxafU_Dropshot.jpg", alt: "로펌 유튜브 촬영 모니터링" },
-  med: { src: "/-OsOnmVqYPgLU469QE_c_Dropshot.jpg", alt: "병원 유튜브 운영 회의" }
+  workflow: { src: "/images/-OsOh6wSRTM460hyo8rc_Dropshot.jpg", alt: "데스크 워크플로우 (운영 시스템)" },
+  tax: { src: "/images/-OsPAdjBwFB8DhWH3Nwb_Dropshot.jpg", alt: "세무사 유튜브 화이트보드 촬영" },
+  strategyPrep: { src: "/images/-OsP-s2ok4S7e5-DPzEq_Dropshot.jpg", alt: "전략 회의 및 촬영 준비" },
+  structure: { src: "/images/-OsOzifdISDcuu5yiPi2_Dropshot.jpg", alt: "기업 유튜브 태블릿 회의" },
+  law: { src: "/images/-OsOzm7uC2XvC54gxafU_Dropshot.jpg", alt: "로펌 유튜브 촬영 모니터링" },
+  med: { src: "/images/-OsOnmVqYPgLU469QE_c_Dropshot.jpg", alt: "병원 유튜브 운영 회의" }
 } as const;
 
 export const content: Content = {
@@ -369,7 +370,6 @@ export const content: Content = {
     emphasis: "문제는 영상 제작 능력만이 아니라, 매달 같은 기준으로 운영하고 개선할 팀이 있느냐입니다.",
     image: images.strategyPrep
   },
-  // 🚨 텍스트 교체 (초록 문장 및 해시태그 제거 후 Bullet 포맷 통일)
   presenterOps: {
     label: "촬영 준비",
     h2: "전문가가 편하게 말할 수 있도록\n촬영 전부터 정리합니다.",
@@ -401,7 +401,6 @@ export const content: Content = {
       }
     ]
   },
-  // 🚨 텍스트 교체 (보기 좋은 화면보다 -> 보기 좋은 화면은 기본)
   videoQuality: {
     label: "제작 품질",
     h2: "보기 좋은 화면은 기본,\n매달 같은 기준으로 관리합니다.",
@@ -813,7 +812,7 @@ export const content: Content = {
         target: "영상 인재를 뽑아야 하지만 실무 역량 판단 기준이 부족한 경우"
       }
     ],
-    emphasis: "업종, 촬영 환경, 승인 구조를 확인한 뒤 운영 범위와 계약 방식을 제안합니다."
+    emphasis: "업종, 촬영 환경, 승인 구조를 확인한 뒤 운영 범위와 계약 방식을 제안합니다. 필요에 따라 카드 정기결제 또는 세금계산서 계약으로 진행할 수 있습니다."
   },
   riskManagement: {
     label: "[ 리스크 관리 ]",
@@ -860,7 +859,7 @@ export const content: Content = {
         ]
       }
     ],
-    note: "해당되는 항목이 있다면, 먼저 채널 링크를 보내 진단부터 받아보세요."
+    note: "해당되는 항목이 있다면, 아래 안내에서 우리 조직에 맞는 운영 방식부터 먼저 확인해 보세요."
   },
   faq: {
     label: "[ 운영 안내 ]",
