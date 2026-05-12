@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { motion, Variants, AnimatePresence } from "framer-motion";
 import ContactCTA from "../components/ContactCTA";
+import StrategyChapterDeck from "../components/StrategyChapterDeck";
 import DiagnosticCalculator from "../components/DiagnosticCalculator";
 import { content } from "../content";
 import { getSortedInsights } from "../content/insights";
@@ -72,36 +73,43 @@ function TeamMemberCard({ person }: { person: any }) {
       onClick={() => setIsExpanded(!isExpanded)}
       className={`group relative flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 shadow-sm transition-all duration-500 cursor-pointer hover:shadow-xl ${isExpanded ? 'ring-2 ring-[#21c1a2]' : ''}`}
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-black/5">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#F1F1F1]">
         <Image 
           src={person.image.src} 
           alt={person.name} 
           fill 
-          className={`object-cover object-top transition-transform duration-700 group-hover:scale-105 ${isExpanded ? 'scale-105 brightness-50' : ''}`} 
+          className={`object-cover object-top transition-transform duration-700 group-hover:scale-105 ${isExpanded ? 'scale-105 brightness-75' : ''}`} 
           sizes="(max-width: 768px) 100vw, 33vw"
         />
         {!isExpanded && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 md:p-8">
-            <p className="text-white text-[13px] md:text-sm font-bold">상세 스펙 보기 +</p>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
+            {/* 🚨 지시사항 반영: '상세 스펙'을 '세부 경력'으로 교체 */}
+            <p className="text-white text-[13px] md:text-sm font-bold">세부 경력 보기 +</p>
           </div>
         )}
       </div>
 
-      <div className="p-6 md:p-8 flex flex-col flex-1 bg-white">
-        <div className="mb-4">
-          <h3 className="text-[22px] md:text-[26px] font-bold text-[#0B0F0E]">
-            {person.name} <span className="text-[12px] md:text-[13px] text-black/30 font-bold ml-1.5 uppercase tracking-widest">{person.englishName}</span>
+      <div className="p-8 flex flex-col flex-1 bg-white">
+        <div className="mb-6">
+          <h3 className="text-[26px] font-bold text-[#0B0F0E]">
+            {person.name} <span className="text-[13px] text-black/30 font-bold ml-1.5 uppercase tracking-widest">{person.englishName}</span>
           </h3>
-          <p className="text-[#21c1a2] text-[12px] md:text-[13px] font-bold uppercase tracking-widest mt-2 md:mt-3">
+          <p className="text-[#21c1a2] text-[15px] font-bold mt-2">
             {person.name === "채동우" ? "채널 기획 · 운영 총괄" : person.name === "손현우" ? "촬영 · 제작 총괄" : "구성 · 편집 총괄"}
           </p>
         </div>
-        <p className="text-[14px] md:text-[15px] font-medium leading-[1.8] text-black/60 line-clamp-2">
+        
+        <p className="text-[15px] font-medium leading-[1.8] text-black/60 mb-2">
           {person.body}
         </p>
         {!isExpanded && (
-          <div className="mt-4 pt-4 border-t border-black/5 text-center">
-            <span className="text-[12px] font-bold text-black/30 group-hover:text-[#21c1a2] transition-colors">프로필 열어보기 ▼</span>
+          <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-between">
+            <div className="flex gap-2">
+              {person.responsibilities.slice(0, 2).map((r: string) => (
+                <span key={r} className="text-[11px] font-bold bg-black/5 px-2 py-1 rounded text-black/40">#{r}</span>
+              ))}
+            </div>
+            <span className="text-[12px] font-bold text-[#21c1a2]">Profile ▼</span>
           </div>
         )}
       </div>
@@ -112,24 +120,22 @@ function TeamMemberCard({ person }: { person: any }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="px-6 md:px-8 pb-6 md:pb-8 pt-0 bg-white"
+            className="px-8 pb-8 pt-0 bg-white"
           >
-            <div className="border-t border-black/5 pt-5 md:pt-6 space-y-5 md:space-y-6">
+            <div className="border-t border-black/5 pt-6 space-y-6">
               {person.specs.map((spec: any) => (
                 <div key={spec.category}>
-                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-2 md:mb-3">{spec.category}</h4>
-                  <ul className="grid grid-cols-1 gap-1.5 md:gap-2">
+                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-3">{spec.category}</h4>
+                  <ul className="space-y-1.5">
                     {spec.items.map((item: string) => (
-                      <li key={item} className="flex items-start gap-2 text-[13px] md:text-[14px] font-bold text-black/70">
-                        <span className="mt-1.5 h-1 w-1 bg-[#21c1a2] rounded-full shrink-0" /> <span className="leading-snug">{item}</span>
+                      <li key={item} className="flex items-start gap-2 text-[14px] font-bold text-black/70 leading-snug">
+                        <span className="mt-1.5 h-1 w-1 bg-[#21c1a2] rounded-full shrink-0" /> {item}
                       </li>
                     ))}
                   </ul>
                 </div>
               ))}
-              <div className="mt-4 text-center">
-                <span className="text-[12px] font-bold text-black/30 hover:text-black transition-colors cursor-pointer">닫기 ▲</span>
-              </div>
+              <p className="text-center text-[12px] font-bold text-black/20 mt-4">카드를 다시 누르면 닫힙니다</p>
             </div>
           </motion.div>
         )}
@@ -147,6 +153,7 @@ export default function Page() {
   const hasPhoneHref = phoneHref.startsWith("tel:");
   const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
   
+  // 🚨 빌드 에러 복구 구문 완벽 유지
   const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
 
   const totalSubscribers = content.portfolio.items.reduce((sum, item) => sum + item.subscriberCurrent, 0);
@@ -157,8 +164,11 @@ export default function Page() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight * 0.8) setIsScrolled(true);
-      else setIsScrolled(false);
+      if (window.scrollY > window.innerHeight * 0.8) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll);
@@ -169,24 +179,32 @@ export default function Page() {
     <main className="bg-white text-[#0B0F0E] antialiased pb-20 md:pb-0">
       
       {/* 1. 스마트 헤더 */}
-      <header className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}>
+      <header 
+        className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${
+          isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
         <div className={`${shell} flex h-[60px] md:h-20 items-center justify-between`}>
           <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
             <Image src="/logo.png" alt="Turnkeyhaus" width={140} height={38} className="h-6 md:h-8 w-auto object-contain" priority />
           </Link>
+
           <nav className="hidden items-center gap-8 lg:flex">
             {content.nav.map((item) => (
-              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-black transition-colors ${focusRing}`}>{item.label}</Link>
+              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-[#21c1a2] transition-colors ${focusRing}`}>
+                {item.label}
+              </Link>
             ))}
           </nav>
+
           <ActionLink href="https://sclu.io/share/bulk/file/bf2w8ioROJvw" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
             소개서 다운로드
           </ActionLink>
         </div>
       </header>
 
-      {/* 2. 풀스크린 비디오 */}
-      <section className="relative w-full bg-black overflow-hidden aspect-video md:aspect-auto md:h-[100svh] md:min-h-[500px]">
+      {/* 🚀 2. 풀스크린 비디오 (PC/모바일 모두 16:9 완벽 고정) */}
+      <section className="relative w-full bg-black overflow-hidden aspect-video">
         <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover object-center">
           <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
         </video>
@@ -196,19 +214,20 @@ export default function Page() {
       <section id="top" className="bg-white py-16 md:py-24 lg:py-32">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-[1000px] space-y-6 md:space-y-8 text-[#0B0F0E]">
-            <p className="text-[12px] md:text-[13px] font-bold tracking-[0.2em] text-[#21c1a2] uppercase">턴키하우스 by TKDG</p>
-            <h1 className="whitespace-pre-line break-keep text-[32px] sm:text-[48px] font-bold leading-[1.25] tracking-tight md:text-[64px] lg:text-[76px]">
+            <p className="text-[13px] font-bold tracking-[0.2em] text-[#21c1a2] uppercase">턴키하우스 by TKDG</p>
+            <h1 className="whitespace-pre-line break-keep text-[36px] sm:text-[54px] lg:text-[84px] font-bold leading-[1.15] tracking-tight">
               {content.heroValue.headline}
             </h1>
-            <p className="max-w-[58ch] whitespace-pre-line break-keep text-[16px] sm:text-[18px] leading-[1.7] text-black/60 md:text-[22px] font-medium">
+            <p className="max-w-[58ch] text-[18px] lg:text-[24px] text-black/60 font-medium leading-relaxed">
               {content.heroValue.body}
             </p>
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4 md:pt-6">
-              <ActionLink href={content.heroValue.primaryCta.href} className="inline-flex justify-center items-center rounded-full bg-[#21c1a2] px-8 py-3.5 md:py-4 text-[15px] md:text-[16px] font-bold text-[#07211d] hover:bg-[#1db197] transition-transform hover:scale-105 w-full sm:w-auto text-center">
-                {content.heroValue.primaryCta.label}
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-6">
+              <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-[#21c1a2] px-10 py-5 text-[16px] font-bold text-black shadow-lg shadow-[#21c1a2]/20">
+                무료 3포인트 진단 받기
               </ActionLink>
-              <ActionLink href={content.heroValue.secondaryCta.href} className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-8 py-3.5 md:py-4 text-[15px] md:text-[16px] font-bold text-[#0B0F0E] hover:bg-black/5 transition-colors w-full sm:w-auto text-center">
-                {content.heroValue.secondaryCta.label}
+              <ActionLink href="#portfolio" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-10 py-5 text-[16px] font-bold">
+                운영 사례 보기
               </ActionLink>
             </div>
           </motion.div>
@@ -219,11 +238,11 @@ export default function Page() {
               <dd className="text-[32px] md:text-[40px] font-bold tracking-tight">{content.portfolio.items.length}개 채널</dd>
             </div>
             <div className="space-y-2 md:space-y-3 text-center sm:text-left border-t sm:border-t-0 sm:border-l border-black/10 pt-6 sm:pt-0 sm:pl-6">
-              <dt className="text-[12px] md:text-[13px] font-bold tracking-[0.14em] text-black/40 uppercase">현재 구독자 합산</dt>
+              <dt className="text-[12px] md:text-[13px] font-bold tracking-[0.14em] text-black/40 uppercase">누적 구독자</dt>
               <dd className="text-[32px] md:text-[40px] font-bold tracking-tight">{formatInteger(totalSubscribers)}명</dd>
             </div>
             <div className="space-y-2 md:space-y-3 text-center sm:text-left border-t sm:border-t-0 sm:border-l border-black/10 pt-6 sm:pt-0 sm:pl-6">
-              <dt className="text-[12px] md:text-[13px] font-bold tracking-[0.14em] text-black/40 uppercase">전체 영상 누적 조회수</dt>
+              <dt className="text-[12px] md:text-[13px] font-bold tracking-[0.14em] text-black/40 uppercase">누적 조회수</dt>
               <dd className="text-[32px] md:text-[40px] font-bold tracking-tight">약 {totalVideoViewsInMan}</dd>
             </div>
           </div>
@@ -252,8 +271,8 @@ export default function Page() {
 
                 <div className="space-y-6 md:space-y-8">
                   <div>
-                    <h3 className="text-[26px] md:text-[32px] font-bold tracking-tight text-[#0B0F0E] leading-tight mb-2">{item.title}</h3>
-                    <p className="text-[12px] md:text-[13px] font-bold text-[#21c1a2] uppercase tracking-widest mb-3 md:mb-4">클라이언트: {item.clientName}</p>
+                    <span className="text-[13px] font-bold text-[#21c1a2] uppercase tracking-widest">{item.clientName}</span>
+                    <h3 className="text-[26px] md:text-[32px] font-bold tracking-tight text-[#0B0F0E] leading-tight mt-2 mb-4">{item.title}</h3>
                     <p className="text-[15px] md:text-[17px] leading-[1.8] text-black/70 font-medium">{item.oneLiner}</p>
                   </div>
 
@@ -276,7 +295,7 @@ export default function Page() {
                   </div>
 
                   <ActionLink href={`/cases/${item.caseSlug}`} className="inline-block mt-2 md:mt-4 text-[14px] md:text-[15px] font-bold border-b-2 border-black/10 pb-1 hover:border-[#21c1a2] hover:text-[#21c1a2] transition-colors">
-                    케이스 스터디 상세 보기 →
+                    프로젝트 해부도 보기 →
                   </ActionLink>
                 </div>
               </motion.article>
@@ -317,7 +336,7 @@ export default function Page() {
             ))}
 
             <div className="mt-12 text-center md:text-left">
-               <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-8 py-4 text-[15px] font-bold text-black shadow-sm hover:bg-black/5 transition-colors">채널 링크 보내고 1차 진단 받기</ActionLink>
+               <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-[#0B0F0E] px-10 py-5 text-[16px] font-bold text-white shadow-sm hover:bg-[#21c1a2] transition-colors">채널 링크 보내고 1차 진단 받기</ActionLink>
             </div>
           </div>
         </div>
@@ -367,7 +386,7 @@ export default function Page() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16">
             <SectionHeader label={content.strategyFrame.label} title={content.strategyFrame.h2} lead={content.approach.lead} />
           </motion.div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 border-t border-black/10 pt-12">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 border-t border-black/10 pt-12 mb-16">
             {content.strategyFrame.steps.map((step, index) => (
               <div key={step.title} className="bg-white p-8 rounded-2xl border border-black/5 shadow-sm">
                 <p className="text-[12px] font-bold tracking-widest text-[#21c1a2] mb-3">STEP 0{index + 1}</p>
@@ -376,14 +395,16 @@ export default function Page() {
               </div>
             ))}
           </div>
+          <div className="bg-white p-6 md:p-12 rounded-[40px] border border-black/5 shadow-sm">
+             <StrategyChapterDeck />
+          </div>
           <p className="mt-12 md:mt-16 text-center text-[16px] md:text-[18px] font-bold leading-[1.8] md:leading-[1.9] text-[#21c1a2]">{content.approach.keyline}</p>
         </div>
       </section>
 
-      {/* 🚀 9. 제작 품질 & 출연자 운영 (완벽 구조 및 톤 수정) */}
+      {/* 9. 제작 품질 & 출연자 운영 */}
       <section className="py-16 md:py-24 lg:py-32 bg-white">
         <div className={shell}>
-          {/* 상위 우산 메시지 추가 */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16 max-w-3xl mx-auto text-center">
             <h2 className={sectionTitle}>촬영 품질과 출연자 준비를{"\n"}함께 관리합니다.</h2>
             <p className="mt-4 md:mt-6 text-[15px] sm:text-[17px] leading-[1.8] text-black/70 md:text-[19px] font-medium break-keep">
@@ -412,9 +433,9 @@ export default function Page() {
                  <p className="whitespace-pre-line break-keep text-[15px] md:text-[16px] leading-[1.7] text-black/70 font-medium">{content.presenterOps.lead}</p>
               </div>
               <div className="mt-8 md:mt-10 space-y-4 border-t border-black/5 pt-6 md:pt-8">
-                {content.presenterOps.points.map((point) => (
-                   <p key={point} className="text-[14px] md:text-[15px] font-bold text-[#0B0F0E] flex items-start gap-3"><span className="mt-1.5 h-1.5 w-1.5 bg-[#21c1a2] rounded-full shrink-0"/>{point}</p>
-                ))}
+                <ul className="space-y-3 pt-2">
+                   {content.presenterOps.points.map(p => <li key={p} className="flex gap-3 items-start text-[14px] md:text-[15px] font-bold text-black/70"><span className="mt-1.5 md:mt-2 h-1.5 w-1.5 bg-[#21c1a2] rounded-full shrink-0"/>{p}</li>)}
+                </ul>
               </div>
             </motion.div>
           </div>
@@ -465,8 +486,9 @@ export default function Page() {
       {/* 11. 팀 소개 */}
       <section id="team" className="py-16 md:py-24 lg:py-32 bg-white">
         <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20 text-center max-w-3xl mx-auto">
-            <SectionHeader label={content.leadership.label} title={content.leadership.h2} lead={content.leadership.lead} />
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20 text-center max-w-4xl mx-auto">
+            <h2 className={sectionTitle}>담당자가 바뀌지 않는{"\n"}운영 구조를 만듭니다.</h2>
+            <p className="mt-6 text-[18px] text-black/60 font-medium">역할별 책임자를 고정해 채널 톤과 운영 히스토리가 끊기지 않도록 관리합니다.</p>
           </motion.div>
           
           <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
