@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { motion, Variants, AnimatePresence } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import ContactCTA from "../components/ContactCTA";
 import StrategyChapterDeck from "../components/StrategyChapterDeck";
 import DiagnosticCalculator from "../components/DiagnosticCalculator";
@@ -64,82 +64,6 @@ function isGoogleFormEmbedUrl(url: string) {
   return url.startsWith("https://docs.google.com/forms/d/e/") && url.includes("/viewform?embedded=true");
 }
 
-// 🚀 추가된 클릭 확장형 팀 멤버 카드 컴포넌트
-function TeamMemberCard({ person }: { person: any }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <motion.div 
-      layout
-      onClick={() => setIsExpanded(!isExpanded)}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 shadow-sm transition-all duration-500 cursor-pointer hover:shadow-xl ${isExpanded ? 'ring-2 ring-[#21c1a2]' : ''}`}
-    >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-black/5">
-        <Image 
-          src={person.image.src} 
-          alt={person.name} 
-          fill 
-          className={`object-cover object-top transition-transform duration-700 group-hover:scale-105 ${isExpanded ? 'scale-105 brightness-50' : ''}`} 
-          sizes="(max-width: 768px) 100vw, 33vw"
-        />
-        {!isExpanded && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 md:p-8">
-            <p className="text-white text-[13px] md:text-sm font-bold">상세 스펙 보기 +</p>
-          </div>
-        )}
-      </div>
-
-      <div className="p-6 md:p-8 flex flex-col flex-1 bg-white">
-        <div className="mb-4">
-          <h3 className="text-[22px] md:text-[26px] font-bold text-[#0B0F0E]">
-            {person.name} <span className="text-[12px] md:text-[13px] text-black/30 font-bold ml-1.5 uppercase tracking-widest">{person.englishName}</span>
-          </h3>
-          <p className="text-[#21c1a2] text-[12px] md:text-[13px] font-bold uppercase tracking-widest mt-2 md:mt-3">
-            {person.responsibilities.slice(0, 2).join(' · ')}
-          </p>
-        </div>
-        <p className="text-[14px] md:text-[15px] font-medium leading-[1.8] text-black/60 line-clamp-2">
-          {person.body}
-        </p>
-        {!isExpanded && (
-          <div className="mt-4 pt-4 border-t border-black/5 text-center">
-            <span className="text-[12px] font-bold text-black/30 group-hover:text-[#21c1a2] transition-colors">프로필 열어보기 ▼</span>
-          </div>
-        )}
-      </div>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="px-6 md:px-8 pb-6 md:pb-8 pt-0 bg-white"
-          >
-            <div className="border-t border-black/5 pt-5 md:pt-6 space-y-5 md:space-y-6">
-              {person.specs.map((spec: any) => (
-                <div key={spec.category}>
-                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-2 md:mb-3">{spec.category}</h4>
-                  <ul className="grid grid-cols-1 gap-1.5 md:gap-2">
-                    {spec.items.map((item: string) => (
-                      <li key={item} className="flex items-start gap-2 text-[13px] md:text-[14px] font-bold text-black/70">
-                        <span className="mt-1.5 h-1 w-1 bg-[#21c1a2] rounded-full shrink-0" /> <span className="leading-snug">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-              <div className="mt-4 text-center">
-                <span className="text-[12px] font-bold text-black/30 hover:text-black transition-colors cursor-pointer">닫기 ▲</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
-
 export default function Page() {
   const insightPosts = getSortedInsights().slice(0, 4);
   const formEmbedUrl = content.contact.googleFormEmbedUrl.trim();
@@ -159,8 +83,12 @@ export default function Page() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight * 0.8) setIsScrolled(true);
-      else setIsScrolled(false);
+      // 메뉴바 등장 로직: 영상 높이(또는 대략적인 스크롤 위치)를 벗어나면 표시
+      if (window.scrollY > window.innerHeight * 0.5) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll);
@@ -171,30 +99,38 @@ export default function Page() {
     <main className="bg-white text-[#0B0F0E] antialiased pb-20 md:pb-0">
       
       {/* 1. 스마트 헤더 */}
-      <header className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}>
+      <header 
+        className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${
+          isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
         <div className={`${shell} flex h-[60px] md:h-20 items-center justify-between`}>
           <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
             <Image src="/logo.png" alt="Turnkeyhaus" width={140} height={38} className="h-6 md:h-8 w-auto object-contain" priority />
           </Link>
+
           <nav className="hidden items-center gap-8 lg:flex">
             {content.nav.map((item) => (
-              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-black transition-colors ${focusRing}`}>{item.label}</Link>
+              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-black transition-colors ${focusRing}`}>
+                {item.label}
+              </Link>
             ))}
           </nav>
+
           <ActionLink href="https://sclu.io/share/bulk/file/bf2w8ioROJvw" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
             소개서 다운로드
           </ActionLink>
         </div>
       </header>
 
-      {/* 2. 풀스크린 비디오 */}
-      <section className="relative w-full bg-black overflow-hidden aspect-video md:aspect-auto md:h-[100svh] md:min-h-[500px]">
+      {/* 🚀 2. 영상 잘림 완벽 해결 (aspect-video 고정) */}
+      <section className="relative w-full bg-black overflow-hidden aspect-video">
         <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover object-center">
           <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
         </video>
       </section>
 
-      {/* 3. Hero 텍스트 */}
+      {/* 3. Hero 텍스트 영역 */}
       <section id="top" className="bg-white py-16 md:py-24 lg:py-32">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-[1000px] space-y-6 md:space-y-8 text-[#0B0F0E]">
@@ -205,6 +141,7 @@ export default function Page() {
             <p className="max-w-[58ch] whitespace-pre-line break-keep text-[16px] sm:text-[18px] leading-[1.7] text-black/60 md:text-[22px] font-medium">
               {content.heroValue.body}
             </p>
+
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-4 md:pt-6">
               <ActionLink href={content.heroValue.primaryCta.href} className="inline-flex justify-center items-center rounded-full bg-[#21c1a2] px-8 py-3.5 md:py-4 text-[15px] md:text-[16px] font-bold text-[#07211d] hover:bg-[#1db197] transition-transform hover:scale-105 w-full sm:w-auto text-center">
                 {content.heroValue.primaryCta.label}
@@ -363,13 +300,12 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 🚀 8. 전략 프레임 (슬라이드 원상 복구 완료) */}
+      {/* 8. 전략 프레임 */}
       <section id="approach" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16">
             <SectionHeader label={content.strategyFrame.label} title={content.strategyFrame.h2} lead={content.approach.lead} />
           </motion.div>
-          {/* 🚨 지시사항 반영: 예시 사진 슬라이드(StrategyChapterDeck) 다시 렌더링 */}
           <div className="border-t border-black/10 pt-12">
              <StrategyChapterDeck />
           </div>
@@ -403,42 +339,8 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 10. 서비스 필러 */}
-      <section id="services" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
-        <div className={`${shell}`}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20 max-w-3xl">
-            <SectionHeader label={content.servicePillars.label} title={content.servicePillars.h2} lead={content.servicePillars.lead} />
-          </motion.div>
-
-          <div className="grid gap-6 lg:grid-cols-3">
-            {content.servicePillars.cards.map((card, index) => (
-              <motion.article key={card.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: index * 0.1 }}
-                className={`flex flex-col justify-between rounded-2xl md:rounded-3xl bg-white p-6 md:p-10 border border-black/5 hover:shadow-xl transition-all duration-300 ${index === 0 ? 'lg:col-span-2' : ''}`}
-              >
-                <div>
-                  <p className="text-[11px] md:text-[12px] font-bold tracking-[0.15em] text-[#21c1a2] mb-3 md:mb-4">SERVICE 0{index + 1}</p>
-                  <p className="text-[15px] md:text-[16px] font-bold text-black/50 mb-3 md:mb-4">{card.title}</p>
-                  <h3 className="break-keep text-[26px] md:text-[32px] font-bold leading-[1.24] tracking-tight text-[#0B0F0E] mb-4 md:mb-6">{card.headline}</h3>
-                  <p className="break-keep text-[15px] md:text-[16px] leading-[1.8] md:leading-[1.85] text-black/70 font-medium mb-8 md:mb-10">{card.body}</p>
-                </div>
-                <div className="border-t border-black/10 pt-6 md:pt-8">
-                  <ul className="grid gap-2.5 md:gap-3 text-[14px] md:text-[15px] leading-[1.7] md:leading-[1.75] text-black/70 font-medium mb-8 md:mb-10 sm:grid-cols-2">
-                    {card.bullets.map((bullet) => (
-                      <li key={bullet} className="flex items-start gap-2"><span className="mt-2 h-1 w-1 bg-[#21c1a2] rounded-full shrink-0"/> {bullet}</li>
-                    ))}
-                  </ul>
-                  <ActionLink href={card.href} className="inline-flex items-center text-[15px] md:text-[16px] font-bold text-[#0B0F0E] border-b-2 border-black/10 pb-1 hover:border-[#21c1a2] transition-colors">
-                    {card.ctaLabel} <span className="ml-2">→</span>
-                  </ActionLink>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 11. 업종별 적용 */}
-      <section id="professional" className="py-16 md:py-24 lg:py-32 bg-white">
+      {/* 10. 업종별 적용 */}
+      <section id="professional" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-16 md:mb-24 max-w-3xl">
             <SectionHeader label={content.professionalTargets.label} title={content.professionalTargets.h2} lead={content.professionalTargets.lead} />
@@ -447,7 +349,7 @@ export default function Page() {
           <div className="space-y-16 md:space-y-20">
             {content.professionalTargets.cards.map((card, index) => (
               <motion.article key={card.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="grid items-center gap-8 md:gap-12 lg:grid-cols-2">
-                <figure className={`relative aspect-[4/3] w-full overflow-hidden rounded-2xl md:rounded-3xl bg-[#FAFAFA] border border-black/5 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                <figure className={`relative aspect-[4/3] w-full overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
                   {card.image ? (
                     <Image src={card.image.src} alt={card.image.alt} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
                   ) : (
@@ -478,44 +380,44 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 🚀 12. 팀 소개 (클릭 인터랙션 & 레이아웃 정상화 반영 완료) */}
-      <section id="team" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
+      {/* 11. 팀 소개 (상호작용 지원) */}
+      <section id="team" className="py-16 md:py-24 lg:py-32 bg-white">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20 text-center max-w-3xl mx-auto">
             <SectionHeader label={content.leadership.label} title={content.leadership.h2} lead={content.leadership.lead} />
           </motion.div>
           
           <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
-            {content.leadership.people.map((person) => (
-              <TeamMemberCard key={person.name} person={person} />
+            {content.leadership.people.map((person, idx) => (
+              <motion.article key={person.name} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: idx * 0.1 }} 
+                className="group flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-[#FAFAFA] border border-black/5 shadow-sm hover:shadow-xl transition-all duration-500"
+              >
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-white border-b border-black/5">
+                  <Image src={person.image.src} alt={person.image.alt} fill className="object-cover object-top transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 33vw" />
+                </div>
+                <div className="p-6 md:p-8 lg:p-10 flex flex-col flex-1">
+                  <div className="mb-5 md:mb-6 border-b border-black/5 pb-5 md:pb-6">
+                    <h3 className="text-[24px] md:text-[28px] font-bold text-[#0B0F0E]">
+                      {person.name} <span className="text-[12px] md:text-[13px] text-black/30 font-bold ml-1.5 md:ml-2 uppercase tracking-widest">{person.englishName}</span>
+                    </h3>
+                    <p className="text-[#21c1a2] text-[13px] md:text-[14px] font-bold uppercase tracking-widest mt-2 md:mt-3">
+                      {person.responsibilities.slice(0, 2).join(' · ')}
+                    </p>
+                  </div>
+                  <p className="text-[14px] md:text-[15px] font-medium leading-[1.8] md:leading-[1.85] text-black/60 mb-6 md:mb-8 flex-1">{person.body}</p>
+                  <ul className="flex flex-wrap gap-2 mt-auto">
+                    {person.responsibilities.slice(0, 3).map(r => (
+                      <li key={r} className="bg-white border border-black/5 text-black/50 text-[11px] md:text-[12px] font-bold px-2.5 py-1 md:px-3 md:py-1.5 rounded-full">#{r}</li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 13. 리포트 샘플 */}
-      <section id="proof" className="py-16 md:py-24 lg:py-32 bg-white">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-[#FAFAFA] rounded-2xl md:rounded-3xl p-8 md:p-10 lg:p-16 border border-black/5 grid gap-12 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]">
-             <div>
-                <SectionHeader label={content.reportSample.label} title={content.reportSample.h2} lead={content.reportSample.lead} />
-             </div>
-             <div>
-                <dl className="divide-y divide-black/10 border-y border-black/10">
-                  {content.reportSample.rows.map((row) => (
-                    <div key={row.label} className="grid gap-2 md:gap-4 py-4 md:py-6 md:grid-cols-[160px_1fr] md:items-center">
-                      <dt className="text-[12px] md:text-[13px] font-bold tracking-[0.08em] text-black/40">{row.label}</dt>
-                      <dd className="text-[15px] md:text-[16px] font-bold text-[#0B0F0E]">{row.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <p className="mt-6 md:mt-8 text-[14px] md:text-[15px] leading-[1.8] md:leading-[1.85] text-black/50 font-medium">{content.reportSample.note}</p>
-             </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 14. 선택 기준 */}
+      {/* 12. 선택 기준 & CTA */}
       <section id="fit" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-t border-black/5">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-16 md:mb-20 max-w-3xl mx-auto text-center">
@@ -544,7 +446,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 15. 리스크 관리 */}
+      {/* 13. 리스크 관리 */}
       <section id="risk" className="py-16 md:py-24 lg:py-32 bg-[#0B0F0E] text-white">
         <div className={`${shell} grid gap-12 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]`}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
@@ -561,12 +463,12 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 16. 계산기 */}
+      {/* 14. 계산기 */}
       <section className="bg-white py-16 md:py-24 border-b border-black/5">
         <DiagnosticCalculator />
       </section>
 
-      {/* 17. 연락처 및 폼 */}
+      {/* 15. 연락처 및 폼 */}
       <section id="contact" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA]">
         <div className={shell}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16 max-w-3xl">
@@ -610,7 +512,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 18. FAQ & 블로그 */}
+      {/* 16. FAQ & 블로그 */}
       <section className="py-16 md:py-24 lg:py-32 bg-white">
         <div className={shell}>
           <div className="grid gap-16 md:gap-24 lg:grid-cols-[1fr_1fr]">
