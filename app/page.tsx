@@ -22,7 +22,7 @@ const fadeUp: Variants = {
 };
 
 function isExternalLink(href: string) {
-  return href.startsWith("http://") || href.startsWith("https://");
+  return href.startsWith("http://") || href.startsWith("https://") || href.startsWith("/");
 }
 
 function ActionLink({ href, className, children }: { href: string; className: string; children: ReactNode }) {
@@ -197,8 +197,9 @@ export default function Page() {
             ))}
           </nav>
 
-          <ActionLink href="https://sclu.io/share/bulk/file/bf2w8ioROJvw" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
-            소개서 다운로드
+          {/* 🚨 수정: proposal.html을 새 창에서 열도록 변경 */}
+          <ActionLink href="/proposal.html" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
+            제안서 보기
           </ActionLink>
         </div>
       </header>
