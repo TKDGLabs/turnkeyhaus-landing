@@ -197,9 +197,9 @@ export default function Page() {
             ))}
           </nav>
 
-          {/* 🚨 수정: proposal.html을 새 창에서 열도록 변경 */}
+          {/* 🔥 서비스 제안서 보기 버튼으로 수정된 부분 */}
           <ActionLink href="/proposal.html" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
-            제안서 보기
+            서비스 제안서 보기
           </ActionLink>
         </div>
       </header>
