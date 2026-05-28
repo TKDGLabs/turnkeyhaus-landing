@@ -59,8 +59,14 @@ export default function AuthPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const next = params.get("next");
+    const requestedMode = params.get("mode");
+
     if (next) {
       setNextPath(next);
+    }
+
+    if (requestedMode === "signup" || requestedMode === "signin") {
+      setMode(requestedMode);
     }
   }, []);
 

@@ -350,6 +350,7 @@ export const content: Content = {
     { label: "사례", href: "/#portfolio" },
     { label: "요금제", href: "/#pilot" },
     { label: "인사이트", href: "/insights" },
+    { label: "회원가입", href: "/auth?mode=signup&next=/store" },
     { label: "상담", href: "/#contact" }
   ],
   heroValue: {

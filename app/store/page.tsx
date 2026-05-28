@@ -22,6 +22,19 @@ const PAY_METHOD_OPTIONS = [
 
 type PayMethod = (typeof PAY_METHOD_OPTIONS)[number]["value"];
 
+type PaymentDraftResponse =
+  | {
+      status: "success";
+      data: {
+        paymentId: string;
+        request: Parameters<typeof PortOne.requestPayment>[0];
+      };
+    }
+  | {
+      status: "fail";
+      message?: string;
+    };
+
 type ProfileRow = {
   first_name: string | null;
   last_name: string | null;
@@ -75,27 +88,6 @@ declare global {
 
 function sanitizeDigits(value: string) {
   return value.replace(/[^0-9]/g, "");
-}
-
-function buildCustomerId({
-  phone,
-  businessNumber,
-  email
-}: {
-  phone: string;
-  businessNumber: string;
-  email: string;
-}) {
-  const businessDigits = sanitizeDigits(businessNumber);
-  if (businessDigits) return `biz-${businessDigits}`.slice(0, 20);
-
-  const phoneDigits = sanitizeDigits(phone);
-  if (phoneDigits) return `hp-${phoneDigits.slice(-11)}`.slice(0, 20);
-
-  const emailSlug = email.toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (emailSlug) return `em-${emailSlug.slice(0, 16)}`.slice(0, 20);
-
-  return `guest-${Date.now().toString().slice(-8)}`;
 }
 
 function composeSelectedAddress(data: KakaoPostcodeAddressData) {
@@ -273,35 +265,46 @@ export default function StorePage() {
       return;
     }
 
-    const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID?.trim();
-    const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY?.trim();
-    if (!storeId || !channelKey) {
-      setError("결제창 설정을 확인 중입니다. 결제 요청이 급하시면 카카오톡 또는 전화 상담으로 요청해 주세요.");
-      return;
-    }
-
     setLoading(true);
     try {
-      const paymentId = `tkdh-${selectedProduct.id}-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
-      const redirectUrl = `${window.location.origin}/store/result`;
       const normalizedBizNo = sanitizeDigits(businessRegistrationNumber);
       const normalizedEmail = customerEmail.trim() || authUser?.email || "";
-      const customerId = buildCustomerId({
-        phone: customerPhone,
-        businessNumber: businessRegistrationNumber,
-        email: normalizedEmail
+
+      const draftResponse = await fetch("/api/store/payment-drafts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: selectedProduct.id,
+          payMethod,
+          companyName,
+          customerName,
+          customerPhone,
+          customerEmail: normalizedEmail,
+          customerRole,
+          zipcode,
+          addressLine1,
+          addressLine2,
+          businessRegistrationNumber,
+          userId: authUser?.id ?? null,
+          loginEmail: authUser?.email || normalizedEmail || null
+        })
       });
-      const address = addressLine1.trim()
-        ? {
-            addressLine1: addressLine1.trim(),
-            addressLine2: addressLine2.trim() || "-"
-          }
-        : undefined;
+      const draftPayload = (await draftResponse.json()) as PaymentDraftResponse;
+
+      if (draftPayload.status !== "success") {
+        setError(draftPayload.message ?? "결제 요청을 준비하지 못했습니다.");
+        return;
+      }
+
+      if (!draftResponse.ok) {
+        setError("결제 요청을 준비하지 못했습니다.");
+        return;
+      }
 
       sessionStorage.setItem(
         "turnkeyhaus:last-payment",
         JSON.stringify({
-          paymentId,
+          paymentId: draftPayload.data.paymentId,
           productId: selectedProduct.id,
           amount: selectedProduct.price,
           productName: selectedProduct.name,
@@ -318,63 +321,7 @@ export default function StorePage() {
         })
       );
 
-      const response = await PortOne.requestPayment({
-        storeId,
-        channelKey,
-        paymentId,
-        orderName: selectedProduct.name,
-        totalAmount: selectedProduct.price,
-        currency: "KRW",
-        payMethod,
-        customer: {
-          customerId,
-          fullName: customerName.trim(),
-          phoneNumber: phoneDigits,
-          email: normalizedEmail || undefined,
-          address,
-          zipcode: zipcode.trim() || undefined
-        },
-        products: [
-          {
-            id: selectedProduct.id,
-            name: selectedProduct.name,
-            amount: selectedProduct.price,
-            quantity: 1,
-            code: selectedProduct.galaxiaItemCode
-          }
-        ],
-        storeDetails: {
-          businessName: companyName.trim() || undefined,
-          businessRegistrationNumber: normalizedBizNo || undefined,
-          address: [addressLine1.trim(), addressLine2.trim()].filter(Boolean).join(" ") || undefined,
-          zipcode: zipcode.trim() || undefined,
-          contactName: customerRole.trim() || undefined,
-          phoneNumber: phoneDigits,
-          email: normalizedEmail || undefined
-        },
-        customData: {
-          userId: authUser?.id ?? null,
-          loginEmail: authUser?.email || normalizedEmail || null,
-          companyName: companyName.trim() || null,
-          customerRole: customerRole.trim() || null,
-          businessRegistrationNumber: normalizedBizNo || null,
-          requestedCashReceipt: Boolean(normalizedBizNo),
-          address: {
-            zipcode: zipcode.trim() || null,
-            addressLine1: addressLine1.trim() || null,
-            addressLine2: addressLine2.trim() || null
-          }
-        },
-        bypass: {
-          galaxia: {
-            ITEM_CODE: selectedProduct.galaxiaItemCode
-          }
-        },
-        // SDK 타입 정의 상 필수로 잡히는 필드(실제 카드 결제에서는 미사용)
-        alipayPlus: {},
-        redirectUrl,
-        forceRedirect: true
-      });
+      const response = await PortOne.requestPayment(draftPayload.data.request);
 
       if (response?.code !== undefined) {
         setError(response.message ?? "결제 요청 중 오류가 발생했습니다.");

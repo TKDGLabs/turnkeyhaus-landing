@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { Webhook } from "@portone/server-sdk";
+import { verifyStorePayment } from "@/lib/payments/portone";
+
+export const runtime = "nodejs";
 
 function getWebhookSecrets() {
   const secrets = new Set<string>();
@@ -73,16 +76,16 @@ export async function POST(request: Request) {
 
     const paymentId = getPaymentIdFromWebhook((webhook as { data?: unknown }).data);
 
-    if (paymentId && process.env.PORTONE_API_SECRET) {
-      // 웹훅 payload 자체를 신뢰하지 않고 결제 조회로 상태를 다시 확인합니다.
-      await fetch(`https://api.portone.io/payments/${encodeURIComponent(paymentId)}`, {
-        method: "GET",
-        headers: {
-          Authorization: `PortOne ${process.env.PORTONE_API_SECRET}`,
-          "Content-Type": "application/json"
-        },
-        cache: "no-store"
-      });
+    if (paymentId) {
+      // 웹훅 payload 자체를 신뢰하지 않고 결제 조회로 상태/금액/상품을 다시 확인합니다.
+      const verification = await verifyStorePayment(paymentId);
+      if (!verification.ok) {
+        console.warn("PortOne webhook payment verification skipped:", {
+          paymentId,
+          message: verification.message,
+          paymentStatus: verification.paymentStatus
+        });
+      }
     }
 
     return NextResponse.json({ ok: true });
@@ -91,4 +94,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "internal error" }, { status: 500 });
   }
 }
-

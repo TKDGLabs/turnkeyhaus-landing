@@ -8,7 +8,7 @@ import { motion, Variants, AnimatePresence } from "framer-motion";
 import ContactCTA from "../components/ContactCTA";
 import StrategyChapterDeck from "../components/StrategyChapterDeck";
 import DiagnosticCalculator from "../components/DiagnosticCalculator";
-import { content } from "../content";
+import { content, type LeadershipProfile, type SpecItem } from "../content";
 import { getSortedInsights } from "../content/insights";
 
 const shell = "mx-auto w-full max-w-[1320px] px-5 sm:px-6 lg:px-10";
@@ -64,7 +64,7 @@ function isGoogleFormEmbedUrl(url: string) {
   return url.startsWith("https://docs.google.com/forms/d/e/") && url.includes("/viewform?embedded=true");
 }
 
-function TeamMemberCard({ person }: { person: any }) {
+function TeamMemberCard({ person }: { person: LeadershipProfile }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -123,7 +123,7 @@ function TeamMemberCard({ person }: { person: any }) {
             className="px-8 pb-8 pt-0 bg-white"
           >
             <div className="border-t border-black/5 pt-6 space-y-6">
-              {person.specs.map((spec: any) => (
+              {person.specs.map((spec: SpecItem) => (
                 <div key={spec.category}>
                   <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-3">{spec.category}</h4>
                   <ul className="space-y-1.5">
@@ -197,10 +197,17 @@ export default function Page() {
             ))}
           </nav>
 
-          {/* 🔥 서비스 제안서 보기 버튼으로 수정된 부분 */}
-          <ActionLink href="/proposal.html" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
-            서비스 제안서 보기
-          </ActionLink>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/auth?mode=signup&next=/store"
+              className={`hidden h-9 items-center rounded-full border border-black/15 bg-white px-4 text-[13px] font-bold text-black/65 transition-colors hover:border-[#21c1a2] hover:text-[#13977f] md:inline-flex ${focusRing}`}
+            >
+              회원가입
+            </Link>
+            <ActionLink href="/proposal.html" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
+              서비스 제안서 보기
+            </ActionLink>
+          </div>
         </div>
       </header>
 
@@ -230,6 +237,9 @@ export default function Page() {
               <ActionLink href="#portfolio" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-10 py-5 text-[16px] font-bold">
                 운영 사례 보기
               </ActionLink>
+              <ActionLink href="/auth?mode=signup&next=/store" className="inline-flex justify-center items-center rounded-full bg-[#0B0F0E] px-10 py-5 text-[16px] font-bold text-white">
+                회원가입
+              </ActionLink>
             </div>
           </motion.div>
           
@@ -258,7 +268,7 @@ export default function Page() {
           </motion.div>
 
           <div className="space-y-12 md:space-y-16">
-            {content.portfolio.items.map((item, i) => (
+            {content.portfolio.items.map((item) => (
               <motion.article key={item.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
                 className="grid gap-8 md:gap-12 lg:grid-cols-[1fr_1fr] items-center bg-white rounded-2xl md:rounded-3xl p-6 sm:p-8 lg:p-12 border border-black/5 shadow-sm"
               >

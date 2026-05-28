@@ -29,7 +29,7 @@ Google Form에서 `보내기` 버튼을 누른 뒤 `< >`(임베드) 탭으로 �
 복사한 URL을 `content.ts`의 `content.contact.googleFormEmbedUrl`에 넣습니다. (`forms.gle` 공유 링크는 iframe에 사용하지 않음)
 
 ## Supabase 회원가입/로그인 연동
-이 프로젝트는 `/auth`에서 회원가입/로그인을 처리하고, `/store`는 로그인 사용자만 접근 가능합니다.
+이 프로젝트는 `/auth`에서 회원가입/로그인을 처리합니다. 홈페이지의 `회원가입` 버튼은 `/auth?mode=signup&next=/store`로 연결되어 가입 탭을 바로 엽니다.
 
 1. `.env.example`을 복사해 `.env.local` 생성
 2. 아래 값을 입력
@@ -39,20 +39,28 @@ Google Form에서 `보내기` 버튼을 누른 뒤 `< >`(임베드) 탭으로 �
    - `scripts/supabase/auth-profile-setup.sql`
 4. Authentication > URL Configuration에서 Site URL/Redirect URL을 운영 도메인으로 설정
 
+### 운영 전에 Supabase 콘솔에서 확인할 것
+- Authentication > Providers > Email 활성화
+- Authentication > URL Configuration의 Site URL을 운영 도메인으로 설정
+- Redirect URLs에 운영 도메인과 로컬 개발 주소 추가
+- 이메일 인증을 켜둔 경우, 가입자는 인증 메일 확인 후 로그인해야 함
+
 ### 구현된 내용
 - 회원가입 시 `first_name`, `last_name`, `company_name`, `phone_number`, `role`, `business_registration_number`를 `user_metadata`로 저장
 - `auth.users` 생성 트리거로 `public.profiles` 자동 생성
 - `public.profiles` RLS 정책 적용(본인 row만 조회/수정)
-- `middleware.ts`에서 `/store` 접근 보호 및 비로그인 시 `/auth?next=/store` 리다이렉트
+- `/auth?mode=signup` 또는 `/auth?mode=signin` 쿼리로 처음 열릴 탭을 지정 가능
+- `/store`에서는 로그인 사용자의 프로필 정보를 자동으로 불러와 결제 폼에 채움
 
 ## PortOne 결제 연동
-이 프로젝트는 `/store`에서 결제를 시작하고 `/store/result`에서 결과를 검증합니다.
+이 프로젝트는 `/store`에서 결제 정보를 입력하고, `/api/store/payment-drafts`에서 서버 서명된 결제 요청을 만든 뒤, `/store/result`와 `/api/confirm`에서 결과를 검증합니다.
 
 1. `.env.example`을 복사해 `.env.local` 생성
 2. 아래 값을 입력
    - `NEXT_PUBLIC_PORTONE_STORE_ID`
    - `NEXT_PUBLIC_PORTONE_CHANNEL_KEY`
    - `PORTONE_API_SECRET` (서버 전용)
+   - `PORTONE_PAYMENT_ID_SECRET` (서버 전용, 권장. 미설정 시 `PORTONE_API_SECRET` 사용)
    - `PORTONE_WEBHOOK_SECRET` (실연동)
    - `PORTONE_WEBHOOK_SECRET_TEST` (테스트 연동)
 3. 개발 서버 실행 후 `/store`에서 테스트 결제 진행
@@ -62,11 +70,14 @@ Google Form에서 `보내기` 버튼을 누른 뒤 `< >`(임베드) 탭으로 �
 - 결제 요청에 `bypass.galaxia.ITEM_CODE`를 상품별 코드로 전달합니다.
 - 결제 페이지에서 `상호명/이름/전화번호/주소/직함/사업자번호`를 입력하면 `storeDetails`/`customData`로 함께 전달됩니다.
 - 결제 페이지 주소 입력은 카카오 우편번호 팝업(`postcode.v2.js`)이 기본 연동되어 있어 `우편번호 찾기` 버튼으로 자동 입력할 수 있습니다.
+- 결제 요청 본문은 브라우저가 직접 만들지 않고 `/api/store/payment-drafts`가 생성합니다.
+- `paymentId`에는 상품 ID와 HMAC 서명이 포함되어 `/api/confirm`에서 금액/상품 변조를 검증합니다.
 
 ### 웹훅 연동
 - 웹훅 수신 URL: `/api/portone/webhook`
 - 포트원 콘솔 > 결제연동 > 연동정보 > 결제알림(Webhook) 관리에서 테스트/실연동 각각 URL과 시크릿을 발급하세요.
 - 이 엔드포인트는 시그니처 검증 후 처리하며, `paymentId`가 있는 이벤트는 포트원 결제 조회를 한 번 더 수행합니다.
+- 결제 요청마다 `noticeUrls`에 현재 호스트 기준 `/api/portone/webhook`을 함께 전달합니다.
 
 ### 보안 주의
 - `PORTONE_API_SECRET`은 절대 클라이언트 코드에 넣지 않습니다.
