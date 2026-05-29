@@ -8,7 +8,7 @@ import { motion, Variants, AnimatePresence } from "framer-motion";
 import ContactCTA from "../components/ContactCTA";
 import StrategyChapterDeck from "../components/StrategyChapterDeck";
 import DiagnosticCalculator from "../components/DiagnosticCalculator";
-import { content, type LeadershipProfile, type SpecItem } from "../content";
+import { content } from "../content";
 import { getSortedInsights } from "../content/insights";
 
 const shell = "mx-auto w-full max-w-[1320px] px-5 sm:px-6 lg:px-10";
@@ -22,7 +22,7 @@ const fadeUp: Variants = {
 };
 
 function isExternalLink(href: string) {
-  return href.startsWith("http://") || href.startsWith("https://") || href.startsWith("/");
+  return href.startsWith("http://") || href.startsWith("https://");
 }
 
 function ActionLink({ href, className, children }: { href: string; className: string; children: ReactNode }) {
@@ -64,16 +64,16 @@ function isGoogleFormEmbedUrl(url: string) {
   return url.startsWith("https://docs.google.com/forms/d/e/") && url.includes("/viewform?embedded=true");
 }
 
-function TeamMemberCard({ person }: { person: LeadershipProfile }) {
+function TeamMemberCard({ person }: { person: any }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <motion.div 
       layout
       onClick={() => setIsExpanded(!isExpanded)}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 shadow-sm transition-all duration-500 cursor-pointer hover:shadow-xl ${isExpanded ? 'ring-2 ring-[#21c1a2]' : ''}`}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-[#FAFAFA] border border-black/5 shadow-sm transition-all duration-500 cursor-pointer hover:shadow-xl ${isExpanded ? 'ring-2 ring-[#21c1a2]' : ''}`}
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#F1F1F1]">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-white border-b border-black/5">
         <Image 
           src={person.image.src} 
           alt={person.name} 
@@ -82,34 +82,28 @@ function TeamMemberCard({ person }: { person: LeadershipProfile }) {
           sizes="(max-width: 768px) 100vw, 33vw"
         />
         {!isExpanded && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
-            {/* 🚨 지시사항 반영: '상세 스펙'을 '세부 경력'으로 교체 */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 md:p-8">
             <p className="text-white text-[13px] md:text-sm font-bold">세부 경력 보기 +</p>
           </div>
         )}
       </div>
 
-      <div className="p-8 flex flex-col flex-1 bg-white">
+      <div className="p-6 md:p-8 flex flex-col flex-1 bg-white">
         <div className="mb-6">
-          <h3 className="text-[26px] font-bold text-[#0B0F0E]">
-            {person.name} <span className="text-[13px] text-black/30 font-bold ml-1.5 uppercase tracking-widest">{person.englishName}</span>
+          <h3 className="text-[24px] md:text-[28px] font-bold text-[#0B0F0E]">
+            {person.name} <span className="text-[12px] md:text-[13px] text-black/30 font-bold ml-1.5 md:ml-2 uppercase tracking-widest">{person.englishName}</span>
           </h3>
-          <p className="text-[#21c1a2] text-[15px] font-bold mt-2">
+          <p className="text-[#21c1a2] text-[13px] md:text-[14px] font-bold uppercase tracking-widest mt-2 md:mt-3">
             {person.name === "채동우" ? "채널 기획 · 운영 총괄" : person.name === "손현우" ? "촬영 · 제작 총괄" : "구성 · 편집 총괄"}
           </p>
         </div>
         
-        <p className="text-[15px] font-medium leading-[1.8] text-black/60 mb-2">
+        <p className="text-[14px] md:text-[15px] font-medium leading-[1.8] md:leading-[1.85] text-black/60 mb-2">
           {person.body}
         </p>
         {!isExpanded && (
-          <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-between">
-            <div className="flex gap-2">
-              {person.responsibilities.slice(0, 2).map((r: string) => (
-                <span key={r} className="text-[11px] font-bold bg-black/5 px-2 py-1 rounded text-black/40">#{r}</span>
-              ))}
-            </div>
-            <span className="text-[12px] font-bold text-[#21c1a2]">Profile ▼</span>
+          <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-center">
+            <span className="text-[12px] font-bold text-[#21c1a2]">세부 경력 열어보기 ▼</span>
           </div>
         )}
       </div>
@@ -120,22 +114,24 @@ function TeamMemberCard({ person }: { person: LeadershipProfile }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="px-8 pb-8 pt-0 bg-white"
+            className="px-6 md:px-8 pb-6 md:pb-8 pt-0 bg-white"
           >
-            <div className="border-t border-black/5 pt-6 space-y-6">
-              {person.specs.map((spec: SpecItem) => (
+            <div className="border-t border-black/5 pt-5 md:pt-6 space-y-5 md:space-y-6">
+              {person.specs.map((spec: any) => (
                 <div key={spec.category}>
-                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-3">{spec.category}</h4>
+                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-2 md:mb-3">{spec.category}</h4>
                   <ul className="space-y-1.5">
                     {spec.items.map((item: string) => (
-                      <li key={item} className="flex items-start gap-2 text-[14px] font-bold text-black/70 leading-snug">
+                      <li key={item} className="flex items-start gap-2 text-[13px] md:text-[14px] font-bold text-black/70 leading-snug">
                         <span className="mt-1.5 h-1 w-1 bg-[#21c1a2] rounded-full shrink-0" /> {item}
                       </li>
                     ))}
                   </ul>
                 </div>
               ))}
-              <p className="text-center text-[12px] font-bold text-black/20 mt-4">카드를 다시 누르면 닫힙니다</p>
+              <div className="mt-4 text-center">
+                <span className="text-[12px] font-bold text-black/30 hover:text-black transition-colors cursor-pointer">닫기 ▲</span>
+              </div>
             </div>
           </motion.div>
         )}
@@ -153,8 +149,8 @@ export default function Page() {
   const hasPhoneHref = phoneHref.startsWith("tel:");
   const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
   
-  // 🚨 빌드 에러 복구 구문 완벽 유지
-  const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
+  const problemLead = content.problem?.lead || "";
+  const [problemSupport = "", problemDetail = ""] = problemLead.split("\n\n");
 
   const totalSubscribers = content.portfolio.items.reduce((sum, item) => sum + item.subscriberCurrent, 0);
   const totalVideoViews = content.heroStats.totalVideoViews;
@@ -164,11 +160,8 @@ export default function Page() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight * 0.8) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      if (window.scrollY > window.innerHeight * 0.8) setIsScrolled(true);
+      else setIsScrolled(false);
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll);
@@ -179,39 +172,23 @@ export default function Page() {
     <main className="bg-white text-[#0B0F0E] antialiased pb-20 md:pb-0">
       
       {/* 1. 스마트 헤더 */}
-      <header 
-        className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${
-          isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
-        }`}
-      >
+      <header className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}>
         <div className={`${shell} flex h-[60px] md:h-20 items-center justify-between`}>
           <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
             <Image src="/logo.png" alt="Turnkeyhaus" width={140} height={38} className="h-6 md:h-8 w-auto object-contain" priority />
           </Link>
-
           <nav className="hidden items-center gap-8 lg:flex">
             {content.nav.map((item) => (
-              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-[#21c1a2] transition-colors ${focusRing}`}>
-                {item.label}
-              </Link>
+              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-[#21c1a2] transition-colors ${focusRing}`}>{item.label}</Link>
             ))}
           </nav>
-
-          <div className="flex items-center gap-2">
-            <Link
-              href="/auth?mode=signup&next=/store"
-              className={`hidden h-9 items-center rounded-full border border-black/15 bg-white px-4 text-[13px] font-bold text-black/65 transition-colors hover:border-[#21c1a2] hover:text-[#13977f] md:inline-flex ${focusRing}`}
-            >
-              회원가입
-            </Link>
-            <ActionLink href="/proposal.html" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
-              서비스 제안서 보기
-            </ActionLink>
-          </div>
+          <ActionLink href="https://sclu.io/share/bulk/file/bf2w8ioROJvw" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
+            소개서 다운로드
+          </ActionLink>
         </div>
       </header>
 
-      {/* 🚀 2. 풀스크린 비디오 (PC/모바일 모두 16:9 완벽 고정) */}
+      {/* 2. 풀스크린 비디오 */}
       <section className="relative w-full bg-black overflow-hidden aspect-video">
         <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover object-center">
           <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
@@ -236,9 +213,6 @@ export default function Page() {
               </ActionLink>
               <ActionLink href="#portfolio" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-10 py-5 text-[16px] font-bold">
                 운영 사례 보기
-              </ActionLink>
-              <ActionLink href="/auth?mode=signup&next=/store" className="inline-flex justify-center items-center rounded-full bg-[#0B0F0E] px-10 py-5 text-[16px] font-bold text-white">
-                회원가입
               </ActionLink>
             </div>
           </motion.div>
@@ -268,9 +242,9 @@ export default function Page() {
           </motion.div>
 
           <div className="space-y-12 md:space-y-16">
-            {content.portfolio.items.map((item) => (
+            {content.portfolio.items.map((item, i) => (
               <motion.article key={item.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-                className="grid gap-8 md:gap-12 lg:grid-cols-[1fr_1fr] items-center bg-white rounded-2xl md:rounded-3xl p-6 sm:p-8 lg:p-12 border border-black/5 shadow-sm"
+                className="grid gap-8 md:gap-12 lg:grid-cols-[1fr_1fr] items-center bg-white rounded-2xl md:rounded-3xl p-6 sm:p-8 lg:p-12 border border-black/5 shadow-sm hover:shadow-xl transition-shadow duration-300"
               >
                 <div className="relative w-full aspect-video overflow-hidden rounded-xl md:rounded-2xl bg-black border border-black/5">
                   {item.youtubeId ? (
@@ -503,9 +477,9 @@ export default function Page() {
           </motion.div>
           
           <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
-            <TeamMemberCard person={content.leadership.people[0]} /> {/* 채동우 */}
-            <TeamMemberCard person={content.leadership.people[2]} /> {/* 손현우 */}
-            <TeamMemberCard person={content.leadership.people[1]} /> {/* 양현 */}
+            <TeamMemberCard person={content.leadership.people[0]} />
+            <TeamMemberCard person={content.leadership.people[2]} />
+            <TeamMemberCard person={content.leadership.people[1]} />
           </div>
         </div>
       </section>
@@ -557,8 +531,10 @@ export default function Page() {
       </section>
 
       {/* 14. 계산기 */}
-      <section className="bg-[#FAFAFA] py-16 md:py-24 border-b border-black/5">
-        <DiagnosticCalculator />
+      <section className="bg-[#FAFAFA] border-b border-black/5 [&:has(>*:empty)]:hidden">
+        <div className="py-16 md:py-24">
+          <DiagnosticCalculator />
+        </div>
       </section>
 
       {/* 15. 연락처 및 폼 */}
@@ -606,7 +582,7 @@ export default function Page() {
       </section>
 
       {/* 16. FAQ & 블로그 */}
-      <section className="py-16 md:py-24 lg:py-32 bg-white">
+      <section className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA]">
         <div className={shell}>
           <div className="grid gap-16 md:gap-24 lg:grid-cols-[1fr_1fr]">
             
@@ -619,7 +595,7 @@ export default function Page() {
                       {item.q}
                       <span className="text-[#21c1a2] group-open:-rotate-180 transition-transform">▼</span>
                     </summary>
-                    <p className="mt-4 md:mt-6 text-[15px] md:text-[16px] text-black/60 font-medium leading-[1.8] md:leading-[1.9] whitespace-pre-line bg-[#FAFAFA] p-5 md:p-6 rounded-xl md:rounded-2xl border border-black/5">{item.a}</p>
+                    <p className="mt-4 md:mt-6 text-[15px] md:text-[16px] text-black/60 font-medium leading-[1.8] md:leading-[1.9] whitespace-pre-line bg-white p-5 md:p-6 rounded-xl md:rounded-2xl border border-black/5">{item.a}</p>
                   </details>
                 ))}
               </div>
@@ -630,7 +606,7 @@ export default function Page() {
               {insightPosts.length > 0 && (
                 <div className="mt-8 md:mt-12 space-y-4 md:space-y-6">
                   {insightPosts.map((post) => (
-                    <Link key={post.slug} href={`/insights/${post.slug}`} className={`block bg-[#FAFAFA] p-6 md:p-8 rounded-xl md:rounded-2xl border border-black/5 hover:border-[#21c1a2] hover:bg-white transition-colors shadow-sm ${focusRing}`}>
+                    <Link key={post.slug} href={`/insights/${post.slug}`} className={`block bg-white p-6 md:p-8 rounded-xl md:rounded-2xl border border-black/5 hover:border-[#21c1a2] hover:bg-[#FAFAFA] transition-colors shadow-sm ${focusRing}`}>
                        <p className="text-[12px] md:text-[13px] font-bold tracking-widest text-black/40 mb-2 md:mb-3 uppercase">{post.publishedAt}</p>
                        <h3 className="text-[20px] md:text-[22px] font-bold mb-2 md:mb-3 text-[#0B0F0E]">{post.title}</h3>
                        <p className="text-[14px] md:text-[15px] text-black/50 font-medium leading-[1.8] line-clamp-2">{post.description}</p>
