@@ -33,6 +33,12 @@ type StoreProduct = {
   cta_label?: string | null;
 };
 
+type PortOnePaymentResult = {
+  paymentId?: string;
+  code?: string;
+  message?: string;
+};
+
 type CreateOrderResponse = {
   orderNo: string;
   amount: number;
@@ -306,13 +312,17 @@ export default function StorePage() {
         throw new Error("결제 요청 정보가 생성되지 않았습니다.");
       }
 
-      const portOneResponse = await PortOne.requestPayment(order.paymentRequest);
+      const portOneResponse = (await PortOne.requestPayment(order.paymentRequest as Parameters<typeof PortOne.requestPayment>[0])) as PortOnePaymentResult | undefined;
 
       // 모바일 리디렉션 방식에서는 여기까지 돌아오지 않고 redirectUrl로 이동할 수 있습니다.
       if (!portOneResponse) return;
 
       if (portOneResponse.code !== undefined) {
         throw new Error(portOneResponse.message || "결제가 취소되었거나 실패했습니다.");
+      }
+
+      if (!portOneResponse.paymentId) {
+        throw new Error("결제 ID를 확인할 수 없습니다.");
       }
 
       await completePortOnePayment(order.orderNo, portOneResponse.paymentId);
