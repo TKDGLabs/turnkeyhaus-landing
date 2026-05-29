@@ -1,3 +1,4 @@
+import { PaymentClient } from "@portone/server-sdk";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export type PayMethod = "CARD" | "TRANSFER";
@@ -102,20 +103,8 @@ export async function fetchActiveStoreProduct(productId: string): Promise<StoreP
 }
 
 export async function fetchPortOnePayment(paymentId: string): Promise<PortOnePayment> {
-  const response = await fetch(`https://api.portone.io/payments/${encodeURIComponent(paymentId)}`, {
-    method: "GET",
-    headers: {
-      Authorization: `PortOne ${getPortOneApiSecret()}`
-    },
-    cache: "no-store"
-  });
-
-  if (!response.ok) {
-    const message = await response.text().catch(() => "");
-    throw new Error(`PortOne payment lookup failed: ${response.status} ${message}`);
-  }
-
-  return (await response.json()) as PortOnePayment;
+  const paymentClient = PaymentClient({ secret: getPortOneApiSecret() });
+  return (await paymentClient.getPayment({ paymentId })) as unknown as PortOnePayment;
 }
 
 function readPortOneTotalAmount(payment: PortOnePayment): number | null {
