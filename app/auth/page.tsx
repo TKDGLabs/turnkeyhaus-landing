@@ -92,6 +92,13 @@ function AuthContent() {
     setLoading(true);
     setError(null);
 
+    // 🚨 Vercel 에러 원인 해결: supabase가 없을 때의 안전장치 추가!
+    if (!supabase) {
+      setError("시스템 연결 지연. 잠시 후 다시 시도해주세요.");
+      setLoading(false);
+      return;
+    }
+
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
     if (authError) {
       setError("이메일 또는 비밀번호가 올바르지 않습니다.");
@@ -106,6 +113,13 @@ function AuthContent() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // 🚨 Vercel 에러 원인 해결: supabase가 없을 때의 안전장치 추가!
+    if (!supabase) {
+      setError("시스템 연결 지연. 잠시 후 다시 시도해주세요.");
+      setLoading(false);
+      return;
+    }
 
     // 검증 로직
     if (password.length < 6 || password.length > 20) {
@@ -127,7 +141,6 @@ function AuthContent() {
 
     const fullPhone = `${phone1}-${phone2}-${phone3}`;
 
-    // Supabase 회원가입 호출 (user_metadata에 추가 정보 저장 -> 트리거가 DB로 옮김)
     const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
