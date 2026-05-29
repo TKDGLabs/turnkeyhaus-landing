@@ -29,7 +29,6 @@ type StoreProduct = {
 
 type KakaoPostcodeAddressData = { zonecode: string; address: string; roadAddress: string; jibunAddress: string; userSelectedType: "R" | "J"; bname: string; buildingName: string; apartment: "Y" | "N"; };
 
-// 🚨 Vercel 빌드 에러의 원인이었던 부분 복구! (TypeScript에게 window.kakao가 있다고 알려줌)
 declare global {
   interface Window {
     kakao?: {
@@ -57,6 +56,9 @@ export default function StorePage() {
   const [payMethod, setPayMethod] = useState<PayMethod>("CARD");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
+  // 🚨 비회원 결제 시 가로막을 안내 모달창 상태 추가!
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
   const [companyName, setCompanyName] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -82,7 +84,7 @@ export default function StorePage() {
     async function loadInitialData() {
       if (!supabase) return;
 
-      const { data: productData, error: productError } = await supabase
+      const { data: productData } = await supabase
         .from("store_products")
         .select("*")
         .eq("is_active", true)
@@ -130,6 +132,12 @@ export default function StorePage() {
     if (loading) return;
     setError(null);
 
+    // 🚨 핵심 로직: 로그인 안 된 사용자면 "결제는 회원가입 후 가능합니다" 모달을 강제로 띄웁니다!
+    if (!authUser) {
+      setShowAuthModal(true);
+      return;
+    }
+
     if (!selectedProduct) return setError("상품을 선택해 주세요.");
     if (!customerName.trim() || !customerPhone.trim()) return setError("이름과 전화번호를 입력해 주세요.");
     if (!agreedToTerms) return setError("환불 규정 및 서비스 제공 방식에 동의해 주세요.");
@@ -144,6 +152,13 @@ export default function StorePage() {
     }
   }
 
+  async function handleSignOut() {
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    setAuthUser(null);
+    router.refresh();
+  }
+
   return (
     <main className="mx-auto w-full max-w-[1180px] px-5 py-14 text-[#0B0F0E] sm:px-6 md:py-20">
       <Script src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" onLoad={() => setPostcodeLoaded(true)} />
@@ -154,6 +169,14 @@ export default function StorePage() {
         <p className="max-w-[72ch] break-keep text-[16px] leading-[1.8] text-black/68">
           턴키하우스의 월간 운영은 상담 후 계약서 기반으로 진행됩니다. 이 페이지에서는 진단 리포트와 전략 플랜, 착수금 등 초기 세팅 비용만 안전하게 결제하실 수 있습니다.
         </p>
+        {authUser ? (
+          <div className="flex flex-wrap items-center gap-2 text-[13px] text-black/58">
+            <span className="border border-black/12 bg-black/[0.02] px-2.5 py-1">{authUser.email} (로그인됨)</span>
+            <button type="button" onClick={handleSignOut} className={`h-8 border border-black/15 px-3 text-[12px] font-semibold text-black/65 transition-colors hover:bg-black/[0.03] ${focusRing}`}>로그아웃</button>
+          </div>
+        ) : (
+          <div className="text-[13px] text-black/40 font-medium">로그인하지 않은 상태입니다. 상품 조회가 가능하며 결제 시 회원가입 팝업이 표출됩니다.</div>
+        )}
       </div>
 
       <div className="grid gap-8 md:grid-cols-[1.08fr_0.92fr]">
@@ -230,11 +253,11 @@ export default function StorePage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block space-y-1.5">
                 <span className="text-[12px] font-bold text-black/50">담당자명*</span>
-                <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} required className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
+                <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} required={!!authUser} className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
               </label>
               <label className="block space-y-1.5">
                 <span className="text-[12px] font-bold text-black/50">전화번호*</span>
-                <input value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} required placeholder="010-1234-5678" className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
+                <input value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} required={!!authUser} placeholder="010-1234-5678" className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
               </label>
             </div>
 
@@ -246,7 +269,7 @@ export default function StorePage() {
             <label className="flex items-start gap-3 mt-6 p-4 bg-[#FAFAFA] border border-black/5 rounded-xl cursor-pointer">
               <input 
                 type="checkbox" 
-                required 
+                required={!!authUser}
                 checked={agreedToTerms}
                 onChange={(e) => setAgreedToTerms(e.target.checked)}
                 className="mt-1 w-4 h-4 text-[#21c1a2] border-gray-300 rounded focus:ring-[#21c1a2]"
@@ -269,6 +292,36 @@ export default function StorePage() {
           </form>
         </aside>
       </div>
+
+      {/* 🚨 대형 치트키: 대표님이 기획하신 비회원 방어용 모달 알림창 디자인 구현! */}
+      <AnimatePresence>
+        {showAuthModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="bg-white p-7 rounded-2xl max-w-sm w-full mx-5 border border-black/10 shadow-2xl text-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-50 text-red-500 text-xl font-bold">!</div>
+              <h3 className="text-[18px] font-bold text-[#0B0F0E]">결제 전 안내</h3>
+              <p className="text-[14px] text-black/60 leading-relaxed break-keep">
+                결제는 회원가입 후 가능합니다. 계정을 생성하고 상담 기록과 정산 내역을 한눈에 관리해 보세요.
+              </p>
+              <div className="flex gap-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAuthModal(false)}
+                  className="flex-1 h-11 border border-black/15 rounded-xl text-[14px] font-semibold text-black/55 transition-colors hover:bg-black/[0.03]"
+                >
+                  돌아가기
+                </button>
+                <Link
+                  href="/auth?next=/store&mode=signup"
+                  className="flex-1 h-11 bg-[#21c1a2] text-[#07211d] rounded-xl text-[14px] font-bold flex items-center justify-center transition-colors hover:bg-[#1db197]"
+                >
+                  회원가입 하기
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
