@@ -1,31 +1,136 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { AnimatePresence, motion } from "framer-motion";
 
 const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
+const PRODUCT_IMAGE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGE_BUCKET || "product-images";
+
+type ProductType = "SINGLE" | "SUBSCRIPTION";
 
 type StoreProduct = {
   id: string;
-  type: "SINGLE" | "SUBSCRIPTION";
+  type: ProductType;
   name: string;
   summary: string;
   price: number;
   delivery_info: string;
+  hero_image_url?: string | null;
+  detail_image_urls?: string[] | string | null;
+  detail_markdown?: string | null;
+  cta_label?: string | null;
 };
 
-// 화면 깜빡임 방지 기본 데이터
 const FULL_PRODUCTS: StoreProduct[] = [
-  { id: "tier-ebook", type: "SINGLE", name: "브랜드 유튜브 구축 전자책", summary: "유튜브를 처음 시작하는 전문직/기업 필수 가이드\n문의가 들어오는 채널 세팅의 3가지 핵심 원칙", price: 0, delivery_info: "결제(0원) 즉시 마이페이지 다운로드 제공" },
+  { id: "tier-ebook", type: "SINGLE", name: "브랜드 유튜브 구축 전자책", summary: "유튜브를 처음 시작하는 전문직/기업 필수 가이드\n문의가 들어오는 채널 세팅의 3가지 핵심 원칙", price: 0, delivery_info: "무료 신청 즉시 다운로드 권한 제공" },
   { id: "tier-report", type: "SINGLE", name: "운영 진단 리포트 (1회성)", summary: "현재 채널 및 경쟁 채널 3곳 정밀 분석\n검색 유입을 위한 주제 20개 추출 및 검증\n즉시 적용 가능한 썸네일/제목 교정 가이드", price: 490000, delivery_info: "결제 완료 후 3영업일 이내 PDF 이메일 발송" },
   { id: "tier-planner", type: "SINGLE", name: "90일 채널 전략 플래너 (특가)", summary: "단기 성과를 위한 3개월 채널 로드맵 기획\n시즌 이슈 및 검색량 기반 핵심 키워드 매칭\n기존 업로드 영상 구조 피드백 및 코칭", price: 297000, delivery_info: "결제 완료 후 익일부터 3개월간 온라인/이메일 컨설팅" },
-  { id: "tier-basic", type: "SUBSCRIPTION", name: "유튜브 운영대행 [베이직]", summary: "콘텐츠 기획 및 연출 (6편)\n롱폼 편집 10분 이내 (2편)\n숏폼 신규/재편집 (12편)\n현장 촬영 1회차 (PD 2인/3CAM)", price: 3800000, delivery_info: "첫 달 착수금 결제 (익월부터 세금계산서 청구)" },
-  { id: "tier-standard", type: "SUBSCRIPTION", name: "유튜브 운영대행 [스탠다드]", summary: "콘텐츠 기획 및 연출 (7편)\n롱폼 편집 10분 이내 (3편)\n숏폼 신규/재편집 (16편)\n현장 촬영 1회차 (PD 2인/3CAM)", price: 4400000, delivery_info: "첫 달 착수금 결제 (익월부터 세금계산서 청구)" },
-  { id: "tier-premium", type: "SUBSCRIPTION", name: "유튜브 운영대행 [프리미엄]", summary: "콘텐츠 기획 및 연출 (12편)\n롱폼 편집 10분 이내 (4편)\n숏폼 신규/재편집 (28편)\n현장 촬영 2회차 (PD 2인/3CAM)", price: 5000000, delivery_info: "첫 달 착수금 결제 (익월부터 세금계산서 청구)" }
+  { id: "tier-basic", type: "SUBSCRIPTION", name: "유튜브 운영대행 [베이직]", summary: "콘텐츠 기획 및 연출 (6편)\n롱폼 편집 10분 이내 (2편)\n숏폼 신규/재편집 (12편)\n현장 촬영 1회차 (PD 2인/3CAM)", price: 3800000, delivery_info: "상담 및 계약 범위 확인 후 첫 달 착수금 결제" },
+  { id: "tier-standard", type: "SUBSCRIPTION", name: "유튜브 운영대행 [스탠다드]", summary: "콘텐츠 기획 및 연출 (7편)\n롱폼 편집 10분 이내 (3편)\n숏폼 신규/재편집 (16편)\n현장 촬영 1회차 (PD 2인/3CAM)", price: 4400000, delivery_info: "상담 및 계약 범위 확인 후 첫 달 착수금 결제" },
+  { id: "tier-premium", type: "SUBSCRIPTION", name: "유튜브 운영대행 [프리미엄]", summary: "콘텐츠 기획 및 연출 (12편)\n롱폼 편집 10분 이내 (4편)\n숏폼 신규/재편집 (28편)\n현장 촬영 2회차 (PD 2인/3CAM)", price: 5000000, delivery_info: "상담 및 계약 범위 확인 후 첫 달 착수금 결제" }
 ];
+
+function normalizeProduct(raw: Partial<StoreProduct>): StoreProduct {
+  return {
+    id: String(raw.id ?? ""),
+    type: raw.type === "SUBSCRIPTION" ? "SUBSCRIPTION" : "SINGLE",
+    name: String(raw.name ?? ""),
+    summary: String(raw.summary ?? ""),
+    price: Number(raw.price ?? 0),
+    delivery_info: String(raw.delivery_info ?? ""),
+    hero_image_url: raw.hero_image_url ?? null,
+    detail_image_urls: raw.detail_image_urls ?? null,
+    detail_markdown: raw.detail_markdown ?? null,
+    cta_label: raw.cta_label ?? null
+  };
+}
+
+function normalizeImageList(value?: string[] | string | null) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.filter(Boolean);
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) return parsed.filter((item): item is string => typeof item === "string" && Boolean(item));
+  } catch {
+    // text[]이 아닌 문자열 하나로 들어온 경우 아래에서 단일 이미지로 처리합니다.
+  }
+  return [value];
+}
+
+function renderDetailText(text: string) {
+  return text
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+    .map((paragraph, index) => (
+      <p key={index} className="break-keep text-[15px] font-medium leading-[1.85] text-black/66">
+        {paragraph}
+      </p>
+    ));
+}
+
+function usePublicAssetUrl(pathOrUrl?: string | null) {
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+
+  return useMemo(() => {
+    if (!pathOrUrl) return null;
+    if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
+    if (!supabase) return null;
+    const { data } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(pathOrUrl);
+    return data.publicUrl;
+  }, [pathOrUrl, supabase]);
+}
+
+function StoreImage({ path, alt, className }: { path?: string | null; alt: string; className: string }) {
+  const imageUrl = usePublicAssetUrl(path);
+
+  if (!imageUrl) {
+    return (
+      <div className={`${className} flex items-center justify-center border border-black/5 bg-[#FAFAFA] text-[12px] font-bold uppercase tracking-[0.16em] text-black/25`}>
+        Turnkeyhaus
+      </div>
+    );
+  }
+
+  return <img src={imageUrl} alt={alt} className={className} loading="lazy" />;
+}
+
+function PolicyCards({ product }: { product: StoreProduct }) {
+  const isSub = product.type === "SUBSCRIPTION";
+  const isFree = product.price === 0;
+
+  const cards = isFree
+    ? [
+        ["01", "제공 방식", "무료 신청 완료 후 해당 계정에 자료 다운로드 권한이 부여됩니다."],
+        ["02", "사용 범위", "자료는 신청자 내부 검토 용도로 제공되며, 무단 재배포는 금지됩니다."],
+        ["03", "문의 연결", "자료를 바탕으로 추가 상담이 필요한 경우 문의 페이지를 통해 상담을 요청할 수 있습니다."]
+      ]
+    : isSub
+      ? [
+          ["01", "상담 후 착수", "운영대행은 결제 전 상담과 계약 범위 확인을 거쳐 착수합니다."],
+          ["02", "범위 확정", "촬영 횟수, 산출물 편수, 일정, 추가비용은 별도 계약서 또는 견적서 기준으로 확정됩니다."],
+          ["03", "정산 기준", "착수 이후 취소·해지·환불은 실제 투입 인력과 일정 확보 비용을 기준으로 정산됩니다."]
+        ]
+      : [
+          ["01", "자료 확인", "구매 후 채널 URL과 참고 자료를 확인한 뒤 분석 또는 플래닝 작업을 시작합니다."],
+          ["02", "제공 일정", product.delivery_info || "결제 완료 후 안내된 일정에 따라 산출물을 제공합니다."],
+          ["03", "환불 기준", "무형 서비스 특성상 작업 착수 또는 산출물 전송 이후에는 환불이 제한될 수 있습니다."]
+        ];
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      {cards.map(([number, title, description]) => (
+        <div key={number} className="rounded-xl border border-black/10 bg-white p-5">
+          <p className="mb-2 text-[12px] font-bold text-[#21c1a2]">{number}</p>
+          <h4 className="mb-2 text-[15px] font-bold text-[#0B0F0E]">{title}</h4>
+          <p className="break-keep text-[13px] font-medium leading-relaxed text-black/58">{description}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -33,155 +138,156 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const productId = params.id;
 
   const [product, setProduct] = useState<StoreProduct | null>(
-    FULL_PRODUCTS.find(p => p.id === productId) || null
+    FULL_PRODUCTS.find((item) => item.id === productId) || null
   );
 
   useEffect(() => {
     let isMounted = true;
+
     async function loadProduct() {
       if (!supabase) return;
       try {
-        const { data, error } = await supabase.from("store_products").select("*").eq("id", productId).maybeSingle();
-        if (!error && data && isMounted) setProduct(data as StoreProduct);
+        const { data, error } = await supabase
+          .from("store_products")
+          .select("*")
+          .eq("id", productId)
+          .eq("is_active", true)
+          .maybeSingle();
+
+        if (!error && data && isMounted) {
+          setProduct(normalizeProduct(data as Partial<StoreProduct>));
+        }
       } catch (err) {
         console.error(err);
       }
     }
+
     loadProduct();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [supabase, productId]);
 
-  if (!product) return (
-    <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-      <h1 className="text-2xl font-bold text-[#0B0F0E]">상품을 찾을 수 없습니다.</h1>
-      <button onClick={() => router.push('/store')} className="text-[#21c1a2] font-bold hover:underline">스토어 목록으로 돌아가기</button>
-    </div>
-  );
+  if (!product) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center space-y-4">
+        <h1 className="text-2xl font-bold text-[#0B0F0E]">상품을 찾을 수 없습니다.</h1>
+        <button onClick={() => router.push("/store")} className="font-bold text-[#21c1a2] hover:underline">
+          스토어 목록으로 돌아가기
+        </button>
+      </div>
+    );
+  }
 
   const isSub = product.type === "SUBSCRIPTION";
   const isFree = product.price === 0;
-  const bulletPoints = product.summary.split('\n').filter(text => text.trim() !== '');
+  const bulletPoints = product.summary.split("\n").filter((text) => text.trim() !== "");
+  const detailImages = normalizeImageList(product.detail_image_urls);
+  const detailText =
+    product.detail_markdown ||
+    (isSub
+      ? "운영대행은 상담과 계약 범위 확정 후 착수되는 월간 운영 패키지입니다. 정확한 제공 범위는 상담 및 계약서 기준으로 확정됩니다."
+      : isFree
+        ? "브랜드 유튜브를 처음 시작하는 전문직·기업 담당자가 채널 방향과 기본 세팅을 빠르게 잡을 수 있도록 만든 자료입니다."
+        : "구매 후 채널 URL과 참고 자료를 바탕으로 분석 또는 전략 플래닝을 진행합니다.");
 
   return (
     <main className="mx-auto w-full max-w-[1180px] px-5 py-14 text-[#0B0F0E] sm:px-6 md:py-20">
-      <nav className="mb-8 text-[13px] font-bold text-black/40 flex items-center gap-2">
-        <Link href="/store" className="hover:text-[#21c1a2] transition-colors">Store</Link>
+      <nav className="mb-8 flex items-center gap-2 text-[13px] font-bold text-black/40">
+        <Link href="/store" className="transition-colors hover:text-[#21c1a2]">
+          Store
+        </Link>
         <span>&gt;</span>
         <span className="text-[#0B0F0E]">{product.name}</span>
       </nav>
 
-      <div className="grid gap-12 lg:grid-cols-[1fr_400px] items-start">
+      <div className="grid items-start gap-12 lg:grid-cols-[1fr_400px]">
         <section className="space-y-12">
-          <div className="space-y-4 border-b border-black/10 pb-10">
-            <span className={`inline-block px-3 py-1 rounded-md text-[11px] font-bold tracking-widest uppercase ${isSub ? "bg-[#0B0F0E] text-white" : "bg-[#E6F8F5] text-[#169B82]"}`}>
-              {isSub ? "MONTHLY OPS PLAN" : isFree ? "FREE ASSET" : "SINGLE PROJECT"}
+          <div className="space-y-6 border-b border-black/10 pb-10">
+            <span className={`inline-block rounded-md px-3 py-1 text-[11px] font-bold uppercase tracking-widest ${isSub ? "bg-[#0B0F0E] text-white" : "bg-[#E6F8F5] text-[#169B82]"}`}>
+              {isSub ? "OPS DEPOSIT" : isFree ? "FREE ASSET" : "SINGLE PROJECT"}
             </span>
-            <h1 className="text-[32px] md:text-[42px] font-bold tracking-tight leading-[1.2] text-[#0B0F0E] break-keep">
-              {product.name}
-            </h1>
-            <p className="text-[16px] md:text-[18px] text-black/60 font-medium leading-[1.7] break-keep max-w-[50ch]">
-              브랜드의 성장을 위한 최적의 채널 운영 솔루션. 전문 기획자와 PD가 하나의 전담 팀으로 배정됩니다.
-            </p>
+
+            <div className="grid gap-8 md:grid-cols-[1fr_260px] md:items-start">
+              <div className="space-y-4">
+                <h1 className="break-keep text-[32px] font-bold leading-[1.2] tracking-tight text-[#0B0F0E] md:text-[42px]">{product.name}</h1>
+                <p className="max-w-[54ch] break-keep text-[16px] font-medium leading-[1.75] text-black/60 md:text-[18px]">
+                  {bulletPoints[0] || product.delivery_info}
+                </p>
+              </div>
+              <StoreImage path={product.hero_image_url} alt={`${product.name} 대표 이미지`} className="h-56 w-full rounded-2xl object-cover" />
+            </div>
           </div>
 
           <div className="space-y-8">
             <h3 className="text-[22px] font-bold text-[#0B0F0E]">상세 제공 내역</h3>
-            
-            <div className="bg-[#FAFAFA] p-8 rounded-2xl border border-black/5 space-y-4">
-              <ul className="space-y-4">
-                {bulletPoints.map((bullet, i) => {
-                  const parts = bullet.split('(');
-                  const title = parts[0];
-                  const amount = parts.length > 1 ? `(${parts[1]}` : "";
-                  
-                  return (
-                    <li key={i} className="flex justify-between items-center pb-4 border-b border-black/5 last:border-0 last:pb-0">
-                      <div className="flex items-center gap-3">
-                        <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${isSub ? "bg-[#0B0F0E]" : "bg-[#21c1a2]"}`}/>
-                        <span className="text-[15px] font-bold text-black/80">{title.trim()}</span>
-                      </div>
-                      {amount && <span className={`text-[14px] font-bold px-3 py-1 rounded-full ${isSub ? "bg-black/10 text-black" : "bg-[#E6F8F5] text-[#21c1a2]"}`}>{amount}</span>}
-                    </li>
-                  );
-                })}
-              </ul>
+
+            <div className="space-y-4 rounded-2xl border border-black/5 bg-[#FAFAFA] p-6 md:p-8">
+              {bulletPoints.map((bullet, i) => {
+                const [title, ...rest] = bullet.split("(");
+                const amount = rest.length > 0 ? `(${rest.join("(")}` : "";
+
+                return (
+                  <div key={i} className="flex items-start justify-between gap-4 border-b border-black/5 pb-4 last:border-0 last:pb-0">
+                    <div className="flex items-start gap-3">
+                      <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${isSub ? "bg-[#0B0F0E]" : "bg-[#21c1a2]"}`} />
+                      <span className="break-keep text-[15px] font-bold text-black/80">{title.trim()}</span>
+                    </div>
+                    {amount && <span className={`shrink-0 rounded-full px-3 py-1 text-[13px] font-bold ${isSub ? "bg-black/10 text-black" : "bg-[#E6F8F5] text-[#21c1a2]"}`}>{amount}</span>}
+                  </div>
+                );
+              })}
             </div>
 
-            {/* 🚨 오프라인 계약서의 독소조항 방어 논리를 온라인 운영 정책으로 승화시켰습니다. */}
-            <div className="space-y-6 pt-6 border-t border-black/10">
-              <h3 className="text-[20px] font-bold text-[#0B0F0E]">서비스 운영 및 계약 상세 규정</h3>
-              
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="p-5 border border-black/10 rounded-xl space-y-2">
-                  <h4 className="text-[14px] font-bold text-[#0B0F0E] flex items-center gap-2">
-                    <span className="text-[#21c1a2]">01</span> 피드백 및 수정 정책
-                  </h4>
-                  <p className="text-[13px] text-black/60 leading-relaxed break-keep">
-                    업로드 전 기준 <strong className="text-black">총 3회의 수정(자막, 화면 일부 조정)</strong>이 제공되며, 기존 기획을 벗어나는 재편집은 불가합니다. 검수 요청 후 <strong className="text-black">5영업일 내 무응답 시 자동 승인</strong>으로 간주됩니다.
-                  </p>
-                </div>
-                
-                <div className="p-5 border border-black/10 rounded-xl space-y-2">
-                  <h4 className="text-[14px] font-bold text-[#0B0F0E] flex items-center gap-2">
-                    <span className="text-[#21c1a2]">02</span> 저작권 및 원본 귀속
-                  </h4>
-                  <p className="text-[13px] text-black/60 leading-relaxed break-keep">
-                    최종 산출물(영상) 및 채널 소유권은 고객사에 귀속되나, 영상 제작에 사용된 <strong className="text-black">촬영 원본 파일 및 프로젝트 파일의 소유권은 턴키하우스에 귀속</strong>되며 별도 제공되지 않습니다.
-                  </p>
-                </div>
+            <div className="space-y-4">
+              <h3 className="text-[22px] font-bold text-[#0B0F0E]">상품 설명</h3>
+              <div className="space-y-4 rounded-2xl border border-black/10 bg-white p-6 md:p-8">{renderDetailText(detailText)}</div>
+            </div>
 
-                <div className="p-5 border border-black/10 rounded-xl space-y-2">
-                  <h4 className="text-[14px] font-bold text-[#0B0F0E] flex items-center gap-2">
-                    <span className="text-[#21c1a2]">03</span> 성과 보장 면책
-                  </h4>
-                  <p className="text-[13px] text-black/60 leading-relaxed break-keep">
-                    본 서비스는 브랜드 인지도 제고 및 고관여 고객 설득을 위한 채널 운영대행으로, 비정상적 방법을 통한 <strong className="text-black">조회수, 구독자 수, 단기 매출 등의 정량적 성과를 맹목적으로 보장하지 않습니다.</strong>
-                  </p>
-                </div>
-
-                <div className="p-5 border border-black/10 rounded-xl space-y-2 bg-[#FFF5F5] border-[#FEB2B2]">
-                  <h4 className="text-[14px] font-bold text-[#C53030] flex items-center gap-2">
-                    <span>04</span> 위약금 및 해지 규정
-                  </h4>
-                  <p className="text-[13px] text-[#742A2A] leading-relaxed break-keep">
-                    정기구독의 경우 전담팀 배정 문제로 <strong className="text-[#C53030]">최소 3개월(또는 계약상 의무 횟수) 유지</strong>가 필수입니다. 기간 내 해지 시 <strong className="text-[#C53030]">1개월분의 결제대금이 위약금으로 청구</strong>됩니다.
-                  </p>
+            {detailImages.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-[22px] font-bold text-[#0B0F0E]">상세 이미지</h3>
+                <div className="grid gap-4">
+                  {detailImages.map((image, index) => (
+                    <StoreImage key={`${image}-${index}`} path={image} alt={`${product.name} 상세 이미지 ${index + 1}`} className="max-h-[720px] w-full rounded-2xl border border-black/5 object-cover" />
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
+            <div className="space-y-6 border-t border-black/10 pt-8">
+              <h3 className="text-[20px] font-bold text-[#0B0F0E]">서비스 운영 기준</h3>
+              <PolicyCards product={product} />
+            </div>
           </div>
         </section>
 
-        <aside className="lg:sticky lg:top-32 w-full">
-          <div className="bg-white border border-black/10 rounded-3xl p-8 shadow-xl shadow-black/[0.03]">
-            <p className="text-[13px] font-bold text-black/40 mb-2 uppercase tracking-widest">초기 결제 금액</p>
-            <div className="flex items-end gap-2 mb-8 border-b border-black/10 pb-6">
-              <span className="text-[36px] font-bold tracking-tight text-[#0B0F0E] leading-none">
+        <aside className="w-full lg:sticky lg:top-32">
+          <div className="rounded-3xl border border-black/10 bg-white p-8 shadow-xl shadow-black/[0.03]">
+            <p className="mb-2 text-[13px] font-bold uppercase tracking-widest text-black/40">{isSub ? "첫 달 착수금" : "결제 금액"}</p>
+            <div className="mb-8 flex items-end gap-2 border-b border-black/10 pb-6">
+              <span className="text-[36px] font-bold leading-none tracking-tight text-[#0B0F0E]">
                 {isFree ? "무료" : `${product.price.toLocaleString("ko-KR")}원`}
               </span>
-              {!isFree && <span className="text-[14px] font-semibold text-black/40 mb-1.5">(VAT 포함)</span>}
+              {!isFree && <span className="mb-1.5 text-[14px] font-semibold text-black/40">(VAT 포함)</span>}
             </div>
 
-            <div className="space-y-5 mb-8">
+            <div className="mb-8 space-y-5">
               <div>
-                <p className="text-[12px] font-bold text-black/40 mb-1">서비스 제공 및 정산</p>
-                <p className="text-[14px] font-bold text-[#0B0F0E] break-keep">{product.delivery_info}</p>
+                <p className="mb-1 text-[12px] font-bold text-black/40">서비스 제공 및 정산</p>
+                <p className="break-keep text-[14px] font-bold text-[#0B0F0E]">{product.delivery_info}</p>
               </div>
             </div>
 
-            <button 
-              onClick={() => router.push('/store')}
-              className={`w-full h-14 rounded-xl ${isSub ? "bg-[#0B0F0E]" : "bg-[#21c1a2]"} text-[16px] font-bold ${isSub ? "text-white" : "text-[#07211d]"} transition-transform hover:scale-[1.02] shadow-md ${focusRing}`}
+            <button
+              onClick={() => router.push("/store")}
+              className={`h-14 w-full rounded-xl ${isSub ? "bg-[#0B0F0E]" : "bg-[#21c1a2]"} text-[16px] font-bold ${isSub ? "text-white" : "text-[#07211d]"} shadow-md transition-transform hover:scale-[1.02] ${focusRing}`}
             >
-              {isFree ? "무료로 다운로드 받기" : "약관 확인 및 결제하러 가기"}
+              {product.cta_label || (isFree ? "무료로 다운로드 받기" : "약관 확인 및 결제하러 가기")}
             </button>
-            <p className="text-center text-[12px] text-black/40 font-medium mt-4">
-              안전한 거래를 위해 회원가입 및 약관 동의가 필요합니다.
-            </p>
+            <p className="mt-4 text-center text-[12px] font-medium text-black/40">안전한 거래를 위해 회원가입 및 약관 동의가 필요합니다.</p>
           </div>
         </aside>
-
       </div>
     </main>
   );
