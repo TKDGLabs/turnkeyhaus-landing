@@ -182,8 +182,9 @@ export default function Page() {
               <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-[#21c1a2] transition-colors ${focusRing}`}>{item.label}</Link>
             ))}
           </nav>
-          <ActionLink href="https://sclu.io/share/bulk/file/bf2w8ioROJvw" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
-            소개서 다운로드
+          {/* 🚨 링크 주소 교체 완료! */}
+          <ActionLink href="https://www.turnkey.haus/proposal.html" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
+            공식 제안서
           </ActionLink>
         </div>
       </header>
