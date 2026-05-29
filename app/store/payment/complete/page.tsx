@@ -7,10 +7,11 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
-type CompleteState =
-  | { status: "loading"; message: string }
-  | { status: "success"; message: string; orderNo?: string }
-  | { status: "error"; message: string; orderNo?: string };
+type CompleteState = {
+  status: "loading" | "success" | "error";
+  message: string;
+  orderNo?: string;
+};
 
 function PaymentCompleteContent() {
   const searchParams = useSearchParams();
