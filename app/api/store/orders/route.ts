@@ -50,10 +50,18 @@ function normalizePayMethod(value: unknown): PayMethod {
   return value === "TRANSFER" ? "TRANSFER" : "CARD";
 }
 
+function resolveSiteOrigin() {
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "");
+  if (configuredUrl) return configuredUrl;
+
+  const vercelUrl = process.env.VERCEL_URL?.trim().replace(/\/$/, "");
+  if (vercelUrl) return `https://${vercelUrl}`;
+
+  return "http://localhost:3000";
+}
+
 function buildRedirectUrl(orderNo: string) {
-  const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
-  const base = origin.replace(/\/$/, "");
-  return `${base}/store/payment/complete?orderNo=${encodeURIComponent(orderNo)}`;
+  return `${resolveSiteOrigin()}/store/payment/complete?orderNo=${encodeURIComponent(orderNo)}`;
 }
 
 export async function POST(request: Request) {
