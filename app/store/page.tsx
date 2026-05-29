@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { AnimatePresence } from "framer-motion"; // 🚨 에러 원인 해결: 애니메이션 모듈 추가!
+import { AnimatePresence } from "framer-motion";
 
 const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
@@ -81,36 +81,63 @@ export default function StorePage() {
   );
 
   useEffect(() => {
+    let isMounted = true;
+
     async function loadInitialData() {
-      if (!supabase) return;
-
-      const { data: productData } = await supabase
-        .from("store_products")
-        .select("*")
-        .eq("is_active", true)
-        .order("sort_order", { ascending: true });
-
-      if (productData && productData.length > 0) {
-        setProducts(productData);
-        setSelectedProductId(productData[0].id);
+      if (!supabase) {
+        if (isMounted) setLoading(false);
+        return;
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setAuthUser(user);
-        const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
-        if (profile) {
-          setCustomerName(`${profile.first_name || ""} ${profile.last_name || ""}`.trim());
-          setCompanyName(profile.company_name || "");
-          setCustomerPhone(profile.phone_number || "");
-          setBusinessRegistrationNumber(profile.business_registration_number || "");
+      try {
+        // 1. 🚨 상품 데이터를 먼저 무조건 가져옵니다.
+        const { data: productData, error: productError } = await supabase
+          .from("store_products")
+          .select("*")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true });
+
+        if (productError) {
+          console.error("상품 로딩 에러:", productError);
+        } else if (productData && isMounted) {
+          setProducts(productData);
+          if (productData.length > 0) {
+            setSelectedProductId(productData[0].id);
+          }
         }
-        setCustomerEmail(user.email || "");
+
+        // 🚨 핵심 수정: 유저 정보를 확인하기 전에, 상품부터 화면에 띄우도록 로딩 스위치를 먼저 끕니다!
+        if (isMounted) setLoading(false);
+
+        // 2. 유저 정보 가져오기 (에러가 나도 화면을 멈추지 않습니다)
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user && isMounted) {
+          setAuthUser(user);
+          setCustomerEmail(user.email || "");
+          
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .maybeSingle();
+            
+          if (profile && isMounted) {
+            setCustomerName(`${profile.first_name || ""} ${profile.last_name || ""}`.trim());
+            setCompanyName(profile.company_name || "");
+            setCustomerPhone(profile.phone_number || "");
+            setBusinessRegistrationNumber(profile.business_registration_number || "");
+          }
+        }
+      } catch (err) {
+        console.error("초기 데이터 로딩 중 에러 발생:", err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
-      setLoading(false);
     }
     
     loadInitialData();
+    
+    return () => { isMounted = false; };
   }, [supabase]);
 
   function handleOpenPostcodePopup() {
@@ -180,9 +207,14 @@ export default function StorePage() {
 
       <div className="grid gap-8 md:grid-cols-[1.08fr_0.92fr]">
         <section className="space-y-4">
+          {/* 🚨 만약 Supabase 연동에 실패하거나 상품이 0개라면 친절한 안내 문구를 띄웁니다 */}
           {products.length === 0 && !loading && (
-            <p className="border p-5 text-black/60">현재 신청 가능한 상품이 없습니다.</p>
+            <div className="border border-black/10 bg-[#FAFAFA] p-8 text-center rounded-2xl">
+              <p className="text-[16px] font-bold text-black/60 mb-2">현재 신청 가능한 상품이 없습니다.</p>
+              <p className="text-[13px] text-black/40">Supabase의 store_products 테이블 데이터나 권한(RLS)을 확인해주세요.</p>
+            </div>
           )}
+
           {products.map((product) => {
             const active = selectedProductId === product.id;
             return (
@@ -282,10 +314,10 @@ export default function StorePage() {
             <div className="pt-2">
               <button
                 type="submit"
-                disabled={loading || !selectedProduct}
+                disabled={loading || (!selectedProduct && products.length > 0)}
                 className={`inline-flex h-14 w-full items-center justify-center rounded-xl bg-[#0B0F0E] text-[16px] font-bold text-white transition-transform hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 ${focusRing}`}
               >
-                {loading ? "불러오는 중..." : `${selectedProduct?.price?.toLocaleString("ko-KR") ?? 0}원 결제하기`}
+                {loading ? "불러오는 중..." : selectedProduct ? `${selectedProduct.price.toLocaleString("ko-KR")}원 결제하기` : "상품을 선택해주세요"}
               </button>
             </div>
           </form>
