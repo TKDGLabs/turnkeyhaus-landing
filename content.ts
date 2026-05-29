@@ -308,7 +308,6 @@ export type Content = {
   };
 };
 
-// 🚨 사진 깨짐 해결: 경로를 모두 /images/ 로 통일했습니다.
 const images = {
   workflow: { src: "/images/-OsOh6wSRTM460hyo8rc_Dropshot.jpg", alt: "데스크 워크플로우 (운영 시스템)" },
   tax: { src: "/images/-OsPAdjBwFB8DhWH3Nwb_Dropshot.jpg", alt: "세무사 유튜브 화이트보드 촬영" },
@@ -350,8 +349,8 @@ export const content: Content = {
     { label: "사례", href: "/#portfolio" },
     { label: "요금제", href: "/#pilot" },
     { label: "인사이트", href: "/insights" },
-    { label: "회원가입", href: "/auth?mode=signup&next=/store" },
-    { label: "상담", href: "/#contact" }
+    { label: "상담", href: "/#contact" },
+    { label: "스토어", href: "/store" }
   ],
   heroValue: {
     headline: "전문직·고관여 브랜드의\n유튜브 운영을\n한 팀으로 맡습니다.",
