@@ -224,4 +224,79 @@ export default function StorePage() {
                   <p className="text-[13px] font-bold tracking-[0.06em] text-black/58 uppercase">결제수단</p>
                   <div className="flex flex-wrap gap-2">
                     {PAY_METHOD_OPTIONS.map((option) => (
-                      <button key={option.value} type="button" onClick={() => setPayMethod(option.
+                      <button key={option.value} type="button" onClick={() => setPayMethod(option.value)} className={`inline-flex h-10 items-center rounded-lg border px-4 text-[14px] font-bold transition-colors ${focusRing} ${payMethod === option.value ? "border-[#21c1a2] bg-[#21c1a2] text-[#07211d]" : "border-black/15 text-black/65 hover:bg-black/5"}`}>
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block space-y-1.5">
+                  <span className="text-[12px] font-bold text-black/50">담당자명*</span>
+                  <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} required={!!authUser} className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
+                </label>
+                <label className="block space-y-1.5">
+                  <span className="text-[12px] font-bold text-black/50">전화번호*</span>
+                  <input value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} required={!!authUser} className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
+                </label>
+              </div>
+
+              <label className="block space-y-1.5">
+                <span className="text-[12px] font-bold text-black/50">이메일 (결제 내역 수신용)</span>
+                <input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
+              </label>
+
+              <AnimatePresence>
+                {selectedProduct?.type === "SUBSCRIPTION" && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="bg-[#FFF5F5] border border-[#FEB2B2] border-l-4 border-l-[#E53E3E] p-5 rounded-lg overflow-hidden space-y-3">
+                    <h4 className="text-[14px] font-bold text-[#C53030]">🚨 정기구독 의무 약정 및 해지 규정</h4>
+                    <p className="text-[13px] text-[#742A2A] leading-relaxed font-medium break-keep">
+                      운영대행 플랜은 최소 3개월의 의무 유지 기간이 적용됩니다. 중도 해지 시 잔여 월에 대한 해지 위약금이 발생하며, 위약금 결제가 완료되어야만 구독 해지가 승인됩니다.
+                    </p>
+                    <label className="flex items-start gap-2 pt-2 cursor-pointer">
+                      <input type="checkbox" required checked={agreedToPenalty} onChange={(e) => setAgreedToPenalty(e.target.checked)} className="mt-0.5 w-4 h-4 text-[#E53E3E] border-gray-300 rounded" />
+                      <span className="text-[13px] font-bold text-[#C53030]">위약금 및 해지 제한 규정에 동의합니다. (필수)</span>
+                    </label>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <label className="flex items-start gap-3 p-4 bg-[#FAFAFA] border border-black/5 rounded-xl cursor-pointer">
+                <input type="checkbox" required={!!authUser} checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 w-4 h-4 text-[#21c1a2] border-gray-300 rounded" />
+                <div className="text-[13px] leading-relaxed text-black/70 font-medium">
+                  <p>무형 서비스 특성상 작업 착수 또는 리포트 전송 이후에는 환불이 불가함을 확인했습니다. (필수)</p>
+                </div>
+              </label>
+
+              {error && <p className="text-[13px] font-bold text-red-500 text-center animate-pulse">{error}</p>}
+
+              <div className="pt-2">
+                <button type="submit" disabled={processLoading || !selectedProduct} className={`inline-flex h-14 w-full items-center justify-center rounded-xl ${selectedProduct?.type === "SUBSCRIPTION" ? "bg-[#0B0F0E]" : "bg-[#21c1a2]"} text-[16px] font-bold ${selectedProduct?.type === "SUBSCRIPTION" ? "text-white" : "text-[#07211d]"} transition-transform hover:scale-[1.02] disabled:opacity-50 ${focusRing}`}>
+                  {processLoading ? "처리 중..." : selectedProduct ? `${selectedProduct.price === 0 ? "무료 다운로드 받기" : `${selectedProduct.price.toLocaleString("ko-KR")}원 결제하기`}` : "상품을 선택해주세요"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </aside>
+      </div>
+
+      <AnimatePresence>
+        {showAuthModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white p-7 rounded-2xl max-w-sm w-full mx-5 border border-black/10 shadow-2xl text-center space-y-4">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-50 text-red-500 text-xl font-bold">!</div>
+              <h3 className="text-[18px] font-bold text-[#0B0F0E]">결제 전 안내</h3>
+              <p className="text-[14px] text-black/60 leading-relaxed break-keep">결제는 회원가입 후 가능합니다.</p>
+              <div className="flex gap-2 pt-3">
+                <button onClick={() => setShowAuthModal(false)} className="flex-1 h-11 border border-black/15 rounded-xl text-[14px] font-semibold text-black/55 hover:bg-black/5">돌아가기</button>
+                <Link href="/auth?next=/store&mode=signup" className="flex-1 h-11 bg-[#21c1a2] text-[#07211d] rounded-xl text-[14px] font-bold flex items-center justify-center hover:bg-[#1db197]">회원가입 하기</Link>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </main>
+  );
+}
