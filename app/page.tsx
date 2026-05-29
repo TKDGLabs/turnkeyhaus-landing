@@ -91,19 +91,24 @@ function TeamMemberCard({ person }: { person: any }) {
       <div className="p-8 flex flex-col flex-1 bg-white">
         <div className="mb-6">
           <h3 className="text-[26px] font-bold text-[#0B0F0E]">
-            {person.name} <span className="text-[13px] text-black/30 font-bold ml-1.5 md:ml-2 uppercase tracking-widest">{person.englishName}</span>
+            {person.name} <span className="text-[13px] text-black/30 font-bold ml-1.5 uppercase tracking-widest">{person.englishName}</span>
           </h3>
-          <p className="text-[#21c1a2] text-[13px] md:text-[14px] font-bold uppercase tracking-widest mt-2 md:mt-3">
+          <p className="text-[#21c1a2] text-[15px] font-bold mt-2">
             {person.name === "채동우" ? "채널 기획 · 운영 총괄" : person.name === "손현우" ? "촬영 · 제작 총괄" : "구성 · 편집 총괄"}
           </p>
         </div>
         
-        <p className="text-[14px] md:text-[15px] font-medium leading-[1.8] text-black/60 mb-2">
+        <p className="text-[15px] font-medium leading-[1.8] text-black/60 mb-2">
           {person.body}
         </p>
         {!isExpanded && (
-          <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-center">
-            <span className="text-[12px] font-bold text-[#21c1a2]">세부 경력 열어보기 ▼</span>
+          <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-between">
+            <div className="flex gap-2">
+              {person.responsibilities.slice(0, 2).map((r: string) => (
+                <span key={r} className="text-[11px] font-bold bg-black/5 px-2 py-1 rounded text-black/40">#{r}</span>
+              ))}
+            </div>
+            <span className="text-[12px] font-bold text-[#21c1a2]">Profile ▼</span>
           </div>
         )}
       </div>
@@ -114,24 +119,22 @@ function TeamMemberCard({ person }: { person: any }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="px-6 md:px-8 pb-6 md:pb-8 pt-0 bg-white"
+            className="px-8 pb-8 pt-0 bg-white"
           >
-            <div className="border-t border-black/5 pt-5 md:pt-6 space-y-5 md:space-y-6">
+            <div className="border-t border-black/5 pt-6 space-y-6">
               {person.specs.map((spec: any) => (
                 <div key={spec.category}>
-                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-2 md:mb-3">{spec.category}</h4>
+                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-3">{spec.category}</h4>
                   <ul className="space-y-1.5">
                     {spec.items.map((item: string) => (
-                      <li key={item} className="flex items-start gap-2 text-[13px] md:text-[14px] font-bold text-black/70 leading-snug">
+                      <li key={item} className="flex items-start gap-2 text-[14px] font-bold text-black/70 leading-snug">
                         <span className="mt-1.5 h-1 w-1 bg-[#21c1a2] rounded-full shrink-0" /> {item}
                       </li>
                     ))}
                   </ul>
                 </div>
               ))}
-              <div className="mt-4 text-center">
-                <span className="text-[12px] font-bold text-black/30 hover:text-black transition-colors cursor-pointer">닫기 ▲</span>
-              </div>
+              <p className="text-center text-[12px] font-bold text-black/20 mt-4">카드를 다시 누르면 닫힙니다</p>
             </div>
           </motion.div>
         )}
@@ -160,8 +163,11 @@ export default function Page() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight * 0.8) setIsScrolled(true);
-      else setIsScrolled(false);
+      if (window.scrollY > window.innerHeight * 0.8) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll);
@@ -272,6 +278,13 @@ export default function Page() {
                     </div>
                   </dl>
 
+                  <div className="hidden md:grid gap-4 md:gap-6 border-t border-black/5 pt-5 md:pt-6 text-[13px] md:text-[14px] font-medium leading-[1.75] text-black/60 sm:grid-cols-2">
+                    {item.before && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">BEFORE</p><p className="break-keep">{item.before}</p></div>)}
+                    {item.action && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">ACTION</p><p className="break-keep">{item.action}</p></div>)}
+                    {item.after && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">AFTER</p><p className="break-keep">{item.after}</p></div>)}
+                    {item.proof && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">운영 포인트</p><p className="break-keep">{item.proof}</p></div>)}
+                  </div>
+
                   <ActionLink href={`/cases/${item.caseSlug}`} className="inline-block mt-2 md:mt-4 text-[14px] md:text-[15px] font-bold border-b-2 border-black/10 pb-1 hover:border-[#21c1a2] hover:text-[#21c1a2] transition-colors">
                     프로젝트 해부도 보기 →
                   </ActionLink>
@@ -303,7 +316,7 @@ export default function Page() {
                 </div>
                 <div>
                   <h3 className="text-[22px] md:text-[26px] font-bold tracking-tight text-[#0B0F0E] mb-4 md:mb-6">{level.title}</h3>
-                  <ul className="grid gap-3 md:gap-4 text-[14px] md:text-[15px] font-medium text-black/70 sm:grid-cols-2">
+                  <ul className="grid gap-3 md:gap-4 text-[14px] md:text-[15px] font-medium leading-[1.7] md:leading-[1.75] text-black/70 sm:grid-cols-2">
                     {level.bullets.map((bullet) => (
                       <li key={bullet} className="flex gap-2.5 md:gap-3 items-start"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-black/30 shrink-0"/>{bullet}</li>
                     ))}
@@ -470,9 +483,9 @@ export default function Page() {
           </motion.div>
           
           <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
-            <TeamMemberCard person={content.leadership.people[0]} /> {/* 채동우 */}
-            <TeamMemberCard person={content.leadership.people[2]} /> {/* 손현우 */}
-            <TeamMemberCard person={content.leadership.people[1]} /> {/* 양현 */}
+            <TeamMemberCard person={content.leadership.people[0]} />
+            <TeamMemberCard person={content.leadership.people[2]} />
+            <TeamMemberCard person={content.leadership.people[1]} />
           </div>
         </div>
       </section>
@@ -523,7 +536,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 14. 계산기 */}
+      {/* 14. 계산기 (empty:hidden 으로 안전하게 처리) */}
       <section className="bg-[#FAFAFA] border-b border-black/5 [&:has(>*:empty)]:hidden">
         <div className="py-16 md:py-24">
           <DiagnosticCalculator />
@@ -584,5 +597,75 @@ export default function Page() {
               <div className="mt-8 md:mt-12 divide-y divide-black/5 border-y border-black/10">
                 {content.faq.items.map((item) => (
                   <details key={item.q} className="group py-5 md:py-6">
-                    <summary className={`flex cursor-pointer items-center justify-between list-none text-[18px] md:text-[20px] font-bold text-[#0B0F0E] ${focusRing}`}>{item.q}<span className="text-[#21c1a2] group-open:-rotate-180 transition-transform">▼</span></summary>
-                    <p className="mt-4 md:mt-6 text-[15px] md:text-[16px] text-black/60 font-medium leading-
+                    <summary className={`flex cursor-pointer items-center justify-between list-none text-[18px] md:text-[20px] font-bold text-[#0B0F0E] ${focusRing}`}>
+                      {item.q}
+                      <span className="text-[#21c1a2] group-open:-rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <p className="mt-4 md:mt-6 text-[15px] md:text-[16px] text-black/60 font-medium leading-[1.8] md:leading-[1.9] whitespace-pre-line bg-white p-5 md:p-6 rounded-xl md:rounded-2xl border border-black/5">{item.a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+
+            <div id="blog">
+              <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
+              {insightPosts.length > 0 && (
+                <div className="mt-8 md:mt-12 space-y-4 md:space-y-6">
+                  {insightPosts.map((post) => (
+                    <Link key={post.slug} href={`/insights/${post.slug}`} className={`block bg-white p-6 md:p-8 rounded-xl md:rounded-2xl border border-black/5 hover:border-[#21c1a2] hover:bg-[#FAFAFA] transition-colors shadow-sm ${focusRing}`}>
+                       <p className="text-[12px] md:text-[13px] font-bold tracking-widest text-black/40 mb-2 md:mb-3 uppercase">{post.publishedAt}</p>
+                       <h3 className="text-[20px] md:text-[22px] font-bold mb-2 md:mb-3 text-[#0B0F0E]">{post.title}</h3>
+                       <p className="text-[14px] md:text-[15px] text-black/50 font-medium leading-[1.8] line-clamp-2">{post.description}</p>
+                    </Link>
+                  ))}
+                  <div className="pt-6 md:pt-8 text-center border-t border-black/5">
+                    <ActionLink href="/insights" className="inline-flex items-center text-[15px] md:text-[16px] font-bold text-[#0B0F0E] border-b-2 border-black/10 pb-1 hover:border-[#21c1a2] transition-colors">
+                      {content.blog.ctaLabel} →
+                    </ActionLink>
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 모바일 전용 하단 고정 CTA */}
+      <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-black/10 p-3 md:hidden shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+         <div className="flex gap-2 max-w-[400px] mx-auto">
+            {hasKakaoChatUrl && (
+              <a href={kakaoChatUrl} className="flex-1 bg-[#21c1a2] text-black text-[13px] font-bold py-3.5 rounded-xl text-center">
+                카카오톡 상담
+              </a>
+            )}
+            <a href="#contact" className="flex-1 bg-[#0B0F0E] text-white text-[13px] font-bold py-3.5 rounded-xl text-center">
+              무료 진단 신청
+            </a>
+         </div>
+      </div>
+
+      <ContactCTA />
+
+      {/* Footer */}
+      <footer className="bg-white py-12 md:py-16 border-t border-black/10 pb-28 md:pb-16">
+        <div className={`${shell} flex flex-col md:flex-row justify-between items-start gap-8 md:gap-12`}>
+          <div>
+            <p className="font-bold text-[16px] md:text-[18px] mb-4 md:mb-6 text-[#0B0F0E]">{content.footer.companyName}</p>
+            <div className="space-y-1.5 md:space-y-2 text-[13px] md:text-[14px] text-black/50 font-medium">
+              {content.footer.lines.map((line) => (
+                <p key={line.label}>{line.label}: {line.value}</p>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-4 md:gap-6 text-[13px] md:text-[14px] font-bold text-black/40">
+            <Link href="/store" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>운영 플랜 신청</Link>
+            <Link href="/terms" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>이용약관</Link>
+            <Link href="/privacy" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>개인정보처리방침</Link>
+            <Link href="/refund" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>환불 정책</Link>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}
