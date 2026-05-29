@@ -16,7 +16,6 @@ type StoreProduct = {
   delivery_info: string;
 };
 
-// 🚨 무적의 상세페이지: 메인과 똑같은 6개 상품 정보를 넣어두어 "로딩중"을 원천 차단합니다.
 const FULL_PRODUCTS: StoreProduct[] = [
   { id: "tier-ebook", type: "SINGLE", name: "브랜드 유튜브 구축 전자책", summary: "유튜브를 처음 시작하는 전문직/기업 필수 가이드\n문의가 들어오는 채널 세팅의 3가지 핵심 원칙", price: 0, delivery_info: "결제(0원) 즉시 마이페이지 다운로드 제공" },
   { id: "tier-report", type: "SINGLE", name: "운영 진단 리포트 (1회성)", summary: "현재 채널 및 경쟁 채널 3곳 정밀 분석\n검색 유입을 위한 주제 20개 추출 및 검증\n즉시 적용 가능한 썸네일/제목 교정 가이드", price: 490000, delivery_info: "결제 완료 후 3영업일 이내 PDF 이메일 발송" },
@@ -31,7 +30,6 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const productId = params.id;
 
-  // 로딩 화면 없이, 일단 가지고 있는 정보로 0초 만에 화면을 그립니다!
   const [product, setProduct] = useState<StoreProduct | null>(
     FULL_PRODUCTS.find(p => p.id === productId) || null
   );
