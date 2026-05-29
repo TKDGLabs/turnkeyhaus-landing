@@ -2,6 +2,7 @@
 
 import * as PortOne from "@portone/browser-sdk/v2";
 import type { User } from "@supabase/supabase-js";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
@@ -23,9 +24,19 @@ type StoreProduct = {
   summary: string;
   price: number;
   delivery_info: string;
+  image_url?: string;
 };
 
 type KakaoPostcodeAddressData = { zonecode: string; address: string; roadAddress: string; jibunAddress: string; userSelectedType: "R" | "J"; bname: string; buildingName: string; apartment: "Y" | "N"; };
+
+// 🚨 Vercel 빌드 에러의 원인이었던 부분 복구! (TypeScript에게 window.kakao가 있다고 알려줌)
+declare global {
+  interface Window {
+    kakao?: {
+      Postcode?: any;
+    };
+  }
+}
 
 function composeSelectedAddress(data: KakaoPostcodeAddressData) {
   const mainAddress = data.userSelectedType === "R" ? data.roadAddress || data.address : data.jibunAddress || data.address;
@@ -161,12 +172,20 @@ export default function StorePage() {
                   active ? "border-[#21c1a2] bg-[#ecfbf7] shadow-sm" : "border-black/10 bg-white hover:border-[#21c1a2]/50"
                 }`}
               >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-[20px] font-bold tracking-tight text-[#0B0F0E]">{product.name}</p>
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-[20px] font-bold tracking-tight text-[#0B0F0E]">{product.name}</p>
+                      {active && <span className="bg-[#21c1a2] text-black text-[11px] font-bold px-2 py-1 rounded whitespace-nowrap">선택됨</span>}
+                    </div>
                     <p className="mt-1 text-[15px] leading-[1.7] text-black/65">{product.summary}</p>
                   </div>
-                  {active && <span className="bg-[#21c1a2] text-black text-[11px] font-bold px-2 py-1 rounded">선택됨</span>}
+                  
+                  {product.image_url && (
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 overflow-hidden rounded-xl border border-black/5 bg-black/5">
+                      <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                    </div>
+                  )}
                 </div>
                 
                 <div className="mt-4 p-3 bg-white/60 rounded-lg border border-black/5 text-[13px] text-black/60">
@@ -244,7 +263,7 @@ export default function StorePage() {
                 disabled={loading || !selectedProduct}
                 className={`inline-flex h-14 w-full items-center justify-center rounded-xl bg-[#0B0F0E] text-[16px] font-bold text-white transition-transform hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 ${focusRing}`}
               >
-                {loading ? "불러오는 중..." : `${selectedProduct?.price.toLocaleString("ko-KR")}원 결제하기`}
+                {loading ? "불러오는 중..." : `${selectedProduct?.price?.toLocaleString("ko-KR") ?? 0}원 결제하기`}
               </button>
             </div>
           </form>
