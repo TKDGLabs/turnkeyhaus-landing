@@ -8,7 +8,7 @@ import { motion, Variants, AnimatePresence } from "framer-motion";
 import ContactCTA from "../components/ContactCTA";
 import StrategyChapterDeck from "../components/StrategyChapterDeck";
 import DiagnosticCalculator from "../components/DiagnosticCalculator";
-import { content } from "../content";
+import { content, type LeadershipProfile, type SpecItem } from "../content";
 import { getSortedInsights } from "../content/insights";
 
 const shell = "mx-auto w-full max-w-[1320px] px-5 sm:px-6 lg:px-10";
@@ -22,7 +22,7 @@ const fadeUp: Variants = {
 };
 
 function isExternalLink(href: string) {
-  return href.startsWith("http://") || href.startsWith("https://");
+  return href.startsWith("http://") || href.startsWith("https://") || href.startsWith("/");
 }
 
 function ActionLink({ href, className, children }: { href: string; className: string; children: ReactNode }) {
@@ -64,16 +64,16 @@ function isGoogleFormEmbedUrl(url: string) {
   return url.startsWith("https://docs.google.com/forms/d/e/") && url.includes("/viewform?embedded=true");
 }
 
-function TeamMemberCard({ person }: { person: any }) {
+function TeamMemberCard({ person }: { person: LeadershipProfile }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <motion.div 
       layout
       onClick={() => setIsExpanded(!isExpanded)}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-[#FAFAFA] border border-black/5 shadow-sm transition-all duration-500 cursor-pointer hover:shadow-xl ${isExpanded ? 'ring-2 ring-[#21c1a2]' : ''}`}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 shadow-sm transition-all duration-500 cursor-pointer hover:shadow-xl ${isExpanded ? 'ring-2 ring-[#21c1a2]' : ''}`}
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-white border-b border-black/5">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#F1F1F1]">
         <Image 
           src={person.image.src} 
           alt={person.name} 
@@ -82,28 +82,33 @@ function TeamMemberCard({ person }: { person: any }) {
           sizes="(max-width: 768px) 100vw, 33vw"
         />
         {!isExpanded && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 md:p-8">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
             <p className="text-white text-[13px] md:text-sm font-bold">세부 경력 보기 +</p>
           </div>
         )}
       </div>
 
-      <div className="p-6 md:p-8 flex flex-col flex-1 bg-white">
+      <div className="p-8 flex flex-col flex-1 bg-white">
         <div className="mb-6">
-          <h3 className="text-[24px] md:text-[28px] font-bold text-[#0B0F0E]">
-            {person.name} <span className="text-[12px] md:text-[13px] text-black/30 font-bold ml-1.5 md:ml-2 uppercase tracking-widest">{person.englishName}</span>
+          <h3 className="text-[26px] font-bold text-[#0B0F0E]">
+            {person.name} <span className="text-[13px] text-black/30 font-bold ml-1.5 uppercase tracking-widest">{person.englishName}</span>
           </h3>
-          <p className="text-[#21c1a2] text-[13px] md:text-[14px] font-bold uppercase tracking-widest mt-2 md:mt-3">
+          <p className="text-[#21c1a2] text-[15px] font-bold mt-2">
             {person.name === "채동우" ? "채널 기획 · 운영 총괄" : person.name === "손현우" ? "촬영 · 제작 총괄" : "구성 · 편집 총괄"}
           </p>
         </div>
         
-        <p className="text-[14px] md:text-[15px] font-medium leading-[1.8] md:leading-[1.85] text-black/60 mb-2">
+        <p className="text-[15px] font-medium leading-[1.8] text-black/60 mb-2">
           {person.body}
         </p>
         {!isExpanded && (
-          <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-center">
-            <span className="text-[12px] font-bold text-[#21c1a2]">세부 경력 열어보기 ▼</span>
+          <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-between">
+            <div className="flex gap-2">
+              {person.responsibilities.slice(0, 2).map((r: string) => (
+                <span key={r} className="text-[11px] font-bold bg-black/5 px-2 py-1 rounded text-black/40">#{r}</span>
+              ))}
+            </div>
+            <span className="text-[12px] font-bold text-[#21c1a2]">Profile ▼</span>
           </div>
         )}
       </div>
@@ -114,24 +119,22 @@ function TeamMemberCard({ person }: { person: any }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="px-6 md:px-8 pb-6 md:pb-8 pt-0 bg-white"
+            className="px-8 pb-8 pt-0 bg-white"
           >
-            <div className="border-t border-black/5 pt-5 md:pt-6 space-y-5 md:space-y-6">
-              {person.specs.map((spec: any) => (
+            <div className="border-t border-black/5 pt-6 space-y-6">
+              {person.specs.map((spec: SpecItem) => (
                 <div key={spec.category}>
-                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-2 md:mb-3">{spec.category}</h4>
+                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-3">{spec.category}</h4>
                   <ul className="space-y-1.5">
                     {spec.items.map((item: string) => (
-                      <li key={item} className="flex items-start gap-2 text-[13px] md:text-[14px] font-bold text-black/70 leading-snug">
+                      <li key={item} className="flex items-start gap-2 text-[14px] font-bold text-black/70 leading-snug">
                         <span className="mt-1.5 h-1 w-1 bg-[#21c1a2] rounded-full shrink-0" /> {item}
                       </li>
                     ))}
                   </ul>
                 </div>
               ))}
-              <div className="mt-4 text-center">
-                <span className="text-[12px] font-bold text-black/30 hover:text-black transition-colors cursor-pointer">닫기 ▲</span>
-              </div>
+              <p className="text-center text-[12px] font-bold text-black/20 mt-4">카드를 다시 누르면 닫힙니다</p>
             </div>
           </motion.div>
         )}
@@ -149,8 +152,7 @@ export default function Page() {
   const hasPhoneHref = phoneHref.startsWith("tel:");
   const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
   
-  const problemLead = content.problem?.lead || "";
-  const [problemSupport = "", problemDetail = ""] = problemLead.split("\n\n");
+  const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
 
   const totalSubscribers = content.portfolio.items.reduce((sum, item) => sum + item.subscriberCurrent, 0);
   const totalVideoViews = content.heroStats.totalVideoViews;
@@ -160,8 +162,11 @@ export default function Page() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight * 0.8) setIsScrolled(true);
-      else setIsScrolled(false);
+      if (window.scrollY > window.innerHeight * 0.8) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll);
@@ -172,20 +177,31 @@ export default function Page() {
     <main className="bg-white text-[#0B0F0E] antialiased pb-20 md:pb-0">
       
       {/* 1. 스마트 헤더 */}
-      <header className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"}`}>
+      <header 
+        className={`fixed top-0 z-50 w-full border-b border-black/5 bg-white/95 backdrop-blur-xl transition-all duration-500 ease-in-out ${
+          isScrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
         <div className={`${shell} flex h-[60px] md:h-20 items-center justify-between`}>
           <Link href="#top" className={`inline-flex items-center ${focusRing}`}>
             <Image src="/logo.png" alt="Turnkeyhaus" width={140} height={38} className="h-6 md:h-8 w-auto object-contain" priority />
           </Link>
+
+          {/* 메뉴 순서가 content.ts에 맞춰져 렌더링 됩니다 */}
           <nav className="hidden items-center gap-8 lg:flex">
             {content.nav.map((item) => (
-              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-[#21c1a2] transition-colors ${focusRing}`}>{item.label}</Link>
+              <Link key={item.href} href={item.href} className={`text-[14px] font-bold text-black/60 hover:text-[#21c1a2] transition-colors ${focusRing}`}>
+                {item.label}
+              </Link>
             ))}
           </nav>
-          {/* 🚨 링크 주소 교체 완료! */}
-          <ActionLink href="https://www.turnkey.haus/proposal.html" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
-            공식 제안서
-          </ActionLink>
+
+          <div className="flex items-center gap-2">
+            {/* 🚨 회원가입 버튼 삭제, 바로 공식 제안서만 남김 */}
+            <ActionLink href="https://www.turnkey.haus/proposal.html" className="inline-flex h-9 md:h-10 items-center rounded-full bg-[#21c1a2] px-5 md:px-6 text-[13px] md:text-[14px] font-bold text-black transition-transform hover:scale-105">
+              공식 제안서
+            </ActionLink>
+          </div>
         </div>
       </header>
 
@@ -215,6 +231,7 @@ export default function Page() {
               <ActionLink href="#portfolio" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-10 py-5 text-[16px] font-bold">
                 운영 사례 보기
               </ActionLink>
+              {/* 🚨 메인 배너의 뜬금없는 회원가입 버튼도 삭제 완료! */}
             </div>
           </motion.div>
           
@@ -478,9 +495,9 @@ export default function Page() {
           </motion.div>
           
           <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
-            <TeamMemberCard person={content.leadership.people[0]} />
-            <TeamMemberCard person={content.leadership.people[2]} />
-            <TeamMemberCard person={content.leadership.people[1]} />
+            <TeamMemberCard person={content.leadership.people[0]} /> {/* 채동우 */}
+            <TeamMemberCard person={content.leadership.people[2]} /> {/* 손현우 */}
+            <TeamMemberCard person={content.leadership.people[1]} /> {/* 양현 */}
           </div>
         </div>
       </section>
@@ -532,10 +549,8 @@ export default function Page() {
       </section>
 
       {/* 14. 계산기 */}
-      <section className="bg-[#FAFAFA] border-b border-black/5 [&:has(>*:empty)]:hidden">
-        <div className="py-16 md:py-24">
-          <DiagnosticCalculator />
-        </div>
+      <section className="bg-[#FAFAFA] py-16 md:py-24 border-b border-black/5">
+        <DiagnosticCalculator />
       </section>
 
       {/* 15. 연락처 및 폼 */}
