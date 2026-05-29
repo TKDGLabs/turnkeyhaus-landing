@@ -19,7 +19,7 @@ const PAY_METHOD_OPTIONS = [
 
 type PayMethod = (typeof PAY_METHOD_OPTIONS)[number]["value"];
 
-// Supabase에서 불러올 상품 타입
+// 상품 데이터 타입
 type StoreProduct = {
   id: string;
   name: string;
@@ -27,8 +27,36 @@ type StoreProduct = {
   price: number;
   delivery_info: string;
   image_url?: string;
-  sort_order: number;
+  sort_order?: number;
 };
+
+// 🚨 무적의 폴백(Fallback) 데이터: DB가 터져도 무조건 화면에 띄워줄 기본 상품들
+const STORE_PRODUCTS: StoreProduct[] = [
+  {
+    id: "tier-1",
+    name: "운영 진단 리포트 (1회성)",
+    summary: "현재 채널·경쟁 채널 3개 분석\n주제 20개와 검증 운영표 제안\n썸네일/제목 개선안",
+    price: 490000,
+    delivery_info: "결제 완료 후 3영업일 이내 PDF 이메일 발송",
+    sort_order: 1
+  },
+  {
+    id: "tier-2",
+    name: "3개월 채널 운영 전략 플랜",
+    summary: "3개월 채널 로드맵 기획\n주제 및 핵심 키워드 추출\n기존 업로드 영상 피드백",
+    price: 297000,
+    delivery_info: "결제 완료 후 익일부터 3개월간 온라인/이메일 컨설팅 제공",
+    sort_order: 2
+  },
+  {
+    id: "tier-3",
+    name: "제작 포함 1개월 검증 운영 (착수금)",
+    summary: "월간 기획과 1회차 촬영 운영\n긴 영상/쇼츠 일정 편성\n썸네일 및 초기 업로드 세팅",
+    price: 2500000,
+    delivery_info: "결제 후 1개월 내 촬영 및 편집본 이메일/클라우드 전송",
+    sort_order: 3
+  }
+];
 
 type KakaoPostcodeAddressData = { zonecode: string; address: string; roadAddress: string; jibunAddress: string; userSelectedType: "R" | "J"; bname: string; buildingName: string; apartment: "Y" | "N"; };
 
@@ -51,8 +79,9 @@ export default function StorePage() {
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
 
-  const [products, setProducts] = useState<StoreProduct[]>([]);
-  const [selectedProductId, setSelectedProductId] = useState<string>("");
+  // 🚨 화면이 빈칸으로 시작하지 않게 기본 상품(STORE_PRODUCTS)을 채워두고 시작합니다!
+  const [products, setProducts] = useState<StoreProduct[]>(STORE_PRODUCTS);
+  const [selectedProductId, setSelectedProductId] = useState<string>(STORE_PRODUCTS[0].id);
   
   const [payMethod, setPayMethod] = useState<PayMethod>("CARD");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -86,25 +115,22 @@ export default function StorePage() {
       }
 
       try {
-        // 1. Supabase에서 진열할 상품들 불러오기
+        // 1. Supabase에서 데이터 불러오기 시도
         const { data: productData, error: productError } = await supabase
           .from("store_products")
           .select("*")
           .eq("is_active", true)
           .order("sort_order", { ascending: true });
 
-        if (productError) {
-          console.error("상품 로딩 에러:", productError);
-        } else if (productData && isMounted) {
+        // 🚨 Supabase에 정상적인 데이터가 있을 때만 덮어씌웁니다. 없으면 기본 상품(STORE_PRODUCTS) 유지!
+        if (!productError && productData && productData.length > 0 && isMounted) {
           setProducts(productData);
-          if (productData.length > 0) {
-            setSelectedProductId(productData[0].id);
-          }
+          setSelectedProductId(productData[0].id);
         }
 
         if (isMounted) setLoading(false);
 
-        // 2. 로그인한 유저 정보 불러오기
+        // 2. 유저 정보 불러오기
         const { data: { user } } = await supabase.auth.getUser();
         if (user && isMounted) {
           setAuthUser(user);
@@ -147,7 +173,6 @@ export default function StorePage() {
     if (loading) return;
     setError(null);
 
-    // 비회원은 강제 가입 모달 띄우기
     if (!authUser) {
       setShowAuthModal(true);
       return;
@@ -196,18 +221,11 @@ export default function StorePage() {
 
       <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
         <section className="space-y-4">
-          {products.length === 0 && !loading && (
-            <div className="border border-black/10 bg-[#FAFAFA] p-8 text-center rounded-2xl">
-              <p className="text-[16px] font-bold text-black/60 mb-2">현재 신청 가능한 상품이 없습니다.</p>
-              <p className="text-[13px] text-black/40">Supabase 관리자 페이지에서 상품을 추가해 주세요.</p>
-            </div>
-          )}
-
           {products.map((product, index) => {
             const active = selectedProductId === product.id;
-            const optionLabel = `OPTION ${(index + 1).toString().padStart(2, '0')}`; // OPTION 01, 02 자동 생성
+            const optionLabel = `OPTION ${(index + 1).toString().padStart(2, '0')}`;
             
-            // 🚨 핵심 마법: summary(설명)에 적힌 글을 줄바꿈(엔터) 기준으로 쪼개서 체크리스트로 만듭니다.
+            // 엔터(\n) 기준으로 체크리스트 분리
             const bullets = product.summary.split('\n').filter(text => text.trim() !== '');
 
             return (
@@ -235,7 +253,6 @@ export default function StorePage() {
                       {active && <span className="bg-[#21c1a2] text-[#07211d] text-[11px] font-bold px-2.5 py-1 rounded whitespace-nowrap">선택됨</span>}
                     </div>
                     
-                    {/* 엔터로 쪼개진 글자들을 예쁜 체크리스트로 출력 */}
                     <ul className="grid gap-2.5 text-[13px] md:text-[14px] font-medium text-black/70 mb-6">
                       {bullets.map((bullet, i) => (
                         <li key={i} className="flex gap-2.5 items-start">
