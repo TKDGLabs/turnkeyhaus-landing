@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { AnimatePresence, motion } from "framer-motion";
 
 const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
@@ -16,6 +17,7 @@ type StoreProduct = {
   delivery_info: string;
 };
 
+// 화면 깜빡임 방지 기본 데이터
 const FULL_PRODUCTS: StoreProduct[] = [
   { id: "tier-ebook", type: "SINGLE", name: "브랜드 유튜브 구축 전자책", summary: "유튜브를 처음 시작하는 전문직/기업 필수 가이드\n문의가 들어오는 채널 세팅의 3가지 핵심 원칙", price: 0, delivery_info: "결제(0원) 즉시 마이페이지 다운로드 제공" },
   { id: "tier-report", type: "SINGLE", name: "운영 진단 리포트 (1회성)", summary: "현재 채널 및 경쟁 채널 3곳 정밀 분석\n검색 유입을 위한 주제 20개 추출 및 검증\n즉시 적용 가능한 썸네일/제목 교정 가이드", price: 490000, delivery_info: "결제 완료 후 3영업일 이내 PDF 이메일 발송" },
@@ -78,7 +80,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               {product.name}
             </h1>
             <p className="text-[16px] md:text-[18px] text-black/60 font-medium leading-[1.7] break-keep max-w-[50ch]">
-              브랜드의 성장을 위한 최적의 채널 운영 솔루션. 전담 기획자와 PD가 하나의 팀으로 배정됩니다.
+              브랜드의 성장을 위한 최적의 채널 운영 솔루션. 전문 기획자와 PD가 하나의 전담 팀으로 배정됩니다.
             </p>
           </div>
 
@@ -105,22 +107,49 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               </ul>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-black/10">
-              <h4 className="text-[16px] font-bold text-[#0B0F0E]">계약 및 결제 안내</h4>
-              <p className="text-[15px] leading-[1.8] text-black/60 font-medium break-keep">
-                본 페이지에서의 결제는 안전하게 진행됩니다. 결제 확인 후 1영업일 이내에 전담 매니저가 배정되어 킥오프 미팅 및 세부 일정을 조율합니다.
-                {isSub && " 정기구독 상품의 경우 첫 달 착수금 결제 후, 익월부터는 법인 세금계산서 청구 또는 전용 결제 링크를 통해 별도 과금됩니다."}
-              </p>
-            </div>
-            
-            {isSub && (
-              <div className="bg-[#FFF5F5] border border-[#FEB2B2] border-l-4 border-l-[#E53E3E] p-6 rounded-xl space-y-3 mt-8">
-                <h4 className="text-[15px] font-bold text-[#C53030]">🚨 의무 유지 기간 및 위약금 안내</h4>
-                <p className="text-[14px] text-[#742A2A] leading-relaxed font-medium break-keep">
-                  채널 운영대행 플랜은 초기 채널 분석 및 전담 인력 고정 배치를 위해 <strong>최소 3개월의 의무 유지 기간</strong>이 적용됩니다. 중도 해지 시 위약금이 발생할 수 있습니다.
-                </p>
+            {/* 🚨 오프라인 계약서의 독소조항 방어 논리를 온라인 운영 정책으로 승화시켰습니다. */}
+            <div className="space-y-6 pt-6 border-t border-black/10">
+              <h3 className="text-[20px] font-bold text-[#0B0F0E]">서비스 운영 및 계약 상세 규정</h3>
+              
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="p-5 border border-black/10 rounded-xl space-y-2">
+                  <h4 className="text-[14px] font-bold text-[#0B0F0E] flex items-center gap-2">
+                    <span className="text-[#21c1a2]">01</span> 피드백 및 수정 정책
+                  </h4>
+                  <p className="text-[13px] text-black/60 leading-relaxed break-keep">
+                    업로드 전 기준 <strong className="text-black">총 3회의 수정(자막, 화면 일부 조정)</strong>이 제공되며, 기존 기획을 벗어나는 재편집은 불가합니다. 검수 요청 후 <strong className="text-black">5영업일 내 무응답 시 자동 승인</strong>으로 간주됩니다.
+                  </p>
+                </div>
+                
+                <div className="p-5 border border-black/10 rounded-xl space-y-2">
+                  <h4 className="text-[14px] font-bold text-[#0B0F0E] flex items-center gap-2">
+                    <span className="text-[#21c1a2]">02</span> 저작권 및 원본 귀속
+                  </h4>
+                  <p className="text-[13px] text-black/60 leading-relaxed break-keep">
+                    최종 산출물(영상) 및 채널 소유권은 고객사에 귀속되나, 영상 제작에 사용된 <strong className="text-black">촬영 원본 파일 및 프로젝트 파일의 소유권은 턴키하우스에 귀속</strong>되며 별도 제공되지 않습니다.
+                  </p>
+                </div>
+
+                <div className="p-5 border border-black/10 rounded-xl space-y-2">
+                  <h4 className="text-[14px] font-bold text-[#0B0F0E] flex items-center gap-2">
+                    <span className="text-[#21c1a2]">03</span> 성과 보장 면책
+                  </h4>
+                  <p className="text-[13px] text-black/60 leading-relaxed break-keep">
+                    본 서비스는 브랜드 인지도 제고 및 고관여 고객 설득을 위한 채널 운영대행으로, 비정상적 방법을 통한 <strong className="text-black">조회수, 구독자 수, 단기 매출 등의 정량적 성과를 맹목적으로 보장하지 않습니다.</strong>
+                  </p>
+                </div>
+
+                <div className="p-5 border border-black/10 rounded-xl space-y-2 bg-[#FFF5F5] border-[#FEB2B2]">
+                  <h4 className="text-[14px] font-bold text-[#C53030] flex items-center gap-2">
+                    <span>04</span> 위약금 및 해지 규정
+                  </h4>
+                  <p className="text-[13px] text-[#742A2A] leading-relaxed break-keep">
+                    정기구독의 경우 전담팀 배정 문제로 <strong className="text-[#C53030]">최소 3개월(또는 계약상 의무 횟수) 유지</strong>가 필수입니다. 기간 내 해지 시 <strong className="text-[#C53030]">1개월분의 결제대금이 위약금으로 청구</strong>됩니다.
+                  </p>
+                </div>
               </div>
-            )}
+            </div>
+
           </div>
         </section>
 
@@ -145,9 +174,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               onClick={() => router.push('/store')}
               className={`w-full h-14 rounded-xl ${isSub ? "bg-[#0B0F0E]" : "bg-[#21c1a2]"} text-[16px] font-bold ${isSub ? "text-white" : "text-[#07211d]"} transition-transform hover:scale-[1.02] shadow-md ${focusRing}`}
             >
-              {isFree ? "무료로 다운로드 받기" : "결제 페이지로 돌아가기"}
+              {isFree ? "무료로 다운로드 받기" : "약관 확인 및 결제하러 가기"}
             </button>
-            <p className="text-center text-[12px] text-black/40 font-medium mt-4">안전한 거래를 위해 약관 동의가 필요합니다.</p>
+            <p className="text-center text-[12px] text-black/40 font-medium mt-4">
+              안전한 거래를 위해 회원가입 및 약관 동의가 필요합니다.
+            </p>
           </div>
         </aside>
 
