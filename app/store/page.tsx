@@ -1,10 +1,8 @@
 "use client";
 
-import * as PortOne from "@portone/browser-sdk/v2";
 import type { User } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Script from "next/script";
 import { FormEvent, useEffect, useState, useMemo } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { AnimatePresence, motion } from "framer-motion";
@@ -29,7 +27,6 @@ type StoreProduct = {
   sort_order?: number;
 };
 
-// 🚨 0초 로딩의 마법: 대표님의 6개 상품 전체 라인업을 기본 상태로 박아둡니다.
 const FULL_PRODUCTS: StoreProduct[] = [
   { id: "tier-ebook", type: "SINGLE", name: "브랜드 유튜브 구축 전자책", summary: "유튜브를 처음 시작하는 전문직/기업 필수 가이드\n문의가 들어오는 채널 세팅의 3가지 핵심 원칙", price: 0, delivery_info: "결제(0원) 즉시 마이페이지 다운로드 제공" },
   { id: "tier-report", type: "SINGLE", name: "운영 진단 리포트 (1회성)", summary: "현재 채널 및 경쟁 채널 3곳 정밀 분석\n검색 유입을 위한 주제 20개 추출 및 검증\n즉시 적용 가능한 썸네일/제목 교정 가이드", price: 490000, delivery_info: "결제 완료 후 3영업일 이내 PDF 이메일 발송" },
@@ -41,11 +38,8 @@ const FULL_PRODUCTS: StoreProduct[] = [
 
 export default function StorePage() {
   const router = useRouter();
-  
-  // 🚨 무한 루프 에러 해결: useMemo를 사용해 통로(client)를 한 번만 만듭니다!
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
-  // 기본값을 FULL_PRODUCTS로 설정해 로딩 지연을 0으로 만듭니다.
   const [products, setProducts] = useState<StoreProduct[]>(FULL_PRODUCTS);
   const [selectedProductId, setSelectedProductId] = useState<string>(FULL_PRODUCTS[1].id);
   
@@ -69,17 +63,14 @@ export default function StorePage() {
 
   useEffect(() => {
     let isMounted = true;
-
     async function loadBackgroundData() {
       if (!supabase) return;
       try {
-        // 백그라운드 DB 업데이트
         const { data, error: dbError } = await supabase.from("store_products").select("*").eq("is_active", true).order("sort_order", { ascending: true });
         if (!dbError && data && data.length > 0 && isMounted) {
           setProducts(data as StoreProduct[]);
         }
 
-        // 유저 정보 체크
         const { data: { user } } = await supabase.auth.getUser();
         if (user && isMounted) {
           setAuthUser(user);
@@ -94,7 +85,6 @@ export default function StorePage() {
         console.error("백그라운드 로딩 에러:", err);
       }
     }
-    
     loadBackgroundData();
     return () => { isMounted = false; };
   }, [supabase]);
