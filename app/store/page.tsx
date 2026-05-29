@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { AnimatePresence } from "framer-motion"; // 🚨 에러 원인 해결: 애니메이션 모듈 추가!
 
 const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 
@@ -56,7 +57,6 @@ export default function StorePage() {
   const [payMethod, setPayMethod] = useState<PayMethod>("CARD");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  // 🚨 비회원 결제 시 가로막을 안내 모달창 상태 추가!
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const [companyName, setCompanyName] = useState("");
@@ -132,7 +132,6 @@ export default function StorePage() {
     if (loading) return;
     setError(null);
 
-    // 🚨 핵심 로직: 로그인 안 된 사용자면 "결제는 회원가입 후 가능합니다" 모달을 강제로 띄웁니다!
     if (!authUser) {
       setShowAuthModal(true);
       return;
@@ -293,7 +292,6 @@ export default function StorePage() {
         </aside>
       </div>
 
-      {/* 🚨 대형 치트키: 대표님이 기획하신 비회원 방어용 모달 알림창 디자인 구현! */}
       <AnimatePresence>
         {showAuthModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
