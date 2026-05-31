@@ -22,6 +22,7 @@ type CreateOrderBody = {
   companyName?: string;
   businessRegistrationNumber?: string;
   taxInvoiceRequested?: boolean;
+  selectedOptions?: Record<string, string>;
   consents?: {
     terms?: boolean;
     privacy?: boolean;
@@ -48,6 +49,16 @@ function sanitizeUrl(value: unknown) {
 
 function normalizePayMethod(value: unknown): PayMethod {
   return value === "TRANSFER" ? "TRANSFER" : "CARD";
+}
+
+function normalizeSelectedOptions(value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .map(([key, optionValue]) => [sanitizeText(key, 80), sanitizeText(optionValue, 160)] as const)
+      .filter(([key, optionValue]) => key && optionValue)
+  );
 }
 
 function resolveSiteOrigin() {
@@ -83,6 +94,7 @@ export async function POST(request: Request) {
     const companyName = sanitizeText(body.companyName, 120);
     const businessRegistrationNumber = sanitizeText(body.businessRegistrationNumber, 40);
     const payMethod = normalizePayMethod(body.payMethod);
+    const selectedOptions = normalizeSelectedOptions(body.selectedOptions);
     const consents = body.consents ?? {};
 
     if (!customerName || !customerPhone) {
@@ -112,7 +124,8 @@ export async function POST(request: Request) {
       price: product.price,
       delivery_info: product.delivery_info,
       hero_image_url: product.hero_image_url ?? null,
-      detail_image_urls: product.detail_image_urls ?? []
+      detail_image_urls: product.detail_image_urls ?? [],
+      selected_options: selectedOptions
     };
 
     const { data: order, error: insertError } = await supabase
@@ -123,6 +136,7 @@ export async function POST(request: Request) {
         product_id: product.id,
         product_name: product.name,
         product_snapshot: productSnapshot,
+        selected_options: selectedOptions,
         amount: product.price,
         currency: "KRW",
         status: product.price === 0 ? "paid" : "pending",
@@ -203,7 +217,8 @@ export async function POST(request: Request) {
           orderNo,
           productId: product.id,
           userId: user.id,
-          productType: product.type
+          productType: product.type,
+          selectedOptions
         }
       }
     });
