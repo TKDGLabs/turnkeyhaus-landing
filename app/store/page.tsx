@@ -6,16 +6,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { AnimatePresence, motion } from "framer-motion";
 
 const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
 const PRODUCT_IMAGE_BUCKET = process.env.NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGE_BUCKET || "product-images";
 
 const PAY_METHOD_OPTIONS = [
-  { value: "CARD", label: "신용/체크카드" },
-  { value: "TRANSFER", label: "실시간 계좌이체" }
+  { value: "CARD", label: "카드" },
+  { value: "TRANSFER", label: "계좌이체" }
 ] as const;
 
+const CATEGORY_OPTIONS = [
+  { value: "all", label: "전체" },
+  { value: "free", label: "무료자료" },
+  { value: "report", label: "진단·리포트" },
+  { value: "planner", label: "전략 플래너" },
+  { value: "ops", label: "운영대행" }
+] as const;
+
+type CategoryValue = (typeof CATEGORY_OPTIONS)[number]["value"];
 type PayMethod = (typeof PAY_METHOD_OPTIONS)[number]["value"];
 type ProductType = "SINGLE" | "SUBSCRIPTION";
 
@@ -71,12 +79,54 @@ type CreateOrderResponse = {
 };
 
 const FULL_PRODUCTS: StoreProduct[] = [
-  { id: "tier-ebook", type: "SINGLE", name: "브랜드 유튜브 구축 전자책", summary: "유튜브를 처음 시작하는 전문직/기업 필수 가이드\n문의가 들어오는 채널 세팅의 3가지 핵심 원칙", price: 0, delivery_info: "무료 신청 즉시 다운로드 권한 제공" },
-  { id: "tier-report", type: "SINGLE", name: "운영 진단 리포트 (1회성)", summary: "현재 채널 및 경쟁 채널 3곳 정밀 분석\n검색 유입을 위한 주제 20개 추출 및 검증\n즉시 적용 가능한 썸네일/제목 교정 가이드", price: 490000, delivery_info: "결제 완료 후 3영업일 이내 PDF 이메일 발송" },
-  { id: "tier-planner", type: "SINGLE", name: "90일 채널 전략 플래너 (특가)", summary: "단기 성과를 위한 3개월 채널 로드맵 기획\n시즌 이슈 및 검색량 기반 핵심 키워드 매칭\n기존 업로드 영상 구조 피드백 및 코칭", price: 297000, delivery_info: "결제 완료 후 익일부터 3개월간 온라인/이메일 컨설팅" },
-  { id: "tier-basic", type: "SUBSCRIPTION", name: "유튜브 운영대행 [베이직]", summary: "콘텐츠 기획 및 연출 (6편)\n롱폼 편집 10분 이내 (2편)\n숏폼 신규/재편집 (12편)\n현장 촬영 1회차 (PD 2인/3CAM)", price: 3800000, delivery_info: "상담 및 계약 범위 확인 후 첫 달 착수금 결제" },
-  { id: "tier-standard", type: "SUBSCRIPTION", name: "유튜브 운영대행 [스탠다드]", summary: "콘텐츠 기획 및 연출 (7편)\n롱폼 편집 10분 이내 (3편)\n숏폼 신규/재편집 (16편)\n현장 촬영 1회차 (PD 2인/3CAM)", price: 4400000, delivery_info: "상담 및 계약 범위 확인 후 첫 달 착수금 결제" },
-  { id: "tier-premium", type: "SUBSCRIPTION", name: "유튜브 운영대행 [프리미엄]", summary: "콘텐츠 기획 및 연출 (12편)\n롱폼 편집 10분 이내 (4편)\n숏폼 신규/재편집 (28편)\n현장 촬영 2회차 (PD 2인/3CAM)", price: 5000000, delivery_info: "상담 및 계약 범위 확인 후 첫 달 착수금 결제" }
+  {
+    id: "tier-ebook",
+    type: "SINGLE",
+    name: "브랜드 유튜브 구축 전자책",
+    summary: "유튜브를 처음 시작하는 전문직/기업 필수 가이드\n문의가 들어오는 채널 세팅의 3가지 핵심 원칙",
+    price: 0,
+    delivery_info: "무료 신청 즉시 다운로드 권한 제공"
+  },
+  {
+    id: "tier-report",
+    type: "SINGLE",
+    name: "운영 진단 리포트",
+    summary: "현재 채널 및 경쟁 채널 3곳 정밀 분석\n검색 유입을 위한 주제 20개 추출 및 검증\n즉시 적용 가능한 썸네일/제목 교정 가이드",
+    price: 490000,
+    delivery_info: "결제 완료 후 3영업일 이내 PDF 이메일 발송"
+  },
+  {
+    id: "tier-planner",
+    type: "SINGLE",
+    name: "90일 채널 전략 플래너",
+    summary: "단기 성과를 위한 3개월 채널 로드맵 기획\n시즌 이슈 및 검색량 기반 핵심 키워드 매칭\n기존 업로드 영상 구조 피드백 및 코칭",
+    price: 297000,
+    delivery_info: "결제 완료 후 익일부터 3개월간 온라인/이메일 컨설팅"
+  },
+  {
+    id: "tier-basic",
+    type: "SUBSCRIPTION",
+    name: "운영대행 베이직 착수금",
+    summary: "콘텐츠 기획 및 연출 6편\n롱폼 편집 10분 이내 2편\n숏폼 신규/재편집 12편\n현장 촬영 1회차",
+    price: 3800000,
+    delivery_info: "상담 및 계약 범위 확인 후 첫 달 착수금 결제"
+  },
+  {
+    id: "tier-standard",
+    type: "SUBSCRIPTION",
+    name: "운영대행 스탠다드 착수금",
+    summary: "콘텐츠 기획 및 연출 7편\n롱폼 편집 10분 이내 3편\n숏폼 신규/재편집 16편\n현장 촬영 1회차",
+    price: 4400000,
+    delivery_info: "상담 및 계약 범위 확인 후 첫 달 착수금 결제"
+  },
+  {
+    id: "tier-premium",
+    type: "SUBSCRIPTION",
+    name: "운영대행 프리미엄 착수금",
+    summary: "콘텐츠 기획 및 연출 12편\n롱폼 편집 10분 이내 4편\n숏폼 신규/재편집 28편\n현장 촬영 2회차",
+    price: 5000000,
+    delivery_info: "상담 및 계약 범위 확인 후 첫 달 착수금 결제"
+  }
 ];
 
 function normalizeProduct(raw: Partial<StoreProduct>): StoreProduct {
@@ -95,6 +145,42 @@ function normalizeProduct(raw: Partial<StoreProduct>): StoreProduct {
   };
 }
 
+function productCategory(product: StoreProduct): CategoryValue {
+  if (product.price === 0) return "free";
+  if (product.id.includes("report")) return "report";
+  if (product.id.includes("planner")) return "planner";
+  if (product.type === "SUBSCRIPTION") return "ops";
+  return "report";
+}
+
+function productBadge(product: StoreProduct) {
+  const category = productCategory(product);
+  if (category === "free") return "무료자료";
+  if (category === "report") return "PDF 리포트";
+  if (category === "planner") return "전략상품";
+  return "착수금";
+}
+
+function productTagline(product: StoreProduct) {
+  const category = productCategory(product);
+  if (category === "free") return "입문 가이드";
+  if (category === "report") return "3영업일 제공";
+  if (category === "planner") return "90일 로드맵";
+  return "상담 후 진행";
+}
+
+function productInitial(product: StoreProduct) {
+  const category = productCategory(product);
+  if (category === "free") return "EBOOK";
+  if (category === "report") return "REPORT";
+  if (category === "planner") return "PLAN";
+  return "OPS";
+}
+
+function priceLabel(price: number) {
+  return price === 0 ? "무료" : `${price.toLocaleString("ko-KR")}원`;
+}
+
 function usePublicAssetUrl(pathOrUrl?: string | null) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
@@ -107,24 +193,60 @@ function usePublicAssetUrl(pathOrUrl?: string | null) {
   }, [pathOrUrl, supabase]);
 }
 
-function ProductHeroImage({ product }: { product: StoreProduct }) {
+function ProductThumb({ product, selected }: { product: StoreProduct; selected: boolean }) {
   const imageUrl = usePublicAssetUrl(product.hero_image_url);
+  const category = productCategory(product);
+  const accent = category === "ops" ? "from-[#0B0F0E] to-[#2C3A36]" : category === "planner" ? "from-[#21c1a2] to-[#B8FFE4]" : category === "report" ? "from-[#DDF8F3] to-white" : "from-[#F2FFF9] to-white";
 
-  if (!imageUrl) {
+  if (imageUrl) {
     return (
-      <div className="flex h-28 w-full items-center justify-center rounded-xl border border-black/5 bg-[#FAFAFA] text-[11px] font-bold uppercase tracking-[0.14em] text-black/25 sm:h-32">
-        Turnkeyhaus
+      <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#F4F5F5]">
+        <img src={imageUrl} alt={`${product.name} 대표 이미지`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+        {selected ? <div className="absolute inset-0 ring-4 ring-inset ring-[#21c1a2]" /> : null}
       </div>
     );
   }
 
   return (
-    <img
-      src={imageUrl}
-      alt={`${product.name} 대표 이미지`}
-      className="h-28 w-full rounded-xl border border-black/5 object-cover sm:h-32"
-      loading="lazy"
-    />
+    <div className={`relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br ${accent} p-5`}>
+      <div className="absolute right-4 top-4 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-black text-[#0B0F0E] shadow-sm">{productBadge(product)}</div>
+      <div className="flex h-full flex-col justify-end">
+        <p className={`text-[12px] font-black tracking-[0.18em] ${category === "ops" ? "text-white/55" : "text-black/35"}`}>TURNKEYHAUS</p>
+        <p className={`mt-2 text-[34px] font-black leading-none tracking-tight ${category === "ops" ? "text-white" : "text-[#0B0F0E]"}`}>{productInitial(product)}</p>
+        <p className={`mt-3 text-[13px] font-bold ${category === "ops" ? "text-white/68" : "text-black/55"}`}>{productTagline(product)}</p>
+      </div>
+      {selected ? <div className="absolute inset-0 ring-4 ring-inset ring-[#21c1a2]" /> : null}
+    </div>
+  );
+}
+
+function ProductCard({ product, selected, onSelect }: { product: StoreProduct; selected: boolean; onSelect: () => void }) {
+  const bullets = product.summary.split("\n").filter(Boolean);
+  const category = productCategory(product);
+
+  return (
+    <article className="group min-w-0">
+      <button type="button" onClick={onSelect} className={`block w-full rounded-3xl text-left transition-all hover:-translate-y-0.5 ${focusRing}`}>
+        <ProductThumb product={product} selected={selected} />
+        <div className="pt-3">
+          <div className="mb-1.5 flex items-center gap-1.5">
+            <span className={`rounded px-1.5 py-0.5 text-[10px] font-black ${category === "ops" ? "bg-[#0B0F0E] text-white" : "bg-[#E6F8F5] text-[#12846F]"}`}>{productBadge(product)}</span>
+            <span className="truncate text-[11px] font-bold text-black/35">{productTagline(product)}</span>
+          </div>
+          <h3 className="line-clamp-2 min-h-[2.8em] break-keep text-[15px] font-black leading-[1.4] tracking-tight text-[#0B0F0E] md:text-[16px]">{product.name}</h3>
+          <p className="mt-1 line-clamp-2 min-h-[2.9em] break-keep text-[12px] font-medium leading-[1.45] text-black/52">{bullets.slice(0, 2).join(" · ")}</p>
+          <div className="mt-2 flex items-end gap-1.5">
+            {product.price > 0 && <span className="pb-0.5 text-[12px] font-bold text-red-500">VAT 포함</span>}
+            <span className="text-[22px] font-black tracking-tight text-[#0B0F0E]">{priceLabel(product.price)}</span>
+          </div>
+          <p className="mt-1 line-clamp-1 text-[11px] font-bold text-black/38">{product.delivery_info}</p>
+        </div>
+      </button>
+      <div className="mt-2 flex items-center gap-2">
+        <Link href={`/store/${product.id}`} className={`text-[12px] font-black text-black/45 underline-offset-4 hover:text-[#21c1a2] hover:underline ${focusRing}`}>상세보기</Link>
+        {selected ? <span className="rounded-full bg-[#21c1a2] px-2 py-0.5 text-[11px] font-black text-[#07211d]">선택됨</span> : null}
+      </div>
+    </article>
   );
 }
 
@@ -134,6 +256,7 @@ export default function StorePage() {
 
   const [products, setProducts] = useState<StoreProduct[]>(FULL_PRODUCTS);
   const [selectedProductId, setSelectedProductId] = useState<string>(FULL_PRODUCTS[1].id);
+  const [activeCategory, setActiveCategory] = useState<CategoryValue>("all");
 
   const [payMethod, setPayMethod] = useState<PayMethod>("CARD");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -153,10 +276,12 @@ export default function StorePage() {
   const [error, setError] = useState<string | null>(null);
   const [authUser, setAuthUser] = useState<User | null>(null);
 
-  const selectedProduct = useMemo(
-    () => products.find((item) => item.id === selectedProductId),
-    [products, selectedProductId]
-  );
+  const selectedProduct = useMemo(() => products.find((item) => item.id === selectedProductId), [products, selectedProductId]);
+
+  const visibleProducts = useMemo(() => {
+    if (activeCategory === "all") return products;
+    return products.filter((product) => productCategory(product) === activeCategory);
+  }, [activeCategory, products]);
 
   useEffect(() => {
     let isMounted = true;
@@ -197,7 +322,7 @@ export default function StorePage() {
           }
         }
       } catch (err) {
-        console.error("백그라운드 로딩 에러:", err);
+        console.error("스토어 데이터 로딩 에러:", err);
       }
     }
 
@@ -211,10 +336,11 @@ export default function StorePage() {
     setAgreedToTerms(false);
     setAgreedToPenalty(false);
     setAgreedToPrivacy(false);
+    setError(null);
   }, [selectedProductId]);
 
   async function createStoreOrder(): Promise<CreateOrderResponse> {
-    if (!supabase) throw new Error("Supabase 연결 정보가 설정되어 있지 않습니다.");
+    if (!supabase) throw new Error("Supabase 연결 정보가 설정되어 있지 않습니다. Vercel 환경변수를 확인해 주세요.");
 
     const {
       data: { session }
@@ -290,11 +416,11 @@ export default function StorePage() {
 
     if (!authUser) return setShowAuthModal(true);
     if (!selectedProduct) return setError("상품을 선택해 주세요.");
-    if (!customerName.trim() || !customerPhone.trim()) return setError("이름과 전화번호를 입력해 주세요.");
+    if (!customerName.trim() || !customerPhone.trim()) return setError("담당자명과 전화번호를 입력해 주세요.");
     if (!agreedToPrivacy) return setError("개인정보 처리방침에 동의해 주세요.");
-    if (!agreedToTerms) return setError("무형 서비스 환불 규정에 동의해 주세요.");
+    if (!agreedToTerms) return setError("환불 및 서비스 제공 기준에 동의해 주세요.");
     if (selectedProduct.type === "SUBSCRIPTION" && !agreedToPenalty) {
-      return setError("운영대행 약정 및 해지 규정에 동의하셔야 진행할 수 있습니다.");
+      return setError("운영대행 착수 및 해지 기준을 확인해 주세요.");
     }
 
     setProcessLoading(true);
@@ -309,12 +435,11 @@ export default function StorePage() {
       }
 
       if (!order.paymentRequest || !order.paymentId) {
-        throw new Error("결제 요청 정보가 생성되지 않았습니다.");
+        throw new Error("결제 요청 정보가 생성되지 않았습니다. PortOne 환경변수를 확인해 주세요.");
       }
 
       const portOneResponse = (await PortOne.requestPayment(order.paymentRequest as Parameters<typeof PortOne.requestPayment>[0])) as PortOnePaymentResult | undefined;
 
-      // 모바일 리디렉션 방식에서는 여기까지 돌아오지 않고 redirectUrl로 이동할 수 있습니다.
       if (!portOneResponse) return;
 
       if (portOneResponse.code !== undefined) {
@@ -343,223 +468,188 @@ export default function StorePage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1180px] px-5 py-14 text-[#0B0F0E] sm:px-6 md:py-20">
-      <div className="mb-10 space-y-4 border-b border-black/10 pb-7">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#21c1a2]">[ Store & Plan ]</p>
-        <h1 className="text-[34px] font-semibold leading-[1.2] tracking-tight md:text-[48px]">서비스 및 플랜 결제</h1>
-        <p className="max-w-[72ch] break-keep text-[16px] leading-[1.8] text-black/68">
-          단건 리포트와 플래너는 카드로 바로 결제할 수 있습니다. 월간 운영대행은 상담 및 계약 범위 확인 후 착수금 결제로 진행됩니다.
-        </p>
-        {authUser ? (
-          <div className="flex items-center gap-2 pt-2 text-[13px]">
-            <span className="rounded bg-black/5 px-2.5 py-1.5">{authUser.email}</span>
-            <button onClick={handleSignOut} className={`h-8 rounded border border-black/15 px-3 text-[12px] font-semibold text-black/65 hover:bg-black/5 ${focusRing}`}>
-              로그아웃
-            </button>
+    <main className="min-h-screen bg-white text-[#0B0F0E]">
+      <section className="border-b border-black/10 bg-[#F7F8F7]">
+        <div className="mx-auto grid w-full max-w-[1280px] gap-5 px-5 py-8 sm:px-6 md:grid-cols-[1.3fr_0.7fr] lg:px-8">
+          <div className="overflow-hidden rounded-3xl bg-[#0B0F0E] p-7 text-white md:p-10">
+            <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[#21c1a2]">Turnkeyhaus Store</p>
+            <h1 className="mt-4 max-w-[12ch] break-keep text-[38px] font-black leading-[1.05] tracking-tight sm:text-[54px]">채널 운영 상품을 바로 확인하세요.</h1>
+            <p className="mt-5 max-w-[56ch] break-keep text-[15px] font-medium leading-[1.75] text-white/68 md:text-[17px]">
+              무료 자료, 유료 진단 리포트, 90일 플래너, 운영대행 착수금까지 한 화면에서 고르고 결제할 수 있게 정리했습니다.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-2">
+              {['카드결제', 'PDF 산출물', '채널 진단', '운영대행 착수금'].map((item) => (
+                <span key={item} className="rounded-full border border-white/10 bg-white/8 px-3 py-1.5 text-[12px] font-bold text-white/76">{item}</span>
+              ))}
+            </div>
           </div>
-        ) : (
-          <div className="pt-2 text-[13px] font-medium text-black/40">로그인하지 않은 상태입니다. 결제 시 가입 팝업이 표출됩니다.</div>
-        )}
-      </div>
 
-      <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-        <section className="space-y-4">
-          {products.map((product) => {
-            const active = selectedProductId === product.id;
-            const isSub = product.type === "SUBSCRIPTION";
-            const isFree = product.price === 0;
-            const bullets = product.summary.split("\n").filter((text) => text.trim() !== "");
+          <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-1">
+            <Link href="/store/tier-report" className={`rounded-3xl border border-black/10 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${focusRing}`}>
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#21c1a2]">Best</p>
+              <h2 className="mt-3 break-keep text-[24px] font-black leading-tight">운영 진단 리포트</h2>
+              <p className="mt-2 text-[13px] font-bold text-black/45">3영업일 이내 PDF 제공</p>
+              <p className="mt-5 text-[26px] font-black">490,000원</p>
+            </Link>
+            <Link href="/store/tier-planner" className={`rounded-3xl border border-black/10 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${focusRing}`}>
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#21c1a2]">Special</p>
+              <h2 className="mt-3 break-keep text-[24px] font-black leading-tight">90일 채널 전략 플래너</h2>
+              <p className="mt-2 text-[13px] font-bold text-black/45">3개월 로드맵·피드백</p>
+              <p className="mt-5 text-[26px] font-black">297,000원</p>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-            return (
-              <div
-                key={product.id}
-                className={`w-full cursor-pointer text-left transition-all duration-300 ${focusRing} ${
-                  active
-                    ? `rounded-2xl p-6 shadow-sm ring-2 md:p-8 ${isSub ? "bg-[#FAFAFA] ring-[#0B0F0E]" : "bg-[#FAFAFA] ring-[#21c1a2]"}`
-                    : "rounded-2xl border border-black/10 bg-white p-6 hover:border-[#21c1a2]/40 hover:bg-[#FAFAFA]/50 md:p-8"
-                }`}
-                onClick={() => setSelectedProductId(product.id)}
+      <section className="mx-auto w-full max-w-[1280px] px-5 py-8 sm:px-6 lg:px-8">
+        <div className="mb-6 overflow-x-auto border-b border-black/10 pb-4">
+          <div className="flex min-w-max gap-2">
+            {CATEGORY_OPTIONS.map((category) => (
+              <button
+                key={category.value}
+                type="button"
+                onClick={() => setActiveCategory(category.value)}
+                className={`rounded-full border px-4 py-2 text-[13px] font-black transition-colors ${focusRing} ${activeCategory === category.value ? "border-[#21c1a2] bg-[#21c1a2] text-[#07211d]" : "border-black/10 bg-white text-black/55 hover:bg-black/[0.03]"}`}
               >
-                <div className="grid gap-4 md:gap-6 sm:grid-cols-[160px_1fr]">
-                  <div className="space-y-4">
-                    <ProductHeroImage product={product} />
-                    <div>
-                      <p className={`mb-1.5 text-[11px] font-bold uppercase tracking-widest md:text-[12px] ${isSub ? "text-[#0B0F0E]" : "text-[#21c1a2]"}`}>
-                        {isSub ? "OPS DEPOSIT" : isFree ? "FREE ASSET" : "SINGLE PAYMENT"}
-                      </p>
-                      <p className="text-[22px] font-bold tracking-tight text-[#0B0F0E] md:text-[26px]">{isFree ? "무료" : `${product.price.toLocaleString("ko-KR")}원`}</p>
-                      <p className="mt-1 text-[12px] font-semibold tracking-[0.08em] text-black/45">{isSub ? "첫 달 착수금 / VAT 포함" : "VAT 포함"}</p>
-                    </div>
-                  </div>
+                {category.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-                  <div>
-                    <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
-                      <h3 className="text-[20px] font-bold tracking-tight text-[#0B0F0E] md:text-[22px]">{product.name}</h3>
-                      {active && <span className={`${isSub ? "bg-[#0B0F0E] text-white" : "bg-[#21c1a2] text-[#07211d]"} rounded px-2.5 py-1 text-[11px] font-bold`}>선택됨</span>}
-                    </div>
-
-                    <ul className="mb-5 grid gap-2.5 text-[13px] font-medium text-black/70 md:text-[14px]">
-                      {bullets.map((bullet, i) => (
-                        <li key={i} className="flex items-start gap-2.5">
-                          <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${isSub ? "bg-[#0B0F0E]" : "bg-black/30"}`} />
-                          <span className="break-keep text-left">{bullet.trim()}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-                      <div className="inline-block rounded-lg border border-black/10 bg-white p-3 text-[12px] text-black/60">
-                        <span className="mr-2 font-bold text-black">제공 방식:</span> {product.delivery_info}
-                      </div>
-                      <Link
-                        href={`/store/${product.id}`}
-                        className={`inline-flex items-center border-b border-transparent text-[13px] font-bold transition-colors hover:border-[#21c1a2] ${isSub ? "text-[#0B0F0E]" : "text-[#21c1a2]"}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        상세 내용 보기 →
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+        <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+          <div>
+            <div className="mb-5 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[#21c1a2]">오늘 선택 가능한 상품</p>
+                <h2 className="mt-2 text-[24px] font-black tracking-tight md:text-[30px]">{activeCategory === "all" ? "전체 상품" : CATEGORY_OPTIONS.find((item) => item.value === activeCategory)?.label}</h2>
               </div>
-            );
-          })}
-        </section>
+              <p className="text-[13px] font-bold text-black/38">총 {visibleProducts.length}개</p>
+            </div>
 
-        <aside className="h-fit w-full lg:sticky lg:top-32">
-          <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-sm md:p-8">
-            <h2 className="text-[22px] font-bold tracking-tight">결제 정보 입력</h2>
-            <form className="mt-6 space-y-6" onSubmit={handleProcessPayment}>
-              {selectedProduct && selectedProduct.price > 0 && (
-                <div className="space-y-2">
-                  <p className="text-[13px] font-bold uppercase tracking-[0.06em] text-black/58">결제수단</p>
-                  <div className="flex flex-wrap gap-2">
-                    {PAY_METHOD_OPTIONS.map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => setPayMethod(option.value)}
-                        className={`inline-flex h-10 items-center rounded-lg border px-4 text-[14px] font-bold transition-colors ${focusRing} ${
-                          payMethod === option.value ? "border-[#21c1a2] bg-[#21c1a2] text-[#07211d]" : "border-black/15 text-black/65 hover:bg-black/5"
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
+            <div className="grid grid-cols-2 gap-x-4 gap-y-9 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+              {visibleProducts.map((product) => (
+                <ProductCard key={product.id} product={product} selected={selectedProductId === product.id} onSelect={() => setSelectedProductId(product.id)} />
+              ))}
+            </div>
+          </div>
+
+          <aside className="lg:sticky lg:top-8 lg:self-start">
+            <div className="rounded-3xl border border-black/10 bg-white p-5 shadow-[0_18px_60px_rgba(0,0,0,0.08)] md:p-6">
+              <div className="mb-5 rounded-2xl bg-[#FAFAFA] p-4">
+                <p className="text-[12px] font-black uppercase tracking-[0.14em] text-black/35">선택한 상품</p>
+                <h3 className="mt-2 break-keep text-[20px] font-black leading-tight">{selectedProduct?.name ?? "상품을 선택해 주세요"}</h3>
+                {selectedProduct ? (
+                  <div className="mt-3 flex items-end gap-1.5">
+                    {selectedProduct.price > 0 && <span className="pb-0.5 text-[12px] font-bold text-red-500">VAT 포함</span>}
+                    <span className="text-[28px] font-black tracking-tight">{priceLabel(selectedProduct.price)}</span>
                   </div>
+                ) : null}
+                {selectedProduct?.delivery_info ? <p className="mt-2 break-keep text-[12px] font-bold leading-relaxed text-black/45">{selectedProduct.delivery_info}</p> : null}
+              </div>
+
+              {authUser ? (
+                <div className="mb-4 flex items-center justify-between gap-2 rounded-xl border border-black/10 px-3 py-2 text-[12px] font-bold text-black/55">
+                  <span className="truncate">{authUser.email}</span>
+                  <button type="button" onClick={handleSignOut} className={`shrink-0 text-black/35 hover:text-black ${focusRing}`}>로그아웃</button>
                 </div>
+              ) : (
+                <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] font-bold leading-relaxed text-amber-800">결제는 회원가입/로그인 후 진행됩니다.</div>
               )}
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block space-y-1.5">
-                  <span className="text-[12px] font-bold text-black/50">담당자명*</span>
-                  <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} required={!!authUser} className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
-                </label>
-                <label className="block space-y-1.5">
-                  <span className="text-[12px] font-bold text-black/50">전화번호*</span>
-                  <input value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} required={!!authUser} className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
-                </label>
-              </div>
-
-              <label className="block space-y-1.5">
-                <span className="text-[12px] font-bold text-black/50">이메일 (결제 내역 수신용)</span>
-                <input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
-              </label>
-
-              <label className="block space-y-1.5">
-                <span className="text-[12px] font-bold text-black/50">유튜브 채널 URL / 참고 링크</span>
-                <input value={channelUrl} onChange={(e) => setChannelUrl(e.target.value)} placeholder="https://www.youtube.com/@..." className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
-              </label>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="block space-y-1.5">
-                  <span className="text-[12px] font-bold text-black/50">회사/상호명</span>
-                  <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
-                </label>
-                <label className="block space-y-1.5">
-                  <span className="text-[12px] font-bold text-black/50">사업자등록번호</span>
-                  <input value={businessRegistrationNumber} onChange={(e) => setBusinessRegistrationNumber(e.target.value)} placeholder="000-00-00000" className={`h-11 w-full rounded-lg border border-black/15 px-3 text-[15px] ${focusRing}`} />
-                </label>
-              </div>
-
-              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/5 bg-[#FAFAFA] p-4">
-                <input type="checkbox" checked={taxInvoiceRequested} onChange={(e) => setTaxInvoiceRequested(e.target.checked)} className="mt-1 h-4 w-4 rounded border-gray-300 text-[#21c1a2]" />
-                <div className="text-[13px] font-medium leading-relaxed text-black/70">
-                  <p>세금계산서 또는 현금영수증 발급 안내가 필요합니다. (선택)</p>
-                </div>
-              </label>
-
-              <AnimatePresence>
-                {selectedProduct?.type === "SUBSCRIPTION" && (
-                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="space-y-3 overflow-hidden rounded-lg border border-[#FEB2B2] border-l-4 border-l-[#E53E3E] bg-[#FFF5F5] p-5">
-                    <h4 className="text-[14px] font-bold text-[#C53030]">운영대행 약정 및 해지 규정</h4>
-                    <p className="break-keep text-[13px] font-medium leading-relaxed text-[#742A2A]">
-                      운영대행 플랜은 상담 및 계약 범위 확인 후 착수됩니다. 계약 확정 후에는 배정 인력과 일정 확보 비용이 발생하므로, 별도 계약서와 환불 정책을 기준으로 정산됩니다.
-                    </p>
-                    <label className="flex cursor-pointer items-start gap-2 pt-2">
-                      <input type="checkbox" required checked={agreedToPenalty} onChange={(e) => setAgreedToPenalty(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#E53E3E]" />
-                      <span className="text-[13px] font-bold text-[#C53030]">운영대행 약정 및 해지 규정을 확인했습니다. (필수)</span>
-                    </label>
-                  </motion.div>
+              <form className="space-y-4" onSubmit={handleProcessPayment}>
+                {selectedProduct && selectedProduct.price > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[12px] font-black text-black/45">결제수단</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {PAY_METHOD_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setPayMethod(option.value)}
+                          className={`h-10 rounded-xl border text-[13px] font-black transition-colors ${focusRing} ${payMethod === option.value ? "border-[#21c1a2] bg-[#21c1a2] text-[#07211d]" : "border-black/10 text-black/55 hover:bg-black/[0.03]"}`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </AnimatePresence>
 
-              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/5 bg-[#FAFAFA] p-4">
-                <input type="checkbox" required={!!authUser} checked={agreedToPrivacy} onChange={(e) => setAgreedToPrivacy(e.target.checked)} className="mt-1 h-4 w-4 rounded border-gray-300 text-[#21c1a2]" />
-                <div className="text-[13px] font-medium leading-relaxed text-black/70">
-                  <p>
-                    <Link href="/privacy" target="_blank" className="font-bold underline hover:text-[#21c1a2]">
-                      개인정보 처리방침
-                    </Link>
-                    에 동의합니다. (필수)
-                  </p>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                  <label className="block space-y-1.5">
+                    <span className="text-[12px] font-black text-black/45">담당자명*</span>
+                    <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} className={`h-11 w-full rounded-xl border border-black/15 px-3 text-[14px] ${focusRing}`} />
+                  </label>
+                  <label className="block space-y-1.5">
+                    <span className="text-[12px] font-black text-black/45">전화번호*</span>
+                    <input value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} className={`h-11 w-full rounded-xl border border-black/15 px-3 text-[14px] ${focusRing}`} />
+                  </label>
                 </div>
-              </label>
 
-              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/5 bg-[#FAFAFA] p-4">
-                <input type="checkbox" required={!!authUser} checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-1 h-4 w-4 rounded border-gray-300 text-[#21c1a2]" />
-                <div className="text-[13px] font-medium leading-relaxed text-black/70">
-                  <p>
-                    무형 서비스 특성상 작업 착수 또는 리포트 전송 이후에는 환불이 제한될 수 있음을 확인했습니다.{" "}
-                    <Link href="/refund" target="_blank" className="font-bold underline hover:text-[#21c1a2]">
-                      환불 정책 보기
-                    </Link>
-                    (필수)
-                  </p>
-                </div>
-              </label>
+                <label className="block space-y-1.5">
+                  <span className="text-[12px] font-black text-black/45">이메일</span>
+                  <input type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} className={`h-11 w-full rounded-xl border border-black/15 px-3 text-[14px] ${focusRing}`} />
+                </label>
 
-              {error && <p className="animate-pulse text-center text-[13px] font-bold text-red-500">{error}</p>}
+                <label className="block space-y-1.5">
+                  <span className="text-[12px] font-black text-black/45">채널 URL / 참고 링크</span>
+                  <input value={channelUrl} onChange={(e) => setChannelUrl(e.target.value)} placeholder="https://www.youtube.com/@..." className={`h-11 w-full rounded-xl border border-black/15 px-3 text-[14px] ${focusRing}`} />
+                </label>
 
-              <div className="pt-2">
-                <button type="submit" disabled={processLoading || !selectedProduct} className={`inline-flex h-14 w-full items-center justify-center rounded-xl ${selectedProduct?.type === "SUBSCRIPTION" ? "bg-[#0B0F0E]" : "bg-[#21c1a2]"} text-[16px] font-bold ${selectedProduct?.type === "SUBSCRIPTION" ? "text-white" : "text-[#07211d]"} transition-transform hover:scale-[1.02] disabled:opacity-50 ${focusRing}`}>
-                  {processLoading ? "처리 중..." : selectedProduct ? selectedProduct.cta_label || `${selectedProduct.price === 0 ? "무료 다운로드 받기" : `${selectedProduct.price.toLocaleString("ko-KR")}원 결제하기`}` : "상품을 선택해주세요"}
+                <details className="rounded-2xl border border-black/10 bg-[#FAFAFA] p-3">
+                  <summary className="cursor-pointer text-[12px] font-black text-black/55">사업자 정보 / 세금계산서</summary>
+                  <div className="mt-3 space-y-2">
+                    <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="회사/상호명" className={`h-10 w-full rounded-xl border border-black/15 px-3 text-[13px] ${focusRing}`} />
+                    <input value={businessRegistrationNumber} onChange={(e) => setBusinessRegistrationNumber(e.target.value)} placeholder="사업자등록번호" className={`h-10 w-full rounded-xl border border-black/15 px-3 text-[13px] ${focusRing}`} />
+                    <label className="flex items-start gap-2 text-[12px] font-bold text-black/55">
+                      <input type="checkbox" checked={taxInvoiceRequested} onChange={(e) => setTaxInvoiceRequested(e.target.checked)} className="mt-0.5 h-4 w-4" />
+                      세금계산서/현금영수증 안내가 필요합니다.
+                    </label>
+                  </div>
+                </details>
+
+                {selectedProduct?.type === "SUBSCRIPTION" && (
+                  <label className="flex items-start gap-2 rounded-2xl border border-red-100 bg-red-50 p-3 text-[12px] font-bold leading-relaxed text-red-700">
+                    <input type="checkbox" checked={agreedToPenalty} onChange={(e) => setAgreedToPenalty(e.target.checked)} className="mt-0.5 h-4 w-4" />
+                    운영대행은 상담 및 계약 범위 확인 후 착수되며, 착수 후 취소/환불은 별도 계약 기준으로 정산됨을 확인했습니다.
+                  </label>
+                )}
+
+                <label className="flex items-start gap-2 text-[12px] font-bold leading-relaxed text-black/58">
+                  <input type="checkbox" checked={agreedToPrivacy} onChange={(e) => setAgreedToPrivacy(e.target.checked)} className="mt-0.5 h-4 w-4" />
+                  <span><Link href="/privacy" target="_blank" className="underline">개인정보 처리방침</Link>에 동의합니다.</span>
+                </label>
+
+                <label className="flex items-start gap-2 text-[12px] font-bold leading-relaxed text-black/58">
+                  <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="mt-0.5 h-4 w-4" />
+                  <span><Link href="/refund" target="_blank" className="underline">환불 및 제공 기준</Link>을 확인했습니다.</span>
+                </label>
+
+                {error && <p className="rounded-xl bg-red-50 px-3 py-2 text-[12px] font-black leading-relaxed text-red-600">{error}</p>}
+
+                <button type="submit" disabled={processLoading || !selectedProduct} className={`h-13 w-full rounded-2xl ${selectedProduct?.type === "SUBSCRIPTION" ? "bg-[#0B0F0E] text-white" : "bg-[#21c1a2] text-[#07211d]"} px-4 py-4 text-[15px] font-black transition-transform hover:scale-[1.01] disabled:opacity-45 ${focusRing}`}>
+                  {processLoading ? "처리 중..." : selectedProduct ? selectedProduct.cta_label || (selectedProduct.price === 0 ? "무료 다운로드 신청" : `${priceLabel(selectedProduct.price)} 결제하기`) : "상품을 선택해 주세요"}
                 </button>
-              </div>
-            </form>
-          </div>
-        </aside>
-      </div>
+              </form>
+            </div>
+          </aside>
+        </div>
+      </section>
 
-      <AnimatePresence>
-        {showAuthModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="mx-5 w-full max-w-sm space-y-4 rounded-2xl border border-black/10 bg-white p-7 text-center shadow-2xl">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-xl font-bold text-red-500">!</div>
-              <h3 className="text-[18px] font-bold text-[#0B0F0E]">결제 전 안내</h3>
-              <p className="break-keep text-[14px] leading-relaxed text-black/60">결제는 회원가입 후 가능합니다.</p>
-              <div className="flex gap-2 pt-3">
-                <button onClick={() => setShowAuthModal(false)} className="h-11 flex-1 rounded-xl border border-black/15 text-[14px] font-semibold text-black/55 hover:bg-black/5">
-                  돌아가기
-                </button>
-                <Link href="/auth?next=/store&mode=signup" className="flex h-11 flex-1 items-center justify-center rounded-xl bg-[#21c1a2] text-[14px] font-bold text-[#07211d] hover:bg-[#1db197]">
-                  회원가입 하기
-                </Link>
-              </div>
-            </motion.div>
+      {showAuthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-5 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-3xl bg-white p-7 text-center shadow-2xl">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-xl font-black text-amber-600">!</div>
+            <h3 className="text-[20px] font-black">로그인이 필요합니다</h3>
+            <p className="mt-3 break-keep text-[14px] font-medium leading-relaxed text-black/55">상품 결제와 무료 자료 권한 부여는 회원가입 후 진행됩니다.</p>
+            <div className="mt-6 grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => setShowAuthModal(false)} className={`h-11 rounded-xl border border-black/15 text-[14px] font-black text-black/55 ${focusRing}`}>닫기</button>
+              <Link href="/auth?next=/store&mode=signup" className={`flex h-11 items-center justify-center rounded-xl bg-[#21c1a2] text-[14px] font-black text-[#07211d] ${focusRing}`}>회원가입</Link>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </main>
   );
 }
