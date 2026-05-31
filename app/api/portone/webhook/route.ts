@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     if (paymentId) {
       // 웹훅 payload 자체를 신뢰하지 않고 결제 조회로 상태/금액/상품을 다시 확인합니다.
       const verification = await verifyStorePayment(paymentId);
-      if (!verification.ok) {
+      if (verification.ok === false) {
         console.warn("PortOne webhook payment verification skipped:", {
           paymentId,
           message: verification.message,
