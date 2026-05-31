@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const paymentId = typeof body.paymentId === "string" ? body.paymentId.trim() : "";
     const verification = await verifyStorePayment(paymentId);
 
-    if (!verification.ok) {
+    if (verification.ok === false) {
       return NextResponse.json(
         {
           status: "fail",
