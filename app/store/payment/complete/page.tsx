@@ -64,7 +64,13 @@ function PaymentCompleteContent() {
           body: JSON.stringify({ orderNo, paymentId })
         });
 
-        const payload = await response.json().catch(() => null);
+        // 🚨 Vercel TS strict mode 완벽 방어 코드 🚨
+        let payload: any = null;
+        try {
+          payload = await response.json();
+        } catch (_e) {
+          payload = null;
+        }
 
         if (!response.ok) {
           throw new Error(payload?.message || "결제 검증에 실패했습니다.");
