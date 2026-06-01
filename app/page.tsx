@@ -71,14 +71,14 @@ function TeamMemberCard({ person }: { person: LeadershipProfile }) {
     <motion.div 
       layout
       onClick={() => setIsExpanded(!isExpanded)}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 shadow-sm transition-all duration-500 cursor-pointer hover:shadow-xl ${isExpanded ? 'ring-2 ring-[#21c1a2]' : ''}`}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 shadow-sm transition-all duration-500 cursor-pointer hover:shadow-xl ${isExpanded ? "ring-2 ring-[#21c1a2]" : ""}`}
     >
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#F1F1F1]">
         <Image 
           src={person.image.src} 
           alt={person.name} 
           fill 
-          className={`object-cover object-top transition-transform duration-700 group-hover:scale-105 ${isExpanded ? 'scale-105 brightness-75' : ''}`} 
+          className={`object-cover object-top transition-transform duration-700 group-hover:scale-105 ${isExpanded ? "scale-105 brightness-75" : ""}`} 
           sizes="(max-width: 768px) 100vw, 33vw"
         />
         {!isExpanded && (
@@ -117,7 +117,7 @@ function TeamMemberCard({ person }: { person: LeadershipProfile }) {
         {isExpanded && (
           <motion.div 
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="px-8 pb-8 pt-0 bg-white"
           >
@@ -410,7 +410,7 @@ export default function Page() {
           <div className="space-y-16 md:space-y-20">
             {content.professionalTargets.cards.map((card, index) => (
               <motion.article key={card.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="grid items-center gap-8 md:gap-12 lg:grid-cols-2">
-                <figure className={`relative aspect-[4/3] w-full overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                <figure className={`relative aspect-[4/3] w-full overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 ${index % 2 === 1 ? "lg:order-2" : ""}`}>
                   {card.image ? (
                     <Image src={card.image.src} alt={card.image.alt} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
                   ) : (
@@ -422,4 +422,215 @@ export default function Page() {
                 </figure>
                 <div className="space-y-5 md:space-y-6">
                   <h3 className="text-[28px] md:text-[36px] font-bold tracking-tight text-[#0B0F0E]">{card.title}</h3>
-                  <p className="text-[16px] md:text-[18px
+                  <p className="text-[16px] md:text-[18px] leading-[1.8] md:leading-[1.9] text-black/70 font-medium">{card.oneLiner}</p>
+                  <div className="flex flex-wrap gap-2 pt-1 md:pt-2">
+                    {(card.tags ?? []).map(tag => <span key={tag} className="bg-white border border-black/5 px-2.5 py-1 md:px-3 md:py-1.5 rounded-md text-[12px] md:text-[13px] font-bold text-black/60">#{tag}</span>)}
+                  </div>
+                  <ul className="space-y-2.5 md:space-y-3 border-t border-black/10 pt-5 md:pt-6 text-[14px] md:text-[15px] font-medium text-black/70">
+                    {card.bullets.map(b => <li key={b} className="flex gap-2.5 md:gap-3 items-start"><span className="mt-1.5 md:mt-2 h-1.5 w-1.5 bg-[#21c1a2] rounded-full shrink-0"/>{b}</li>)}
+                  </ul>
+                  <div className="pt-3 md:pt-4">
+                    <ActionLink href={card.href} className="inline-flex items-center border-b-2 border-black/10 pb-1 text-[15px] md:text-[16px] font-bold text-[#0B0F0E] hover:border-[#21c1a2] transition-colors">
+                      {card.ctaLabel} <span className="ml-2">→</span>
+                    </ActionLink>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 10. 팀 소개 */}
+      <section id="team" className="py-16 md:py-24 lg:py-32 bg-white">
+        <div className={shell}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20 text-center max-w-4xl mx-auto">
+            <h2 className={sectionTitle}>담당자가 바뀌지 않는{"\n"}운영 구조를 만듭니다.</h2>
+            <p className="mt-6 text-[18px] text-black/60 font-medium">역할별 책임자를 고정해 채널 톤과 운영 히스토리가 끊기지 않도록 관리합니다.</p>
+          </motion.div>
+          
+          <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
+            <TeamMemberCard person={content.leadership.people[0]} /> {/* 채동우 */}
+            <TeamMemberCard person={content.leadership.people[2]} /> {/* 손현우 */}
+            <TeamMemberCard person={content.leadership.people[1]} /> {/* 양현 */}
+          </div>
+        </div>
+      </section>
+
+      {/* 11. 선택 기준 & CTA */}
+      <section id="fit" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-t border-black/5">
+        <div className={shell}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-16 md:mb-20 max-w-3xl mx-auto text-center">
+            <SectionHeader label={content.aiRecommendation.label} title={content.aiRecommendation.h2} lead={content.aiRecommendation.lead} />
+          </motion.div>
+
+          <div className="grid gap-6 md:gap-8 max-w-5xl mx-auto border-t border-black/10 pt-12 md:pt-16">
+            {content.aiRecommendation.items.map((item) => (
+              <motion.article key={item.prompt} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-white p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl border border-black/5 shadow-sm">
+                <p className="text-[11px] md:text-[12px] font-bold tracking-widest text-[#21c1a2] mb-2 md:mb-3 uppercase">자주 들어온 의뢰 유형</p>
+                <h3 className="text-[22px] md:text-[26px] font-bold tracking-tight text-[#0B0F0E] mb-3 md:mb-4">{item.prompt}</h3>
+                <p className="text-[16px] md:text-[18px] font-medium leading-[1.8] md:leading-[1.85] text-black/70 mb-6 md:mb-8 border-b border-black/5 pb-6 md:pb-8">{item.fit}</p>
+                <ul className="space-y-2.5 md:space-y-3">
+                  {item.reasons.map((reason) => (
+                    <li key={reason} className="text-[14px] md:text-[15px] font-semibold text-black/60 flex items-center gap-2.5 md:gap-3"><span className="h-1.5 w-1.5 bg-black/20 rounded-full shrink-0"/>{reason}</li>
+                  ))}
+                </ul>
+              </motion.article>
+            ))}
+          </div>
+
+          <div className="mt-12 md:mt-16 text-center">
+             <p className="text-[16px] md:text-[18px] font-bold text-[#0B0F0E] mb-6">{content.aiRecommendation.note}</p>
+             <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-[#0B0F0E] border border-black/15 px-8 py-4 text-[15px] font-bold text-white shadow-sm hover:bg-[#21c1a2] hover:text-black transition-colors">카카오톡으로 채널 링크 보내기</ActionLink>
+          </div>
+        </div>
+      </section>
+
+      {/* 12. 리스크 관리 */}
+      <section id="risk" className="py-16 md:py-24 lg:py-32 bg-[#0B0F0E] text-white">
+        <div className={`${shell} grid gap-12 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]`}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <SectionHeader label={content.riskManagement.label} title={content.riskManagement.h2} lead={content.riskManagement.lead} dark />
+          </motion.div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="space-y-8 md:space-y-10">
+            <ul className="divide-y divide-white/10 border-y border-white/10">
+              {content.riskManagement.items.map((item) => (
+                <li key={item} className="py-5 md:py-6 text-[16px] md:text-[18px] font-bold leading-[1.7] md:leading-[1.75] text-white/90">{item}</li>
+              ))}
+            </ul>
+            <p className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-xl md:rounded-2xl text-[15px] md:text-[16px] leading-[1.8] md:leading-[1.85] text-white/60 font-medium">{content.riskManagement.note}</p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 13. 계산기 */}
+      <section className="bg-[#FAFAFA] py-16 md:py-24 border-b border-black/5">
+        <DiagnosticCalculator />
+      </section>
+
+      {/* 14. 연락처 및 폼 */}
+      <section id="contact" className="py-16 md:py-24 lg:py-32 bg-white">
+        <div className={shell}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16 max-w-3xl">
+            <SectionHeader label={content.contact.label} title={content.contact.h2} lead={content.contact.lead} />
+          </motion.div>
+
+          <div className="grid gap-12 md:gap-16 lg:grid-cols-[0.88fr_1.12fr] items-start">
+            <div className="space-y-6 md:space-y-8 border-t border-black/10 pt-6 md:pt-8 bg-[#FAFAFA] p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl border border-black/5 shadow-sm">
+              <div className="space-y-2 md:space-y-3">
+                <h3 className="text-[24px] md:text-[28px] font-bold text-[#0B0F0E] mb-3 md:mb-4">먼저 확인하는 것</h3>
+                <p className="text-[15px] md:text-[16px] font-medium leading-[1.8] md:leading-[1.9] text-black/60">긴 리포트 전에, 상담으로 이어지지 않는 병목부터 빠르게 확인합니다.</p>
+              </div>
+              <ul className="space-y-3 md:space-y-4">
+                {["클릭 전환: 제목·썸네일", "콘텐츠 구조: 주제·재생목록", "문의 동선: 설명란·고정댓글·채널 홈"].map(txt => (
+                  <li key={txt} className="text-[15px] md:text-[16px] font-bold text-[#0B0F0E] flex items-center gap-2.5 md:gap-3"><span className="h-1.5 w-1.5 bg-[#21c1a2] rounded-full"/>{txt}</li>
+                ))}
+              </ul>
+              
+              <div className="flex flex-col xl:flex-row gap-3 md:gap-4 pt-5 md:pt-6 border-t border-black/5">
+                {hasPhoneHref && (
+                  <a href={phoneHref} className={`flex-1 text-center bg-white border border-black/15 py-3.5 md:py-4 rounded-full text-[14px] md:text-[15px] font-bold hover:bg-black/5 transition-colors ${focusRing}`}>
+                    {content.contact.quickCallLabel}
+                  </a>
+                )}
+                {hasKakaoChatUrl && (
+                  <a href={kakaoChatUrl} className={`flex-1 text-center bg-[#21c1a2] text-[#0B0F0E] py-3.5 md:py-4 rounded-full text-[14px] md:text-[15px] font-bold hover:bg-[#1db197] transition-colors ${focusRing}`}>
+                    {content.contact.kakaoCtaLabel}
+                  </a>
+                )}
+              </div>
+            </div>
+            
+            <div id="contact-form" className="rounded-2xl md:rounded-3xl overflow-hidden bg-[#FAFAFA] border border-black/5 h-[600px] md:h-[760px] shadow-sm">
+              {hasFormEmbedUrl ? (
+                <iframe src={formEmbedUrl} className="w-full h-full border-0" loading="lazy" title={content.contact.iframeTitle} referrerPolicy="strict-origin-when-cross-origin" />
+              ) : (
+                <div className="flex h-full items-center justify-center p-8 md:p-10 text-center text-sm font-medium leading-relaxed text-black/40">Google Form 임베드 URL이 아직 설정되지 않았습니다.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 15. FAQ & 블로그 */}
+      <section className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA]">
+        <div className={shell}>
+          <div className="grid gap-16 md:gap-24 lg:grid-cols-[1fr_1fr]">
+            
+            <div id="faq">
+              <SectionHeader label={content.faq.label} title={content.faq.h2} />
+              <div className="mt-8 md:mt-12 divide-y divide-black/5 border-y border-black/10">
+                {content.faq.items.map((item) => (
+                  <details key={item.q} className="group py-5 md:py-6">
+                    <summary className={`flex cursor-pointer items-center justify-between list-none text-[18px] md:text-[20px] font-bold text-[#0B0F0E] ${focusRing}`}>
+                      {item.q}
+                      <span className="text-[#21c1a2] group-open:-rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <p className="mt-4 md:mt-6 text-[15px] md:text-[16px] text-black/60 font-medium leading-[1.8] md:leading-[1.9] whitespace-pre-line bg-white p-5 md:p-6 rounded-xl md:rounded-2xl border border-black/5">{item.a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+
+            <div id="blog">
+              <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
+              {insightPosts.length > 0 && (
+                <div className="mt-8 md:mt-12 space-y-4 md:space-y-6">
+                  {insightPosts.map((post) => (
+                    <Link key={post.slug} href={`/insights/${post.slug}`} className={`block bg-white p-6 md:p-8 rounded-xl md:rounded-2xl border border-black/5 hover:border-[#21c1a2] hover:bg-[#FAFAFA] transition-colors shadow-sm ${focusRing}`}>
+                       <p className="text-[12px] md:text-[13px] font-bold tracking-widest text-black/40 mb-2 md:mb-3 uppercase">{post.publishedAt}</p>
+                       <h3 className="text-[20px] md:text-[22px] font-bold mb-2 md:mb-3 text-[#0B0F0E]">{post.title}</h3>
+                       <p className="text-[14px] md:text-[15px] text-black/50 font-medium leading-[1.8] line-clamp-2">{post.description}</p>
+                    </Link>
+                  ))}
+                  <div className="pt-6 md:pt-8 text-center border-t border-black/5">
+                    <ActionLink href="/insights" className="inline-flex items-center text-[15px] md:text-[16px] font-bold text-[#0B0F0E] border-b-2 border-black/10 pb-1 hover:border-[#21c1a2] transition-colors">
+                      {content.blog.ctaLabel} →
+                    </ActionLink>
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 모바일 전용 하단 고정 CTA */}
+      <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-black/10 p-3 md:hidden shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+         <div className="flex gap-2 max-w-[400px] mx-auto">
+            {hasKakaoChatUrl && (
+              <a href={kakaoChatUrl} className="flex-1 bg-[#21c1a2] text-black text-[13px] font-bold py-3.5 rounded-xl text-center">
+                카카오톡 상담
+              </a>
+            )}
+            <a href="#contact" className="flex-1 bg-[#0B0F0E] text-white text-[13px] font-bold py-3.5 rounded-xl text-center">
+              무료 진단 신청
+            </a>
+         </div>
+      </div>
+
+      <ContactCTA />
+
+      {/* Footer */}
+      <footer className="bg-white py-12 md:py-16 border-t border-black/10 pb-28 md:pb-16">
+        <div className={`${shell} flex flex-col md:flex-row justify-between items-start gap-8 md:gap-12`}>
+          <div>
+            <p className="font-bold text-[16px] md:text-[18px] mb-4 md:mb-6 text-[#0B0F0E]">{content.footer.companyName}</p>
+            <div className="space-y-1.5 md:space-y-2 text-[13px] md:text-[14px] text-black/50 font-medium">
+              {content.footer.lines.map((line) => (
+                <p key={line.label}>{line.label}: {line.value}</p>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-4 md:gap-6 text-[13px] md:text-[14px] font-bold text-black/40">
+            <Link href="/store" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>운영 플랜 신청</Link>
+            <Link href="/terms" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>이용약관</Link>
+            <Link href="/privacy" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>개인정보처리방침</Link>
+            <Link href="/refund" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>환불 정책</Link>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}
