@@ -21,7 +21,14 @@ function sanitizeText(value: unknown, maxLength = 200) {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json().catch(() => null)) as CompleteBody | null;
+    // 🚨 Vercel 에러 해결: 깐깐한 타입 검사를 우회하는 안전한 try-catch 블록으로 변경
+    let body: CompleteBody | null = null;
+    try {
+      body = await request.json();
+    } catch (_error: unknown) {
+      body = null;
+    }
+
     if (!body) return jsonError("요청 본문이 올바르지 않습니다.");
 
     const orderNo = sanitizeText(body.orderNo, 80);
