@@ -349,8 +349,12 @@ export default function DiagnosticCalculator() {
   function moveToContact() {
     const payload = `${summary}\n\n요청 유형: 이 플랜으로 상담 신청`;
     window.sessionStorage.setItem('turnkeyhaus:plan-recommendation', payload);
+    
+    // 🚨 Vercel TS strict mode 방어를 위한 정통 콜백 함수 사용 🚨
     if (navigator.clipboard) {
-      void navigator.clipboard.writeText(payload).catch(() => undefined);
+      navigator.clipboard.writeText(payload).catch(function(_error: unknown): void {
+        // 클립보드 복사 실패 시 무시
+      });
     }
 
     const contact = document.getElementById('contact');
