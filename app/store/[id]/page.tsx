@@ -370,7 +370,6 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   const isOps = product.type === "SUBSCRIPTION";
   const isFree = product.price === 0;
-  const bulletPoints = product.summary.split("\n").filter((text) => text.trim() !== "");
   const detailImages = normalizeImageList(product.detail_image_urls);
   const galleryImages = [product.hero_image_url, ...detailImages].filter(Boolean) as string[];
   const activeImage = galleryImages[activeImageIndex] || product.hero_image_url || null;
@@ -404,7 +403,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         consents: { terms: agreedTerms, privacy: agreedPrivacy, refund: agreedTerms, penalty: isOps ? agreedOps : false }
       })
     });
-    const payload = await response.json().catch(() => null);
+
+    // 🚨 여기서 무한 에러가 났던 놈을 멸망시켰습니다 🚨
+    let payload: any = null;
+    try {
+      payload = await response.json();
+    } catch (_e) {
+      payload = null;
+    }
+
     if (!response.ok) throw new Error(payload?.message || "주문 생성에 실패했습니다.");
     return payload as CreateOrderResponse;
   }
@@ -417,7 +424,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       headers: { "Content-Type": "application/json", ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
       body: JSON.stringify({ orderNo, paymentId })
     });
-    const payload = await response.json().catch(() => null);
+
+    // 🚨 여기서도 무한 에러가 났던 놈을 멸망시켰습니다 🚨
+    let payload: any = null;
+    try {
+      payload = await response.json();
+    } catch (_e) {
+      payload = null;
+    }
+
     if (!response.ok) throw new Error(payload?.message || "결제 검증에 실패했습니다.");
     return payload;
   }
