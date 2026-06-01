@@ -80,7 +80,14 @@ export async function POST(request: Request) {
     const user = await getAuthenticatedUser(request);
     if (!user) return jsonError("로그인이 필요합니다.", 401);
 
-    const body = (await request.json().catch(() => null)) as CreateOrderBody | null;
+    // 🚨 Vercel 에러 해결: 깐깐한 타입 검사를 우회하는 안전한 try-catch 블록으로 변경
+    let body: CreateOrderBody | null = null;
+    try {
+      body = await request.json();
+    } catch (_error: unknown) {
+      body = null;
+    }
+
     if (!body) return jsonError("요청 본문이 올바르지 않습니다.");
 
     const productId = sanitizeText(body.productId, 80);
@@ -163,6 +170,7 @@ export async function POST(request: Request) {
 
     if (insertError) throw new Error(insertError.message);
 
+    // 0원 결제 (무료 전자책 등) 처리
     if (product.price === 0) {
       await supabase.from("store_entitlements").upsert(
         {
