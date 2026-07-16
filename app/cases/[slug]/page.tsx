@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { content } from "@/content";
+import { ORGANIZATION_ID, breadcrumbJsonLd, serializeJsonLd } from "@/lib/seo";
 
 const shell = "mx-auto w-full max-w-[1180px] px-5 sm:px-6 lg:px-10";
 const focusRing =
@@ -43,7 +44,7 @@ export function generateMetadata({ params }: CaseParams): Metadata {
     };
   }
 
-  const title = `${item.title} 운영 사례 | Turnkeyhaus`;
+  const title = `${item.title} 유튜브 운영 사례`;
   const description = `${item.clientName} 사례. ${item.oneLiner} ${item.scope ? `담당 범위: ${item.scope}.` : ""}`;
 
   return {
@@ -57,7 +58,7 @@ export function generateMetadata({ params }: CaseParams): Metadata {
       title,
       description,
       url: `${content.seo.siteUrl}/cases/${item.caseSlug}`,
-      images: [item.imageSrc]
+      images: [item.youtubeId ? `https://i.ytimg.com/vi/${item.youtubeId}/maxresdefault.jpg` : item.imageSrc.startsWith("http") ? item.imageSrc : `${content.seo.siteUrl}${item.imageSrc}`]
     }
   };
 }
@@ -66,25 +67,45 @@ export default function CaseStudyPage({ params }: CaseParams) {
   const item = getCase(params.slug);
 
   if (!item) notFound();
+  const hasMeasuredOutcome = item.maxVideoViews > 0 || item.subscriberCurrent > 0;
+  const isVerticalShort = item.formatLabel === "VERTICAL SHORTS SERIES";
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "CreativeWork",
-    name: `${item.title} 운영 사례`,
-    headline: item.oneLiner,
-    description: `${item.clientName} 유튜브 채널 운영 사례. ${item.scope ?? "채널 운영 범위와 성과를 정리한 사례입니다."}`,
-    url: `${content.seo.siteUrl}/cases/${item.caseSlug}`,
-    provider: {
-      "@type": "Organization",
-      name: content.brand.name,
-      url: content.seo.siteUrl
-    },
-    about: item.tags,
-    isPartOf: {
-      "@type": "WebSite",
-      name: content.brand.name,
-      url: content.seo.siteUrl
-    }
+    "@graph": [
+      {
+        "@type": "CreativeWork",
+        "@id": `${content.seo.siteUrl}/cases/${item.caseSlug}#case-study`,
+        name: `${item.title} 운영 사례`,
+        headline: item.oneLiner,
+        description: `${item.clientName} 유튜브 채널 운영 사례. ${item.scope ?? "채널 운영 범위와 성과를 정리한 사례입니다."}`,
+        url: `${content.seo.siteUrl}/cases/${item.caseSlug}`,
+        image: item.imageSrc.startsWith("http") ? item.imageSrc : `${content.seo.siteUrl}${item.imageSrc}`,
+        provider: { "@id": ORGANIZATION_ID },
+        about: item.tags,
+        sameAs: item.href,
+        isPartOf: { "@id": `${content.seo.siteUrl}/#website` },
+        ...(item.youtubeId && item.videoPublishedAt ? { associatedMedia: { "@id": `${content.seo.siteUrl}/cases/${item.caseSlug}#video` } } : {})
+      },
+      ...(item.youtubeId && item.videoPublishedAt ? [{
+        "@type": "VideoObject",
+        "@id": `${content.seo.siteUrl}/cases/${item.caseSlug}#video`,
+        name: item.videoTitle ?? item.title,
+        description: `${item.clientName} 채널의 대표 영상. ${item.oneLiner}`,
+        thumbnailUrl: `https://i.ytimg.com/vi/${item.youtubeId}/maxresdefault.jpg`,
+        uploadDate: item.videoPublishedAt,
+        duration: item.videoDuration,
+        embedUrl: `https://www.youtube.com/embed/${item.youtubeId}`,
+        contentUrl: item.href,
+        publisher: { "@id": ORGANIZATION_ID },
+        inLanguage: "ko-KR"
+      }] : []),
+      breadcrumbJsonLd([
+        { name: "홈", path: "/" },
+        { name: "운영 사례", path: "/#work" },
+        { name: item.title, path: `/cases/${item.caseSlug}` }
+      ])
+    ]
   };
 
   const caseBlocks = [
@@ -103,25 +124,11 @@ export default function CaseStudyPage({ params }: CaseParams) {
   ].filter((row): row is { label: string; value: string } => Boolean(row.value));
 
   return (
-    <main className="bg-white text-[#0B0F0E]">
+    <main id="main-content" className="bg-white pt-[82px] text-[#0B0F0E]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
       />
-
-      <header className="border-b border-black/10 bg-white">
-        <div className={`${shell} flex items-center justify-between py-4`}>
-          <Link href="/" className={`inline-flex items-center ${focusRing}`}>
-            <Image src="/logo.png" alt="Turnkeyhaus" width={176} height={48} className="h-11 w-auto object-contain" />
-          </Link>
-          <Link
-            href="/#portfolio"
-            className={`inline-flex h-10 items-center border border-black/20 px-4 text-sm font-semibold text-black/76 transition-colors hover:bg-black/[0.03] ${focusRing}`}
-          >
-            사례 목록으로
-          </Link>
-        </div>
-      </header>
 
       <section className="border-b border-black/12">
         <div className={`${shell} py-14 md:py-20`}>
@@ -140,14 +147,29 @@ export default function CaseStudyPage({ params }: CaseParams) {
             </div>
 
             <dl className="grid gap-4 border-y border-black/14 py-5 sm:grid-cols-3 md:py-6">
-              <div>
-                <dt className="text-xs font-semibold tracking-[0.12em] text-black/48">구독자 변화</dt>
-                <dd className="mt-2 break-keep text-[24px] font-semibold tracking-tight">{item.result}</dd>
-              </div>
-              <div>
-                <dt className="text-xs font-semibold tracking-[0.12em] text-black/48">최고 조회수</dt>
-                <dd className="mt-2 text-[24px] font-semibold tracking-tight text-[#21c1a2]">{formatViews(item.maxVideoViews)}</dd>
-              </div>
+              {hasMeasuredOutcome ? (
+                <>
+                  <div>
+                    <dt className="text-xs font-semibold tracking-[0.12em] text-black/48">구독자 변화</dt>
+                    <dd className="mt-2 break-keep text-[24px] font-semibold tracking-tight">{item.result}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-semibold tracking-[0.12em] text-black/48">최고 조회수</dt>
+                    <dd className="mt-2 text-[24px] font-semibold tracking-tight text-[#21c1a2]">{formatViews(item.maxVideoViews)}</dd>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <dt className="text-xs font-semibold tracking-[0.12em] text-black/48">제작 포맷</dt>
+                    <dd className="mt-2 break-keep text-[24px] font-semibold tracking-tight">{item.result}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-semibold tracking-[0.12em] text-black/48">포맷 구분</dt>
+                    <dd className="mt-2 break-keep text-[15px] font-semibold leading-[1.55] text-[#21c1a2]">{item.formatLabel}</dd>
+                  </div>
+                </>
+              )}
               <div>
                 <dt className="text-xs font-semibold tracking-[0.12em] text-black/48">담당 범위</dt>
                 <dd className="mt-2 break-keep text-[15px] font-semibold leading-[1.55]">{item.scope ?? "채널 운영 구조 설계"}</dd>
@@ -159,7 +181,7 @@ export default function CaseStudyPage({ params }: CaseParams) {
 
       <section className="border-b border-black/12">
         <div className={`${shell} grid gap-10 py-12 md:grid-cols-[1.05fr_0.95fr] md:items-start md:py-20`}>
-          <div className="relative aspect-video overflow-hidden border border-black/10 bg-black">
+          <div className={`relative overflow-hidden border border-black/10 bg-black ${isVerticalShort ? "mx-auto aspect-[9/16] w-full max-w-[405px]" : "aspect-video"}`}>
             {item.youtubeId ? (
               <iframe
                 src={`https://www.youtube.com/embed/${item.youtubeId}?rel=0&modestbranding=1`}
@@ -256,13 +278,13 @@ export default function CaseStudyPage({ params }: CaseParams) {
                 href="/#contact"
                 className={`inline-flex items-center border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-[#07211d] transition-colors hover:bg-[#1db197] ${focusRing}`}
               >
-                24시간 3포인트 진단 받기
+                채널 운영 상담
               </Link>
               <Link
-                href="/#pricing"
+                href="/youtube-channel-management"
                 className={`inline-flex items-center border border-black/20 px-5 py-3 text-sm font-semibold text-black/80 transition-colors hover:bg-black/[0.03] ${focusRing}`}
               >
-                운영 플랜 추천기 보기
+                운영 범위 자세히 보기
               </Link>
             </div>
           </div>

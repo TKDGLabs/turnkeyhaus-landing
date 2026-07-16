@@ -13,9 +13,11 @@ export default function CursorFollower() {
   const rafRef = useRef<number | null>(null);
   const activeRef = useRef(false);
   const visibleRef = useRef(false);
+  const labelRef = useRef("");
 
   const [enabled, setEnabled] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [label, setLabel] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -43,6 +45,12 @@ export default function CursorFollower() {
       if (nextActive !== activeRef.current) {
         activeRef.current = nextActive;
       }
+
+      const cursorLabel = element?.closest<HTMLElement>("[data-cursor]")?.dataset.cursor ?? "";
+      if (labelRef.current !== cursorLabel) {
+        labelRef.current = cursorLabel;
+        setLabel(cursorLabel);
+      }
     };
 
     const onLeave = () => {
@@ -58,7 +66,10 @@ export default function CursorFollower() {
       const y = currentY.current;
 
       if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${x - 20}px, ${y - 20}px, 0) scale(${activeRef.current ? 1.15 : 1})`;
+        const size = labelRef.current ? 68 : 40;
+        cursorRef.current.style.transform = `translate3d(${x - size / 2}px, ${y - size / 2}px, 0) scale(${activeRef.current ? 1.08 : 1})`;
+        cursorRef.current.style.width = `${size}px`;
+        cursorRef.current.style.height = `${size}px`;
       }
 
       if (dotRef.current) {
@@ -87,15 +98,17 @@ export default function CursorFollower() {
     <>
       <div
         ref={cursorRef}
-        className={`pointer-events-none fixed left-0 top-0 z-[140] hidden h-10 w-10 rounded-full border border-[#21c1a2]/45 bg-[#21c1a2]/10 transition-opacity duration-200 md:block ${
+        className={`pointer-events-none fixed left-0 top-0 z-[140] hidden h-10 w-10 items-center justify-center rounded-full border border-[#21c1a2]/55 bg-[#0b0b0a]/70 text-[9px] font-bold tracking-[0.12em] text-white backdrop-blur-md transition-[opacity,width,height] duration-200 md:flex ${
           visible ? "opacity-100" : "opacity-0"
         }`}
         aria-hidden="true"
-      />
+      >
+        {label}
+      </div>
       <div
         ref={dotRef}
         className={`pointer-events-none fixed left-0 top-0 z-[141] hidden h-1.5 w-1.5 rounded-full bg-[#21c1a2] transition-opacity duration-150 md:block ${
-          visible ? "opacity-100" : "opacity-0"
+          visible && !label ? "opacity-100" : "opacity-0"
         }`}
         aria-hidden="true"
       />

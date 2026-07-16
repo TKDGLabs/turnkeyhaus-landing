@@ -5,6 +5,7 @@ import { industryPages } from "@/lib/industry-pages";
 import { SEO } from "@/seo.config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const updatedAt = new Date("2026-07-16T00:00:00+09:00");
   const postRoutes: MetadataRoute.Sitemap = insights.map((post) => ({
     url: `${SEO.siteUrl}/insights/${post.slug}`,
     lastModified: new Date(post.publishedAt),
@@ -14,14 +15,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const industryRoutes: MetadataRoute.Sitemap = industryPages.map((page) => ({
     url: `${SEO.siteUrl}/${page.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly",
-    priority: 0.9
+    lastModified: updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.86
   }));
 
   const caseRoutes: MetadataRoute.Sitemap = content.portfolio.items.map((item) => ({
     url: `${SEO.siteUrl}/cases/${item.caseSlug}`,
-    lastModified: new Date(),
+    lastModified: updatedAt,
     changeFrequency: "monthly",
     priority: 0.82
   }));
@@ -29,15 +30,33 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: SEO.siteUrl,
-      lastModified: new Date(),
+      lastModified: updatedAt,
       changeFrequency: "weekly",
       priority: 1
     },
     {
+      url: `${SEO.siteUrl}/youtube-channel-management`,
+      lastModified: updatedAt,
+      changeFrequency: "monthly",
+      priority: 0.95
+    },
+    {
+      url: `${SEO.siteUrl}/company`,
+      lastModified: updatedAt,
+      changeFrequency: "monthly",
+      priority: 0.86
+    },
+    {
       url: `${SEO.siteUrl}/insights`,
-      lastModified: new Date(),
+      lastModified: updatedAt,
       changeFrequency: "weekly",
       priority: 0.9
+    },
+    {
+      url: `${SEO.siteUrl}/proposal.html`,
+      lastModified: updatedAt,
+      changeFrequency: "monthly",
+      priority: 0.78
     },
     ...industryRoutes,
     ...caseRoutes,

@@ -6,7 +6,7 @@ import { getIndustryPage } from "@/lib/industry-pages";
 const page = getIndustryPage("lawfirm-youtube");
 
 export const metadata: Metadata = {
-  title: page?.title ?? "로펌 유튜브 운영대행 | Turnkeyhaus",
+  title: "변호사·로펌 유튜브 운영대행",
   description: page?.description,
   keywords: page?.keywords,
   alternates: {

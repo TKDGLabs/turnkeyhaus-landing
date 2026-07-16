@@ -6,7 +6,7 @@ import { getIndustryPage } from "@/lib/industry-pages";
 const page = getIndustryPage("incheon-youtube-agency");
 
 export const metadata: Metadata = {
-  title: page?.title ?? "인천·수도권 유튜브 운영대행 | Turnkeyhaus",
+  title: "인천·수도권 유튜브 운영대행",
   description: page?.description,
   keywords: page?.keywords,
   alternates: {

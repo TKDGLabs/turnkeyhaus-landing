@@ -1,636 +1,721 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
-import { motion, Variants, AnimatePresence } from "framer-motion";
-import ContactCTA from "../components/ContactCTA";
-import StrategyChapterDeck from "../components/StrategyChapterDeck";
-import DiagnosticCalculator from "../components/DiagnosticCalculator";
-import { content, type LeadershipProfile, type SpecItem } from "../content";
-import { getSortedInsights } from "../content/insights";
+import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useSpring, useTransform, type Variants } from "framer-motion";
+import Lenis from "lenis";
+import { content } from "../content";
+import { insights } from "../content/insights";
 
-const shell = "mx-auto w-full max-w-[1320px] px-5 sm:px-6 lg:px-10";
-const labelClass = "inline-flex items-center border border-black/15 px-3 py-1 text-[11px] font-bold tracking-[0.12em] text-black/55 uppercase";
-const sectionTitle = "whitespace-pre-line break-keep text-[28px] sm:text-[32px] font-bold leading-[1.25] tracking-tight text-[#0B0F0E] md:text-[48px]";
-const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#21c1a2]";
+const ease = [0.22, 1, 0.36, 1] as const;
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" as const } }
+const reveal: Variants = {
+  hidden: { opacity: 0, y: 42 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.9, ease },
+  },
 };
 
-function isExternalLink(href: string) {
-  return href.startsWith("http://") || href.startsWith("https://") || href.startsWith("/");
-}
+const process = [
+  ["01", "상태 진단", "최근 지표와 검색 유입, 상담 동선에서 먼저 막힌 지점을 찾습니다."],
+  ["02", "목표 편성", "채널의 목표와 고객 질문을 월간 주제와 업로드 우선순위로 묶습니다."],
+  ["03", "기획/구성", "전문가의 말투는 살리고, 핵심 답변과 화면 구성을 촬영 전에 설계합니다."],
+  ["04", "촬영 및 편집", "출연자는 설명에 집중하고, 제작팀은 현장 운영부터 후반 편집까지 맡습니다."],
+  ["05", "콘텐츠 발행", "제목·썸네일·설명란·재생목록까지 발견되는 구조로 세팅합니다."],
+  ["06", "성과 체크", "클릭·이탈·상담 반응을 함께 기록해 어떤 형식이 작동했는지 확인합니다."],
+  ["07", "결정 및 변경", "결과를 바탕으로 다음 달 주제와 제목, 썸네일의 우선순위를 조정합니다."],
+] as const;
 
-function ActionLink({ href, className, children }: { href: string; className: string; children: ReactNode }) {
-  const mergedClass = `${className} ${focusRing} transition-all duration-300`;
-  if (isExternalLink(href)) {
-    return <a href={href} target="_blank" rel="noreferrer" className={mergedClass}>{children}</a>;
-  }
-  return <Link href={href} className={mergedClass}>{children}</Link>;
-}
+const marqueeLabels = ["CHANNEL STRATEGY", "CONTENT PLANNING", "PRE-PRODUCTION", "PRODUCTION", "POST-PRODUCTION", "PUBLISHING", "PERFORMANCE REVIEW"] as const;
 
-function SectionHeader({ label, title, lead, dark = false }: { label: string; title: string; lead?: string; dark?: boolean; }) {
+const videoWallItems = [
+  { id: "ajOQC_X-5bE", channel: "주치아 앞선tube", title: "치과에서 가장 많이 묻는 질문을 먼저 설명합니다", format: "LONG" },
+  { id: "uvyvdcKhPfQ", channel: "주치아 앞선tube", title: "임플란트와 치아교정 중 무엇이 먼저일까?", format: "Q&A" },
+  { id: "Z28SynBFHkY", channel: "주치아 앞선tube", title: "보철물을 오래 쓰는 방법", format: "SHORTS" },
+  { id: "etfjuKwPKaA", channel: "주치아 앞선tube", title: "치과 엑스레이를 보는 방법", format: "SHORTS" },
+  { id: "ce7TuHzZSPU", channel: "주치아 앞선tube", title: "빠진 보철물을 다시 살릴 수 있을까?", format: "LONG" },
+  { id: "to3V-CihU1k", channel: "주치아 앞선tube", title: "구강세정기는 무엇을 골라야 할까?", format: "SHORTS" },
+  { id: "mozP07dCcuk", channel: "법 잘하는 변호사들 로맨즈", title: "사건 분야별 질문을 상담 전 콘텐츠로 바꿉니다", format: "LONG" },
+  { id: "uDAmkVy6Fa8", channel: "법 잘하는 변호사들 로맨즈", title: "통장협박 피해를 막는 방법", format: "ISSUE" },
+  { id: "KLpXK7KxHks", channel: "법 잘하는 변호사들 로맨즈", title: "사회 이슈를 법률 기준으로 설명합니다", format: "ISSUE" },
+  { id: "oRm6S4iGNng", channel: "법 잘하는 변호사들 로맨즈", title: "이혼소송에서 인정되는 증거", format: "Q&A" },
+  { id: "YT84DBAbsro", channel: "법 잘하는 변호사들 로맨즈", title: "업무방해죄 처벌과 대응 전략", format: "Q&A" },
+  { id: "zKdsnm68ekE", channel: "법 잘하는 변호사들 로맨즈", title: "AI 시대에도 변호사가 필요한 이유", format: "ISSUE" },
+  { id: "Fii93LBGjSY", channel: "유안티비", title: "검색 질문과 내원 전 설명을 연결합니다", format: "LONG" },
+  { id: "pmGbUvESwt8", channel: "유안티비", title: "비만 치료에서 놓치면 안 되는 기준", format: "SHORTS" },
+  { id: "fBYHRVd6JLs", channel: "유안티비", title: "중년 다이어트 질문을 쉽게 풀어냅니다", format: "LONG" },
+  { id: "_2n62t4Oizc", channel: "유안티비", title: "노화의 파도를 예방하는 방법", format: "Q&A" },
+  { id: "DLpcIyM_PWs", channel: "유안티비", title: "위고비와 마운자로의 차이", format: "Q&A" },
+  { id: "9PvkvmHQqUc", channel: "유안티비", title: "주사피부염 환자가 피해야 할 음식", format: "SHORTS" },
+  { id: "CHCmberPV4o", channel: "홍승표의 뼈탐구생활", title: "정형외과 전문 지식을 쉽게 시작하는 첫 화", format: "NEW SERIES" },
+  { id: "UwJ3IwkDqlU", channel: "김준식의 장례수업", title: "낯선 장례 절차를 한 가지 질문으로 설명합니다", format: "VERTICAL" },
+] as const;
+
+const videoArchiveGroups = [
+  {
+    key: "dental",
+    area: "DENTAL",
+    name: "주치아 앞선tube",
+    description: "치과 진료의 판단 기준을 환자가 이해하는 언어로 풀어낸 채널",
+    items: videoWallItems.filter((item) => item.channel === "주치아 앞선tube"),
+  },
+  {
+    key: "law",
+    area: "LAW",
+    name: "법 잘하는 변호사들 로맨즈",
+    description: "복잡한 사건과 대응 기준을 상담 전에 이해할 수 있도록 정리한 채널",
+    items: videoWallItems.filter((item) => item.channel === "법 잘하는 변호사들 로맨즈"),
+  },
+  {
+    key: "medical",
+    area: "MEDICAL",
+    name: "유안티비",
+    description: "질환과 치료에 대한 궁금증을 생활 속 질문부터 풀어낸 채널",
+    items: videoWallItems.filter((item) => item.channel === "유안티비"),
+  },
+  {
+    key: "bone-life",
+    area: "ORTHOPEDICS",
+    name: "홍승표의 뼈탐구생활",
+    description: "정형외과 전문 지식을 첫 방문자의 질문에서 시작하는 채널",
+    items: videoWallItems.filter((item) => item.channel === "홍승표의 뼈탐구생활"),
+  },
+  {
+    key: "funeral-class",
+    area: "FUNERAL CULTURE",
+    name: "김준식의 장례수업",
+    description: "낯선 장례 절차를 실제 상황별 질문으로 설명하는 채널",
+    items: videoWallItems.filter((item) => item.channel === "김준식의 장례수업"),
+  },
+] as const;
+
+const formatNumber = (value: number) => new Intl.NumberFormat("ko-KR").format(value);
+
+function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className="space-y-4 md:space-y-6">
-      <span className={dark ? "inline-flex items-center border border-white/20 px-3 py-1 text-[11px] font-bold tracking-[0.12em] text-white/60 uppercase" : labelClass}>
-        {label}
-      </span>
-      <h2 className={dark ? `${sectionTitle} text-white` : sectionTitle}>{title}</h2>
-      {lead ? (
-        <p className={dark ? "max-w-[62ch] whitespace-pre-line break-keep text-[15px] sm:text-[17px] leading-[1.8] text-white/70 md:text-[19px] font-medium" : "max-w-[62ch] whitespace-pre-line break-keep text-[15px] sm:text-[17px] leading-[1.8] text-black/70 md:text-[19px] font-medium"}>
-          {lead}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-const formatInteger = (n: number) => new Intl.NumberFormat("ko-KR").format(Math.round(n));
-
-function formatViewsKorean(n: number) {
-  if (n >= 10000) {
-    const tenThousands = n / 10000;
-    const hasDecimal = tenThousands % 1 !== 0;
-    return `${tenThousands.toFixed(hasDecimal ? 1 : 0)}만`;
-  }
-  return formatInteger(n);
-}
-
-function isGoogleFormEmbedUrl(url: string) {
-  return url.startsWith("https://docs.google.com/forms/d/e/") && url.includes("/viewform?embedded=true");
-}
-
-function TeamMemberCard({ person }: { person: LeadershipProfile }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <motion.div 
-      layout
-      onClick={() => setIsExpanded(!isExpanded)}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 shadow-sm transition-all duration-500 cursor-pointer hover:shadow-xl ${isExpanded ? "ring-2 ring-[#21c1a2]" : ""}`}
+    <motion.div
+      className={className}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.16 }}
+      variants={reveal}
     >
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#F1F1F1]">
-        <Image 
-          src={person.image.src} 
-          alt={person.name} 
-          fill 
-          className={`object-cover object-top transition-transform duration-700 group-hover:scale-105 ${isExpanded ? "scale-105 brightness-75" : ""}`} 
-          sizes="(max-width: 768px) 100vw, 33vw"
-        />
-        {!isExpanded && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8">
-            <p className="text-white text-[13px] md:text-sm font-bold">세부 경력 보기 +</p>
-          </div>
-        )}
-      </div>
-
-      <div className="p-8 flex flex-col flex-1 bg-white">
-        <div className="mb-6">
-          <h3 className="text-[26px] font-bold text-[#0B0F0E]">
-            {person.name} <span className="text-[13px] text-black/30 font-bold ml-1.5 uppercase tracking-widest">{person.englishName}</span>
-          </h3>
-          <p className="text-[#21c1a2] text-[15px] font-bold mt-2">
-            {person.name === "채동우" ? "채널 기획 · 운영 총괄" : person.name === "손현우" ? "촬영 · 제작 총괄" : "구성 · 편집 총괄"}
-          </p>
-        </div>
-        
-        <p className="text-[15px] font-medium leading-[1.8] text-black/60 mb-2">
-          {person.body}
-        </p>
-        {!isExpanded && (
-          <div className="mt-4 pt-4 border-t border-black/5 flex items-center justify-between">
-            <div className="flex gap-2">
-              {person.responsibilities.slice(0, 2).map((r: string) => (
-                <span key={r} className="text-[11px] font-bold bg-black/5 px-2 py-1 rounded text-black/40">#{r}</span>
-              ))}
-            </div>
-            <span className="text-[12px] font-bold text-[#21c1a2]">Profile ▼</span>
-          </div>
-        )}
-      </div>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="px-8 pb-8 pt-0 bg-white"
-          >
-            <div className="border-t border-black/5 pt-6 space-y-6">
-              {person.specs.map((spec: SpecItem) => (
-                <div key={spec.category}>
-                  <h4 className="text-[11px] font-bold text-black/30 uppercase tracking-widest mb-3">{spec.category}</h4>
-                  <ul className="space-y-1.5">
-                    {spec.items.map((item: string) => (
-                      <li key={item} className="flex items-start gap-2 text-[14px] font-bold text-black/70 leading-snug">
-                        <span className="mt-1.5 h-1 w-1 bg-[#21c1a2] rounded-full shrink-0" /> {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-              <p className="text-center text-[12px] font-bold text-black/20 mt-4">카드를 다시 누르면 닫힙니다</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {children}
     </motion.div>
   );
 }
 
-export default function Page() {
-  const insightPosts = getSortedInsights().slice(0, 4);
-  const formEmbedUrl = content.contact.googleFormEmbedUrl.trim();
-  const phoneHref = content.contact.phoneHref.trim();
-  const kakaoChatUrl = content.contact.kakaoChatUrl.trim();
-  const hasFormEmbedUrl = isGoogleFormEmbedUrl(formEmbedUrl);
-  const hasPhoneHref = phoneHref.startsWith("tel:");
-  const hasKakaoChatUrl = kakaoChatUrl.startsWith("http://") || kakaoChatUrl.startsWith("https://");
-  
-  const [problemSupport = "", problemDetail = ""] = content.problem.lead.split("\n\n");
+function SectionMeta({ index, label, dark = false }: { index: string; label: string; dark?: boolean }) {
+  return (
+    <div className={`tk-section-meta ${dark ? "tk-section-meta--dark" : ""}`}>
+      <span>{index}</span>
+      <span>{label}</span>
+    </div>
+  );
+}
 
-  const totalSubscribers = content.portfolio.items.reduce((sum, item) => sum + item.subscriberCurrent, 0);
-  const totalVideoViews = content.heroStats.totalVideoViews;
-  const totalVideoViewsInMan = `${formatInteger(totalVideoViews / 10000)}만+`;
+function Arrow() {
+  return <span aria-hidden="true">↗</span>;
+}
+
+export default function Page() {
+  const featured = content.portfolio.items;
+  const coreCases = featured.filter((item) => item.caseType !== "format");
+  const formatCases = featured.filter((item) => item.caseType === "format");
+  const totalSubscribers = coreCases.reduce((sum, item) => sum + item.subscriberCurrent, 0);
+  const latestInsights = insights.slice(0, 3);
+  const heroRef = useRef<HTMLElement | null>(null);
+  const [playHeroVideo, setPlayHeroVideo] = useState(false);
+  const [showContactDock, setShowContactDock] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState<number | null>(null);
+  const [selectedArchive, setSelectedArchive] = useState(0);
+  const activeArchive = videoArchiveGroups[selectedArchive];
+  const { scrollYProgress: pageProgress } = useScroll();
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const smoothPageProgress = useSpring(pageProgress, { stiffness: 120, damping: 28, mass: 0.35 });
+  const heroScale = useTransform(heroProgress, [0, 1], [1, 1.1]);
+  const heroCopyY = useTransform(heroProgress, [0, 1], [0, -90]);
+  const heroCopyOpacity = useTransform(heroProgress, [0, 0.72, 1], [1, 0.92, 0]);
+
+  useEffect(() => {
+    const wideScreen = window.matchMedia("(min-width: 761px)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+
+    setPlayHeroVideo(wideScreen.matches && !reducedMotion.matches && !connection?.saveData);
+  }, []);
+
+  useEffect(() => {
+    const wideScreen = window.matchMedia("(min-width: 761px)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!wideScreen.matches || reducedMotion.matches) return;
+
+    const lenis = new Lenis({
+      lerp: 0.1,
+      smoothWheel: true,
+      wheelMultiplier: 0.86,
+      syncTouch: false,
+    });
+    let frame = 0;
+    const raf = (time: number) => {
+      lenis.raf(time);
+      frame = requestAnimationFrame(raf);
+    };
+    frame = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      lenis.destroy();
+    };
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setShowContactDock(window.scrollY > window.innerHeight * 0.9);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (selectedPerson === null) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedPerson(null);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [selectedPerson]);
+
+  const faqStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: content.faq.items.slice(0, 7).map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a,
+      },
+    })),
+  };
 
   return (
-    <main className="bg-white text-[#0B0F0E] antialiased pb-20 md:pb-0">
-      
-      {/* 1. 풀스크린 비디오 */}
-      <section className="relative w-full bg-black overflow-hidden aspect-video">
-        <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover object-center">
-          <source src="/videos/turnkeyhaus%20hero%20new.mp4" type="video/mp4" />
-        </video>
-      </section>
+    <main id="main-content" className="tk-home">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+      />
+      <motion.div className="tk-page-progress" style={{ scaleX: smoothPageProgress }} aria-hidden="true" />
 
-      {/* 2. Hero 텍스트 영역 */}
-      <section id="top" className="bg-white py-16 md:py-24 lg:py-32">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-[1000px] space-y-6 md:space-y-8 text-[#0B0F0E]">
-            <p className="text-[13px] font-bold tracking-[0.2em] text-[#21c1a2] uppercase">턴키하우스 by TKDG</p>
-            <h1 className="whitespace-pre-line break-keep text-[36px] sm:text-[54px] lg:text-[84px] font-bold leading-[1.15] tracking-tight">
-              {content.heroValue.headline}
-            </h1>
-            <p className="max-w-[58ch] text-[18px] lg:text-[24px] text-black/60 font-medium leading-relaxed">
-              {content.heroValue.body}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 pt-6">
-              <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-[#21c1a2] px-10 py-5 text-[16px] font-bold text-black shadow-lg shadow-[#21c1a2]/20">
-                무료 3포인트 진단 받기
-              </ActionLink>
-              <ActionLink href="#portfolio" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-10 py-5 text-[16px] font-bold">
-                운영 사례 보기
-              </ActionLink>
-            </div>
-          </motion.div>
-          
-          <div className="mt-16 md:mt-24 grid gap-6 md:gap-8 border-t border-black/10 pt-10 md:pt-16 sm:grid-cols-3 bg-[#FAFAFA] rounded-2xl md:rounded-3xl p-8 md:p-10 border border-black/5">
-            <div className="space-y-2 md:space-y-3 text-center sm:text-left">
-              <dt className="text-[12px] md:text-[13px] font-bold tracking-[0.14em] text-black/40 uppercase">대표 사례</dt>
-              <dd className="text-[32px] md:text-[40px] font-bold tracking-tight">{content.portfolio.items.length}개 채널</dd>
-            </div>
-            <div className="space-y-2 md:space-y-3 text-center sm:text-left border-t sm:border-t-0 sm:border-l border-black/10 pt-6 sm:pt-0 sm:pl-6">
-              <dt className="text-[12px] md:text-[13px] font-bold tracking-[0.14em] text-black/40 uppercase">누적 구독자</dt>
-              <dd className="text-[32px] md:text-[40px] font-bold tracking-tight">{formatInteger(totalSubscribers)}명</dd>
-            </div>
-            <div className="space-y-2 md:space-y-3 text-center sm:text-left border-t sm:border-t-0 sm:border-l border-black/10 pt-6 sm:pt-0 sm:pl-6">
-              <dt className="text-[12px] md:text-[13px] font-bold tracking-[0.14em] text-black/40 uppercase">누적 조회수</dt>
-              <dd className="text-[32px] md:text-[40px] font-bold tracking-tight">약 {totalVideoViewsInMan}</dd>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. 포트폴리오 */}
-      <section id="portfolio" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20">
-            <SectionHeader label={content.portfolio.label} title={content.portfolio.h2} lead={content.portfolio.lead} />
-          </motion.div>
-
-          <div className="space-y-12 md:space-y-16">
-            {content.portfolio.items.map((item, i) => (
-              <motion.article key={item.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-                className="grid gap-8 md:gap-12 lg:grid-cols-[1fr_1fr] items-center bg-white rounded-2xl md:rounded-3xl p-6 sm:p-8 lg:p-12 border border-black/5 shadow-sm hover:shadow-xl transition-shadow duration-300"
+      <section ref={heroRef} id="top" className="tk-hero" aria-labelledby="hero-title">
+        <div className="tk-hero__stage">
+          <motion.div className="tk-hero__media" style={{ scale: heroScale }}>
+            {!playHeroVideo ? (
+              <Image
+                src="/images/turnkeyhaus-hq-building.jpg"
+                alt="턴키하우스 사옥 전경"
+                fill
+                priority
+                sizes="100vw"
+                className="tk-hero__poster"
+              />
+            ) : null}
+            {playHeroVideo ? (
+              <video
+                className="tk-hero__video"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                poster="/images/turnkeyhaus-hq-building.jpg"
               >
-                <div className="relative w-full aspect-video overflow-hidden rounded-xl md:rounded-2xl bg-black border border-black/5">
-                  {item.youtubeId ? (
-                    <iframe src={`https://www.youtube.com/embed/${item.youtubeId}?rel=0&modestbranding=1`} className="absolute inset-0 h-full w-full border-0" allowFullScreen />
-                  ) : (
-                    <Image src={item.imageSrc} alt={item.title} fill className="object-cover" />
-                  )}
-                </div>
-
-                <div className="space-y-6 md:space-y-8">
-                  <div>
-                    <span className="text-[13px] font-bold text-[#21c1a2] uppercase tracking-widest">{item.clientName}</span>
-                    <h3 className="text-[26px] md:text-[32px] font-bold tracking-tight text-[#0B0F0E] leading-tight mt-2 mb-4">{item.title}</h3>
-                    <p className="text-[15px] md:text-[17px] leading-[1.8] text-black/70 font-medium">{item.oneLiner}</p>
-                  </div>
-
-                  <dl className="grid grid-cols-2 gap-4 md:gap-6 bg-[#FAFAFA] border border-black/5 rounded-xl p-5 md:p-6">
-                    <div>
-                      <dt className="text-[11px] font-bold text-black/40 uppercase mb-1 md:mb-2">구독자 변화</dt>
-                      <dd className="text-[18px] md:text-[20px] font-bold text-[#0B0F0E]">{item.result}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-[11px] font-bold text-black/40 uppercase mb-1 md:mb-2">최고 조회수</dt>
-                      <dd className="text-[18px] md:text-[20px] font-bold text-[#21c1a2]">{formatViewsKorean(item.maxVideoViews)}회</dd>
-                    </div>
-                  </dl>
-
-                  <div className="hidden md:grid gap-4 md:gap-6 border-t border-black/5 pt-5 md:pt-6 text-[13px] md:text-[14px] font-medium leading-[1.75] text-black/60 sm:grid-cols-2">
-                    {item.before && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">BEFORE</p><p className="break-keep">{item.before}</p></div>)}
-                    {item.action && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">ACTION</p><p className="break-keep">{item.action}</p></div>)}
-                    {item.after && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">AFTER</p><p className="break-keep">{item.after}</p></div>)}
-                    {item.proof && (<div><p className="text-[11px] font-bold tracking-widest text-[#21c1a2] mb-1">운영 포인트</p><p className="break-keep">{item.proof}</p></div>)}
-                  </div>
-
-                  <ActionLink href={`/cases/${item.caseSlug}`} className="inline-block mt-2 md:mt-4 text-[14px] md:text-[15px] font-bold border-b-2 border-black/10 pb-1 hover:border-[#21c1a2] hover:text-[#21c1a2] transition-colors">
-                    프로젝트 해부도 보기 →
-                  </ActionLink>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-
-          <div className="mt-12 md:mt-16 text-center">
-             <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-white border border-black/15 px-8 py-4 text-[15px] font-bold text-black shadow-sm hover:bg-black/5 transition-colors">무료 3포인트 진단 신청</ActionLink>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. 요금제 */}
-      <section id="pilot" className="py-16 md:py-24 lg:py-32 bg-white">
-        <div className={`${shell} grid gap-10 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]`}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="lg:sticky lg:top-32 lg:self-start space-y-4 md:space-y-6">
-            <SectionHeader label={content.pricing.label} title={content.pricing.h2} />
-            <p className="text-[16px] md:text-[18px] font-bold leading-[1.7] md:leading-[1.85] text-[#21c1a2]">{content.pricing.emphasis}</p>
+                <source src="/videos/turnkeyhaus-office-hero-cut.mp4" type="video/mp4" />
+              </video>
+            ) : null}
           </motion.div>
+          <div className="tk-hero__veil" />
 
-          <div className="border-t border-black/10">
-            {content.pricing.levels.slice(0, 3).map((level, index) => (
-              <motion.article key={level.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="grid gap-4 md:gap-6 border-b border-black/10 py-8 md:py-10 lg:grid-cols-[180px_1fr]">
-                <div>
-                  <p className="text-[11px] md:text-[12px] font-bold tracking-widest text-black/40 mb-1 md:mb-2 uppercase">OPTION 0{index + 1}</p>
-                  <p className="text-[24px] md:text-[28px] font-bold tracking-tight text-[#0B0F0E]">{level.priceBand}</p>
-                </div>
-                <div>
-                  <h3 className="text-[22px] md:text-[26px] font-bold tracking-tight text-[#0B0F0E] mb-4 md:mb-6">{level.title}</h3>
-                  <ul className="grid gap-3 md:gap-4 text-[14px] md:text-[15px] font-medium leading-[1.7] md:leading-[1.75] text-black/70 sm:grid-cols-2">
-                    {level.bullets.map((bullet) => (
-                      <li key={bullet} className="flex gap-2.5 md:gap-3 items-start"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-black/30 shrink-0"/>{bullet}</li>
-                    ))}
-                  </ul>
-                  <p className="mt-6 md:mt-8 bg-[#FAFAFA] border border-black/5 p-4 md:p-5 rounded-xl md:rounded-2xl text-[13px] md:text-[14px] font-bold text-black/50">{level.target}</p>
-                </div>
-              </motion.article>
-            ))}
+          <motion.div className="tk-hero__inner" style={{ y: heroCopyY, opacity: heroCopyOpacity }}>
+            <h1 id="hero-title" className="tk-hero__title">
+              <span className="tk-hero__line"><motion.span initial={{ y: "110%" }} animate={{ y: 0 }} transition={{ duration: 0.9, delay: 0.12, ease }}>콘텐츠를 만들고</motion.span></span>
+              <span className="tk-hero__line tk-hero__title-accent"><motion.span initial={{ y: "110%" }} animate={{ y: 0 }} transition={{ duration: 0.9, delay: 0.22, ease }}>채널까지 <span className="tk-nowrap">움직입니다.</span></motion.span></span>
+              <motion.span className="tk-hero__byline" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.42, ease }}>by TKDG</motion.span>
+            </h1>
 
-            <div className="mt-12 text-center md:text-left">
-               <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-[#0B0F0E] px-10 py-5 text-[16px] font-bold text-white shadow-sm hover:bg-[#21c1a2] transition-colors">채널 링크 보내고 1차 진단 받기</ActionLink>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. 하지 않는 일 */}
-      <section id="not-single" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
-        <div className={`${shell} grid gap-10 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]`}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <SectionHeader label={content.exclusions.label} title={content.exclusions.h2} lead={content.exclusions.lead} />
-          </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="border-t border-black/10">
-            {content.exclusions.items.map((item) => (
-              <article key={item.title} className="border-b border-black/10 py-6 md:py-8">
-                <h3 className="break-keep text-[20px] md:text-[24px] font-bold leading-[1.35] tracking-tight text-[#0B0F0E] mb-3 md:mb-4">{item.title}</h3>
-                <p className="max-w-[74ch] break-keep text-[15px] md:text-[16px] font-medium leading-[1.7] md:leading-[1.85] text-black/60">{item.body}</p>
-              </article>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 6. 문제 현실 점검 */}
-      <section id="problem" className="py-16 md:py-24 lg:py-32 bg-white">
-        <div className={`${shell} grid gap-10 md:gap-16 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20`}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="space-y-4 md:space-y-6 lg:sticky lg:top-32 lg:self-start">
-            <span className={labelClass}>{content.problem.label}</span>
-            <h2 className={`${sectionTitle}`}>{content.problem.h2}</h2>
-          </motion.div>
-
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="space-y-6 md:space-y-10">
-            <p className="whitespace-pre-line break-keep text-[16px] md:text-[20px] leading-[1.8] md:leading-[1.9] text-black/80 font-medium">{problemSupport}</p>
-            <p className="whitespace-pre-line break-keep text-[15px] md:text-[18px] leading-[1.8] md:leading-[1.95] text-black/60 font-medium">{problemDetail}</p>
-            <figure className="overflow-hidden rounded-xl md:rounded-2xl bg-[#FAFAFA] border border-black/5 mt-6 md:mt-8">
-              <Image src={content.problem.image.src} alt={content.problem.image.alt} width={1600} height={1030} className="h-auto w-full object-cover" sizes="(max-width: 1024px) 100vw, 90vw" />
-            </figure>
-            <p className="text-[18px] md:text-[22px] font-bold leading-[1.6] md:leading-[1.75] text-[#21c1a2]">
-              {content.problem.emphasis}
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 7. 전략 프레임 */}
-      <section id="approach" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16">
-            <SectionHeader label={content.strategyFrame.label} title={content.strategyFrame.h2} lead={content.approach.lead} />
-          </motion.div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 border-t border-black/10 pt-12 mb-16">
-            {content.strategyFrame.steps.map((step, index) => (
-              <div key={step.title} className="bg-white p-8 rounded-2xl border border-black/5 shadow-sm">
-                <p className="text-[12px] font-bold tracking-widest text-[#21c1a2] mb-3">STEP 0{index + 1}</p>
-                <h4 className="text-[20px] font-bold text-[#0B0F0E] mb-4">{step.title}</h4>
-                <p className="text-[15px] font-medium leading-[1.8] text-black/60">{step.detail}</p>
-              </div>
-            ))}
-          </div>
-          <div className="bg-white p-6 md:p-12 rounded-[40px] border border-black/5 shadow-sm">
-             <StrategyChapterDeck />
-          </div>
-          <p className="mt-12 md:mt-16 text-center text-[16px] md:text-[18px] font-bold leading-[1.8] md:leading-[1.9] text-[#21c1a2]">{content.approach.keyline}</p>
-        </div>
-      </section>
-
-      {/* 8. 제작 품질 & 출연자 운영 */}
-      <section className="py-16 md:py-24 lg:py-32 bg-white">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16 max-w-3xl mx-auto text-center">
-            <h2 className={sectionTitle}>촬영 품질과 출연자 준비를{"\n"}함께 관리합니다.</h2>
-            <p className="mt-4 md:mt-6 text-[15px] sm:text-[17px] leading-[1.8] text-black/70 md:text-[19px] font-medium break-keep">
-              전문직 콘텐츠는 좋은 장비만으로 완성되지 않습니다. 촬영 전 질문지, 현장 진행, 검수 기준까지 정리되어야 오래 운영할 수 있습니다.
-            </p>
-          </motion.div>
-
-          <div className="grid gap-8 md:gap-12 lg:grid-cols-2">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-[#FAFAFA] border border-black/5 p-8 md:p-12 rounded-2xl md:rounded-3xl shadow-sm">
-              <div className="space-y-4 md:space-y-6">
-                 <span className="inline-flex items-center border border-black/15 px-3 py-1 text-[11px] font-bold tracking-[0.12em] text-black/55 uppercase">{content.videoQuality.label}</span>
-                 <h3 className="whitespace-pre-line break-keep text-[24px] sm:text-[28px] font-bold leading-[1.3] tracking-tight text-[#0B0F0E]">{content.videoQuality.h2}</h3>
-                 <p className="whitespace-pre-line break-keep text-[15px] md:text-[16px] leading-[1.7] text-black/70 font-medium">{content.videoQuality.lead}</p>
-              </div>
-              <div className="mt-8 md:mt-10 space-y-4 border-t border-black/5 pt-6 md:pt-8">
-                {content.videoQuality.points.map((point) => (
-                  <p key={point} className="text-[14px] md:text-[15px] font-bold text-[#0B0F0E] flex items-start gap-3"><span className="mt-1.5 h-1.5 w-1.5 bg-[#21c1a2] rounded-full shrink-0"/>{point}</p>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="bg-[#FAFAFA] border border-black/5 p-8 md:p-12 rounded-2xl md:rounded-3xl shadow-sm">
-              <div className="space-y-4 md:space-y-6">
-                 <span className="inline-flex items-center border border-black/15 px-3 py-1 text-[11px] font-bold tracking-[0.12em] text-black/55 uppercase">{content.presenterOps.label}</span>
-                 <h3 className="whitespace-pre-line break-keep text-[24px] sm:text-[28px] font-bold leading-[1.3] tracking-tight text-[#0B0F0E]">{content.presenterOps.h2}</h3>
-                 <p className="whitespace-pre-line break-keep text-[15px] md:text-[16px] leading-[1.7] text-black/70 font-medium">{content.presenterOps.lead}</p>
-              </div>
-              <div className="mt-8 md:mt-10 space-y-4 border-t border-black/5 pt-6 md:pt-8">
-                <ul className="space-y-3 pt-2">
-                   {content.presenterOps.points.map(p => <li key={p} className="flex gap-3 items-start text-[14px] md:text-[15px] font-bold text-black/70"><span className="mt-1.5 md:mt-2 h-1.5 w-1.5 bg-[#21c1a2] rounded-full shrink-0"/>{p}</li>)}
-                </ul>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. 업종별 적용 */}
-      <section id="professional" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-y border-black/5">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-16 md:mb-24 max-w-3xl">
-            <SectionHeader label={content.professionalTargets.label} title={content.professionalTargets.h2} lead={content.professionalTargets.lead} />
-          </motion.div>
-
-          <div className="space-y-16 md:space-y-20">
-            {content.professionalTargets.cards.map((card, index) => (
-              <motion.article key={card.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="grid items-center gap-8 md:gap-12 lg:grid-cols-2">
-                <figure className={`relative aspect-[4/3] w-full overflow-hidden rounded-2xl md:rounded-3xl bg-white border border-black/5 ${index % 2 === 1 ? "lg:order-2" : ""}`}>
-                  {card.image ? (
-                    <Image src={card.image.src} alt={card.image.alt} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
-                  ) : (
-                    <div className="flex h-full flex-col justify-end p-6 md:p-10">
-                      <p className="text-[11px] md:text-[12px] font-bold text-black/40 mb-3 md:mb-4">{card.imageFallback?.eyebrow}</p>
-                      {card.imageFallback?.lines.map(line => <p key={line} className="text-[20px] md:text-2xl font-bold text-[#0B0F0E]">{line}</p>)}
-                    </div>
-                  )}
-                </figure>
-                <div className="space-y-5 md:space-y-6">
-                  <h3 className="text-[28px] md:text-[36px] font-bold tracking-tight text-[#0B0F0E]">{card.title}</h3>
-                  <p className="text-[16px] md:text-[18px] leading-[1.8] md:leading-[1.9] text-black/70 font-medium">{card.oneLiner}</p>
-                  <div className="flex flex-wrap gap-2 pt-1 md:pt-2">
-                    {(card.tags ?? []).map(tag => <span key={tag} className="bg-white border border-black/5 px-2.5 py-1 md:px-3 md:py-1.5 rounded-md text-[12px] md:text-[13px] font-bold text-black/60">#{tag}</span>)}
-                  </div>
-                  <ul className="space-y-2.5 md:space-y-3 border-t border-black/10 pt-5 md:pt-6 text-[14px] md:text-[15px] font-medium text-black/70">
-                    {card.bullets.map(b => <li key={b} className="flex gap-2.5 md:gap-3 items-start"><span className="mt-1.5 md:mt-2 h-1.5 w-1.5 bg-[#21c1a2] rounded-full shrink-0"/>{b}</li>)}
-                  </ul>
-                  <div className="pt-3 md:pt-4">
-                    <ActionLink href={card.href} className="inline-flex items-center border-b-2 border-black/10 pb-1 text-[15px] md:text-[16px] font-bold text-[#0B0F0E] hover:border-[#21c1a2] transition-colors">
-                      {card.ctaLabel} <span className="ml-2">→</span>
-                    </ActionLink>
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 10. 팀 소개 */}
-      <section id="team" className="py-16 md:py-24 lg:py-32 bg-white">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-20 text-center max-w-4xl mx-auto">
-            <h2 className={sectionTitle}>담당자가 바뀌지 않는{"\n"}운영 구조를 만듭니다.</h2>
-            <p className="mt-6 text-[18px] text-black/60 font-medium">역할별 책임자를 고정해 채널 톤과 운영 히스토리가 끊기지 않도록 관리합니다.</p>
-          </motion.div>
-          
-          <div className="grid gap-6 md:gap-8 lg:grid-cols-3">
-            <TeamMemberCard person={content.leadership.people[0]} /> {/* 채동우 */}
-            <TeamMemberCard person={content.leadership.people[2]} /> {/* 손현우 */}
-            <TeamMemberCard person={content.leadership.people[1]} /> {/* 양현 */}
-          </div>
-        </div>
-      </section>
-
-      {/* 11. 선택 기준 & CTA */}
-      <section id="fit" className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA] border-t border-black/5">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-16 md:mb-20 max-w-3xl mx-auto text-center">
-            <SectionHeader label={content.aiRecommendation.label} title={content.aiRecommendation.h2} lead={content.aiRecommendation.lead} />
-          </motion.div>
-
-          <div className="grid gap-6 md:gap-8 max-w-5xl mx-auto border-t border-black/10 pt-12 md:pt-16">
-            {content.aiRecommendation.items.map((item) => (
-              <motion.article key={item.prompt} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-white p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl border border-black/5 shadow-sm">
-                <p className="text-[11px] md:text-[12px] font-bold tracking-widest text-[#21c1a2] mb-2 md:mb-3 uppercase">자주 들어온 의뢰 유형</p>
-                <h3 className="text-[22px] md:text-[26px] font-bold tracking-tight text-[#0B0F0E] mb-3 md:mb-4">{item.prompt}</h3>
-                <p className="text-[16px] md:text-[18px] font-medium leading-[1.8] md:leading-[1.85] text-black/70 mb-6 md:mb-8 border-b border-black/5 pb-6 md:pb-8">{item.fit}</p>
-                <ul className="space-y-2.5 md:space-y-3">
-                  {item.reasons.map((reason) => (
-                    <li key={reason} className="text-[14px] md:text-[15px] font-semibold text-black/60 flex items-center gap-2.5 md:gap-3"><span className="h-1.5 w-1.5 bg-black/20 rounded-full shrink-0"/>{reason}</li>
-                  ))}
-                </ul>
-              </motion.article>
-            ))}
-          </div>
-
-          <div className="mt-12 md:mt-16 text-center">
-             <p className="text-[16px] md:text-[18px] font-bold text-[#0B0F0E] mb-6">{content.aiRecommendation.note}</p>
-             <ActionLink href="#contact" className="inline-flex justify-center items-center rounded-full bg-[#0B0F0E] border border-black/15 px-8 py-4 text-[15px] font-bold text-white shadow-sm hover:bg-[#21c1a2] hover:text-black transition-colors">카카오톡으로 채널 링크 보내기</ActionLink>
-          </div>
-        </div>
-      </section>
-
-      {/* 12. 리스크 관리 */}
-      <section id="risk" className="py-16 md:py-24 lg:py-32 bg-[#0B0F0E] text-white">
-        <div className={`${shell} grid gap-12 md:gap-16 lg:grid-cols-[0.8fr_1.2fr]`}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <SectionHeader label={content.riskManagement.label} title={content.riskManagement.h2} lead={content.riskManagement.lead} dark />
-          </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ delay: 0.2 }} className="space-y-8 md:space-y-10">
-            <ul className="divide-y divide-white/10 border-y border-white/10">
-              {content.riskManagement.items.map((item) => (
-                <li key={item} className="py-5 md:py-6 text-[16px] md:text-[18px] font-bold leading-[1.7] md:leading-[1.75] text-white/90">{item}</li>
-              ))}
-            </ul>
-            <p className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-xl md:rounded-2xl text-[15px] md:text-[16px] leading-[1.8] md:leading-[1.85] text-white/60 font-medium">{content.riskManagement.note}</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 13. 계산기 */}
-      <section className="bg-[#FAFAFA] py-16 md:py-24 border-b border-black/5">
-        <DiagnosticCalculator />
-      </section>
-
-      {/* 14. 연락처 및 폼 */}
-      <section id="contact" className="py-16 md:py-24 lg:py-32 bg-white">
-        <div className={shell}>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="mb-12 md:mb-16 max-w-3xl">
-            <SectionHeader label={content.contact.label} title={content.contact.h2} lead={content.contact.lead} />
-          </motion.div>
-
-          <div className="grid gap-12 md:gap-16 lg:grid-cols-[0.88fr_1.12fr] items-start">
-            <div className="space-y-6 md:space-y-8 border-t border-black/10 pt-6 md:pt-8 bg-[#FAFAFA] p-8 md:p-10 lg:p-12 rounded-2xl md:rounded-3xl border border-black/5 shadow-sm">
-              <div className="space-y-2 md:space-y-3">
-                <h3 className="text-[24px] md:text-[28px] font-bold text-[#0B0F0E] mb-3 md:mb-4">먼저 확인하는 것</h3>
-                <p className="text-[15px] md:text-[16px] font-medium leading-[1.8] md:leading-[1.9] text-black/60">긴 리포트 전에, 상담으로 이어지지 않는 병목부터 빠르게 확인합니다.</p>
-              </div>
-              <ul className="space-y-3 md:space-y-4">
-                {["클릭 전환: 제목·썸네일", "콘텐츠 구조: 주제·재생목록", "문의 동선: 설명란·고정댓글·채널 홈"].map(txt => (
-                  <li key={txt} className="text-[15px] md:text-[16px] font-bold text-[#0B0F0E] flex items-center gap-2.5 md:gap-3"><span className="h-1.5 w-1.5 bg-[#21c1a2] rounded-full"/>{txt}</li>
-                ))}
-              </ul>
-              
-              <div className="flex flex-col xl:flex-row gap-3 md:gap-4 pt-5 md:pt-6 border-t border-black/5">
-                {hasPhoneHref && (
-                  <a href={phoneHref} className={`flex-1 text-center bg-white border border-black/15 py-3.5 md:py-4 rounded-full text-[14px] md:text-[15px] font-bold hover:bg-black/5 transition-colors ${focusRing}`}>
-                    {content.contact.quickCallLabel}
-                  </a>
-                )}
-                {hasKakaoChatUrl && (
-                  <a href={kakaoChatUrl} className={`flex-1 text-center bg-[#21c1a2] text-[#0B0F0E] py-3.5 md:py-4 rounded-full text-[14px] md:text-[15px] font-bold hover:bg-[#1db197] transition-colors ${focusRing}`}>
-                    {content.contact.kakaoCtaLabel}
-                  </a>
-                )}
+            <div className="tk-hero__bottom">
+              <p>전문직·고관여 브랜드의 유튜브를 기획부터 촬영과 발행<br className="tk-desktop-break" /> 다음 달 운영 판단까지 한 팀이 맡습니다.</p>
+              <div className="tk-hero__actions">
+                <a className="tk-hero__primary" href="#contact">채널 운영 상담 <Arrow /></a>
+                <a className="tk-text-link tk-text-link--light" href="#work">대표 운영 사례 <Arrow /></a>
               </div>
             </div>
-            
-            <div id="contact-form" className="rounded-2xl md:rounded-3xl overflow-hidden bg-[#FAFAFA] border border-black/5 h-[600px] md:h-[760px] shadow-sm">
-              {hasFormEmbedUrl ? (
-                <iframe src={formEmbedUrl} className="w-full h-full border-0" loading="lazy" title={content.contact.iframeTitle} referrerPolicy="strict-origin-when-cross-origin" />
-              ) : (
-                <div className="flex h-full items-center justify-center p-8 md:p-10 text-center text-sm font-medium leading-relaxed text-black/40">Google Form 임베드 URL이 아직 설정되지 않았습니다.</div>
-              )}
-            </div>
-          </div>
+          </motion.div>
+
         </div>
       </section>
 
-      {/* 15. FAQ & 블로그 */}
-      <section className="py-16 md:py-24 lg:py-32 bg-[#FAFAFA]">
-        <div className={shell}>
-          <div className="grid gap-16 md:gap-24 lg:grid-cols-[1fr_1fr]">
-            
-            <div id="faq">
-              <SectionHeader label={content.faq.label} title={content.faq.h2} />
-              <div className="mt-8 md:mt-12 divide-y divide-black/5 border-y border-black/10">
-                {content.faq.items.map((item) => (
-                  <details key={item.q} className="group py-5 md:py-6">
-                    <summary className={`flex cursor-pointer items-center justify-between list-none text-[18px] md:text-[20px] font-bold text-[#0B0F0E] ${focusRing}`}>
-                      {item.q}
-                      <span className="text-[#21c1a2] group-open:-rotate-180 transition-transform">▼</span>
-                    </summary>
-                    <p className="mt-4 md:mt-6 text-[15px] md:text-[16px] text-black/60 font-medium leading-[1.8] md:leading-[1.9] whitespace-pre-line bg-white p-5 md:p-6 rounded-xl md:rounded-2xl border border-black/5">{item.a}</p>
-                  </details>
-                ))}
-              </div>
+      <div className="tk-marquee" aria-hidden="true">
+        <div className="tk-marquee__track">
+          {[0, 1].map((group) => (
+            <div className="tk-marquee__group" key={group}>
+              {[0, 1, 2, 3].flatMap((cycle) => marqueeLabels.map((label) => <span key={`${cycle}-${label}`}>{label}<i /></span>))}
             </div>
-
-            <div id="blog">
-              <SectionHeader label={content.blog.label} title={content.blog.h2} lead={content.blog.lead} />
-              {insightPosts.length > 0 && (
-                <div className="mt-8 md:mt-12 space-y-4 md:space-y-6">
-                  {insightPosts.map((post) => (
-                    <Link key={post.slug} href={`/insights/${post.slug}`} className={`block bg-white p-6 md:p-8 rounded-xl md:rounded-2xl border border-black/5 hover:border-[#21c1a2] hover:bg-[#FAFAFA] transition-colors shadow-sm ${focusRing}`}>
-                       <p className="text-[12px] md:text-[13px] font-bold tracking-widest text-black/40 mb-2 md:mb-3 uppercase">{post.publishedAt}</p>
-                       <h3 className="text-[20px] md:text-[22px] font-bold mb-2 md:mb-3 text-[#0B0F0E]">{post.title}</h3>
-                       <p className="text-[14px] md:text-[15px] text-black/50 font-medium leading-[1.8] line-clamp-2">{post.description}</p>
-                    </Link>
-                  ))}
-                  <div className="pt-6 md:pt-8 text-center border-t border-black/5">
-                    <ActionLink href="/insights" className="inline-flex items-center text-[15px] md:text-[16px] font-bold text-[#0B0F0E] border-b-2 border-black/10 pb-1 hover:border-[#21c1a2] transition-colors">
-                      {content.blog.ctaLabel} →
-                    </ActionLink>
-                  </div>
-                </div>
-              )}
-            </div>
-
-          </div>
+          ))}
         </div>
-      </section>
-
-      {/* 모바일 전용 하단 고정 CTA */}
-      <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-black/10 p-3 md:hidden shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
-         <div className="flex gap-2 max-w-[400px] mx-auto">
-            {hasKakaoChatUrl && (
-              <a href={kakaoChatUrl} className="flex-1 bg-[#21c1a2] text-black text-[13px] font-bold py-3.5 rounded-xl text-center">
-                카카오톡 상담
-              </a>
-            )}
-            <a href="#contact" className="flex-1 bg-[#0B0F0E] text-white text-[13px] font-bold py-3.5 rounded-xl text-center">
-              무료 진단 신청
-            </a>
-         </div>
       </div>
 
-      <ContactCTA />
+      <section className="tk-intro">
+        <div className="tk-shell">
+          <SectionMeta index="01" label="WHAT WE DO" />
+          <Reveal className="tk-intro__grid">
+            <h2>전문성을 사람들이 이해하고<br />선택할 수 있는 콘텐츠로 만듭니다.</h2>
+            <div className="tk-intro__copy">
+              <p>
+                영상 한 편을 예쁘게 만드는 일과 채널을 꾸준히 움직이는 일은 다릅니다.
+                턴키하우스는 주제, 출연자, 촬영, 편집, 배포, 데이터가 같은 방향으로 움직이게 합니다.
+              </p>
+              <p>
+                원장님과 변호사님, 대표님은 자신의 일에 집중하고,
+                매달 반복되는 운영 실무는 저희가 맡습니다.
+              </p>
+            </div>
+          </Reveal>
 
-      {/* Footer */}
-      <footer className="bg-white py-12 md:py-16 border-t border-black/10 pb-28 md:pb-16">
-        <div className={`${shell} flex flex-col md:flex-row justify-between items-start gap-8 md:gap-12`}>
-          <div>
-            <p className="font-bold text-[16px] md:text-[18px] mb-4 md:mb-6 text-[#0B0F0E]">{content.footer.companyName}</p>
-            <div className="space-y-1.5 md:space-y-2 text-[13px] md:text-[14px] text-black/50 font-medium">
-              {content.footer.lines.map((line) => (
-                <p key={line.label}>{line.label}: {line.value}</p>
-              ))}
+          <Reveal className="tk-stats" aria-label="대표 운영 성과">
+            <div><strong>5개사 이상</strong><span>현재 파트너</span></div>
+            <div><strong>{formatNumber(totalSubscribers)}</strong><span>사례 채널 누적 구독자</span></div>
+            <div><strong>2,020만+</strong><span>누적 영상 조회</span></div>
+            <div><strong>2016—현재</strong><span>유튜브 운영 경력</span></div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section id="work" className="tk-work">
+        <div className="tk-shell">
+          <SectionMeta index="02" label="SELECTED WORK" dark />
+          <Reveal className="tk-work__heading">
+            <h2>결과만 보여주지 않습니다.<br />무엇을 맡았는지 함께 보여드립니다.</h2>
+            <p>대표 운영 사례 {coreCases.length}건 / 신규 포맷 {formatCases.length}건</p>
+          </Reveal>
+
+          <div className="tk-projects">
+            {coreCases.map((item, index) => {
+              const media = item.youtubeId
+                ? `https://i.ytimg.com/vi/${item.youtubeId}/maxresdefault.jpg`
+                : item.imageSrc;
+              return (
+                <Reveal key={item.title} className={`tk-project tk-project--${index + 1}`}>
+                  <Link href={`/cases/${item.caseSlug}`} className="tk-project__link" aria-label={`${item.clientName} 사례 자세히 보기`} data-cursor="VIEW">
+                    <motion.figure
+                      className="tk-project__media"
+                      initial={{ clipPath: "inset(9% 0 9% 0)" }}
+                      whileInView={{ clipPath: "inset(0% 0 0% 0)" }}
+                      viewport={{ once: true, amount: 0.18 }}
+                      transition={{ duration: 1.05, ease }}
+                    >
+                      <Image
+                        src={media}
+                        alt={`${item.clientName} 유튜브 운영 사례`}
+                        fill
+                        sizes={index === 0 || index === 3 ? "100vw" : "(max-width: 800px) 100vw, 50vw"}
+                        className="tk-project__image"
+                      />
+                      <span className="tk-project__number">0{index + 1}</span>
+                      <span className="tk-project__view">VIEW CASE <Arrow /></span>
+                    </motion.figure>
+                    <div className="tk-project__caption">
+                      <div>
+                        <p>{item.clientName}</p>
+                        <h3>{item.title}</h3>
+                      </div>
+                      <div className="tk-project__result">
+                        <span>{item.oneLiner}</span>
+                        <strong>{item.result}</strong>
+                      </div>
+                    </div>
+                    <dl className="tk-project__evidence" aria-label={`${item.clientName} 운영 전후 요약`}>
+                      <div><dt>BEFORE</dt><dd>{item.before}</dd></div>
+                      <div><dt>ACTION</dt><dd>{item.action}</dd></div>
+                      <div><dt>AFTER</dt><dd>{item.after}</dd></div>
+                    </dl>
+                  </Link>
+                </Reveal>
+              );
+            })}
+          </div>
+
+        </div>
+
+        <div className="tk-publishing-index" aria-labelledby="publishing-index-title">
+          <div className="tk-shell">
+            <Reveal className="tk-publishing-index__heading">
+              <div><p>PUBLISHING ARCHIVE</p><span>CURATED CHANNEL WORK</span></div>
+              <h3 id="publishing-index-title">채널마다 목적에 맞는<br />영상 흐름을 설계합니다.</h3>
+              <p>영상 수만 늘리지 않습니다. 채널별 발행 의도와 실제 포맷을 함께 보여드립니다.</p>
+            </Reveal>
+
+            <div className="tk-publishing-index__layout">
+              <div className="tk-publishing-index__channels" role="tablist" aria-label="운영 채널 선택">
+                {videoArchiveGroups.map((group, index) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    id={`publishing-tab-${group.key}`}
+                    aria-selected={selectedArchive === index}
+                    aria-controls="publishing-index-panel"
+                    className={selectedArchive === index ? "is-active" : ""}
+                    onClick={() => setSelectedArchive(index)}
+                    key={group.key}
+                  >
+                    <span>0{index + 1}</span>
+                    <div><em>{group.area}</em><strong>{group.name}</strong></div>
+                    <i aria-hidden="true">↗</i>
+                  </button>
+                ))}
+              </div>
+
+              <div className="tk-publishing-index__panel" id="publishing-index-panel" role="tabpanel" aria-labelledby={`publishing-tab-${activeArchive.key}`}>
+                <div className="tk-publishing-index__panel-head">
+                  <div><em>{activeArchive.area}</em><h4>{activeArchive.name}</h4></div>
+                  <p>{activeArchive.description}</p>
+                </div>
+
+                <a className="tk-publishing-feature" href={`https://youtu.be/${activeArchive.items[0].id}`} target="_blank" rel="noreferrer">
+                  <figure>
+                    <Image src={`https://i.ytimg.com/vi/${activeArchive.items[0].id}/maxresdefault.jpg`} alt={`${activeArchive.items[0].title} 유튜브 영상 썸네일`} fill sizes="(max-width: 760px) 100vw, 56vw" loading="eager" unoptimized />
+                    <span>대표 영상 재생 <Arrow /></span>
+                  </figure>
+                  <div><em>{activeArchive.items[0].format}</em><strong>{activeArchive.items[0].title}</strong></div>
+                </a>
+
+                <div className="tk-publishing-filmstrip" aria-label={`${activeArchive.name} 발행 영상`}>
+                  {activeArchive.items.slice(1).map((item) => (
+                    <a href={`https://youtu.be/${item.id}`} target="_blank" rel="noreferrer" key={item.id} aria-label={`${item.title} 유튜브에서 보기`}>
+                      <figure><Image src={`https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`} alt={`${item.title} 유튜브 영상 썸네일`} width={320} height={180} sizes="(max-width: 760px) 62vw, 16vw" loading="eager" unoptimized /></figure>
+                      <em>{item.format}</em>
+                      <strong>{item.title}</strong>
+                    </a>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-4 md:gap-6 text-[13px] md:text-[14px] font-bold text-black/40">
-            <Link href="/store" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>운영 플랜 신청</Link>
-            <Link href="/terms" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>이용약관</Link>
-            <Link href="/privacy" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>개인정보처리방침</Link>
-            <Link href="/refund" className={`hover:text-[#21c1a2] transition-colors ${focusRing}`}>환불 정책</Link>
+        </div>
+      </section>
+
+      <section id="system" className="tk-system">
+        <div className="tk-shell">
+          <SectionMeta index="03" label="ONE OPERATING SYSTEM" />
+          <div className="tk-system__top">
+            <Reveal>
+              <h2>기획부터 발행까지<br />하나의 팀이 끝까지 맡습니다.</h2>
+            </Reveal>
+            <Reveal className="tk-system__lead">
+              <p>담당자가 바뀔 때마다 맥락을 다시 설명하지 않도록, 처음 진단한 사람이 발행과 리뷰까지 함께 봅니다.</p>
+            </Reveal>
+          </div>
+
+          <div className="tk-process">
+            {process.map(([number, title, body]) => (
+              <Reveal className="tk-process__row" key={number}>
+                <span>{number}</span>
+                <h3>{title}</h3>
+                <p>{body}</p>
+              </Reveal>
+            ))}
           </div>
         </div>
-      </footer>
+      </section>
+
+      <section id="team" className="tk-team" aria-labelledby="team-title">
+        <div className="tk-shell">
+          <SectionMeta index="04" label="THE OPERATING TEAM" />
+          <Reveal className="tk-team__heading">
+            <h2 id="team-title">처음 만난 팀이<br />운영까지 함께합니다.</h2>
+            <p>전략·채널 운영·촬영 책임자를 고정합니다.<br className="tk-desktop-break" />매달 같은 설명을 반복하지 않아도 됩니다.</p>
+          </Reveal>
+          <div className="tk-team__list">
+            {content.leadership.people.map((person, index) => (
+              <Reveal key={person.name}>
+                <button type="button" className="tk-team-member" onClick={() => setSelectedPerson(index)} aria-label={`${person.name} 경력과 학력 보기`}>
+                  <span>0{index + 1}</span>
+                  <figure>
+                    <Image src={person.image.src} alt={person.image.alt} fill sizes="(max-width: 760px) 42vw, 250px" />
+                  </figure>
+                  <div className="tk-team-member__identity">
+                    <p>{person.role}</p>
+                    <h3>{person.name}</h3>
+                    <small>경력·학력 보기 ↗</small>
+                  </div>
+                  <div className="tk-team-member__detail">
+                    <p>{person.body}</p>
+                    <ul>{person.responsibilities.map((item) => <li key={item}>{item}</li>)}</ul>
+                  </div>
+                </button>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {selectedPerson !== null ? (
+        <div className="tk-profile-modal" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setSelectedPerson(null);
+        }}>
+          <section className="tk-profile-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+            <button type="button" className="tk-profile-modal__close" onClick={() => setSelectedPerson(null)} aria-label="프로필 닫기" autoFocus>CLOSE <span aria-hidden="true">×</span></button>
+            <div className="tk-profile-modal__intro">
+              <figure>
+                <img
+                  src={content.leadership.people[selectedPerson].image.src}
+                  alt={content.leadership.people[selectedPerson].image.alt}
+                  width="1080"
+                  height="1350"
+                  loading="eager"
+                />
+              </figure>
+              <div className="tk-profile-modal__copy">
+                <div className="tk-profile-modal__role"><i>0{selectedPerson + 1}</i><p>{content.leadership.people[selectedPerson].role}</p></div>
+                <h2 id="profile-modal-title">{content.leadership.people[selectedPerson].name}</h2>
+                <span>{content.leadership.people[selectedPerson].englishName}</span>
+                <strong>{content.leadership.people[selectedPerson].body}</strong>
+                <ul className="tk-profile-modal__responsibilities">
+                  {content.leadership.people[selectedPerson].responsibilities.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </div>
+            </div>
+            <div className="tk-profile-modal__specs">
+              {content.leadership.people[selectedPerson].specs.map((spec) => (
+                <div key={spec.category}>
+                  <p>{spec.category}</p>
+                  <ul>{spec.items.map((item) => <li key={item}>{item}</li>)}</ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      <section id="risk" className="tk-risk" aria-labelledby="risk-title">
+        <div className="tk-shell">
+          <SectionMeta index="05" label="RISK MANAGEMENT" dark />
+          <Reveal className="tk-risk__heading">
+            <h2 id="risk-title">전문 분야는 잘 찍는 것만큼<br />잘못 말하지 않는 일이 중요합니다.</h2>
+            <p>{content.riskManagement.lead}</p>
+          </Reveal>
+          <div className="tk-risk__list">
+            {content.riskManagement.items.map((item, index) => (
+              <Reveal className="tk-risk__row" key={item}>
+                <span>0{index + 1}</span><p>{item}</p>
+              </Reveal>
+            ))}
+          </div>
+          <p className="tk-risk__note">{content.riskManagement.note}</p>
+        </div>
+      </section>
+
+      <section id="services" className="tk-services">
+        <div className="tk-shell">
+          <SectionMeta index="06" label="SERVICES" />
+          <Reveal className="tk-services__heading">
+            <h2>외부 채널 운영부터<br />사내 제작팀 구축까지 함께합니다.</h2>
+          </Reveal>
+
+          <div className="tk-service-list">
+            {content.servicePillars.cards.map((service, index) => (
+              <Reveal key={service.title}>
+                <Link href={service.href} className="tk-service-row">
+                  <span className="tk-service-row__index">0{index + 1}</span>
+                  <div>
+                    <p>{service.title}</p>
+                    <h3>{service.headline}</h3>
+                  </div>
+                  <p className="tk-service-row__body">{service.body}</p>
+                  <span className="tk-service-row__arrow"><Arrow /></span>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+          <Link href="/youtube-channel-management" className="tk-services__all">유튜브 채널 운영 범위 자세히 보기 <Arrow /></Link>
+        </div>
+      </section>
+
+      <section className="tk-studio" aria-labelledby="studio-title">
+        <div className="tk-studio__image">
+          <Image src="/images/studio-1.jpg" alt="턴키하우스 촬영 현장" fill sizes="100vw" className="object-cover" />
+        </div>
+        <div className="tk-studio__overlay" />
+        <div className="tk-studio__content tk-shell">
+          <SectionMeta index="07" label="PRODUCTION" dark />
+          <Reveal>
+            <p className="tk-studio__kicker">PLAN BEFORE CAMERA</p>
+            <h2 id="studio-title">카메라를 켜기 전에<br />말할 이유부터 정리합니다.</h2>
+            <p>촬영 전 질문지와 구성, 현장 동선, 검수 기준을 먼저 맞춥니다.<br />좋은 장비는 기본입니다. 전문가가 편하게 말할 수 있는 준비가 결과를 바꿉니다.</p>
+          </Reveal>
+          <div className="tk-studio__facts">
+            <span>멀티캠 촬영</span><span>인물 조명</span><span>현장 디렉팅</span><span>후반 편집</span><span>썸네일·발행</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="showreel" className="tk-showreel" aria-labelledby="showreel-title">
+        <div className="tk-shell">
+          <SectionMeta index="08" label="TURNKEYHAUS INTRO FILM" />
+          <Reveal className="tk-showreel__heading">
+            <h2 id="showreel-title">턴키하우스가 어떤 팀인지<br />영상으로 소개합니다.</h2>
+            <div>
+              <p>기획부터 촬영과 채널 운영까지<br />턴키하우스가 일하는 방식을 영상에 담았습니다.</p>
+              <span>TURNKEYHAUS INTRO FILM · CLICK TO PLAY</span>
+            </div>
+          </Reveal>
+          <Reveal className="tk-showreel__frame">
+            <video controls playsInline preload="none" poster="/images/turnkeyhaus-hq-building.jpg">
+              <source src="/videos/turnkeyhaus hero new.mp4" type="video/mp4" />
+              영상을 재생할 수 없는 환경입니다.
+            </video>
+          </Reveal>
+        </div>
+      </section>
+
+      <section id="pilot" className="tk-start">
+        <div className="tk-shell">
+          <SectionMeta index="09" label="START SMALL" dark />
+          <Reveal className="tk-start__heading">
+            <h2>바로 장기계약하지 않아도 됩니다.</h2>
+            <p>현재 상태와 내부 상황에 맞춰, 필요한 만큼부터 확인할 수 있습니다.</p>
+          </Reveal>
+          <div className="tk-start__options">
+            {content.pricing.levels.slice(0, 3).map((level, index) => (
+              <Reveal className="tk-start__option" key={level.title}>
+                <span>0{index + 1}</span>
+                <div className="tk-start__title"><p>{level.priceBand}</p><h3>{level.title}</h3></div>
+                <div className="tk-start__fit"><small>누구에게 맞는지</small><p>{level.target}</p></div>
+                <ul>{level.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="tk-sectors">
+        <div className="tk-shell">
+          <SectionMeta index="10" label="SECTORS" />
+          <Reveal className="tk-sectors__grid">
+            <h2>설명이 곧 신뢰가 되는<br />업종에 집중합니다.</h2>
+            <p>구매 결정이 어렵고, 전문가의 판단 기준이 중요한 분야일수록 콘텐츠의 역할이 커집니다.</p>
+          </Reveal>
+          <div className="tk-sector-list">
+            {content.professionalTargets.cards.map((sector, index) => (
+              <Reveal className="tk-sector" key={sector.title}>
+                <span>0{index + 1}</span>
+                <h3>{sector.title}</h3>
+                <p>{sector.oneLiner}</p>
+                <Link href={sector.href} aria-label={`${sector.title} 운영 방식 보기`}><Arrow /></Link>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" className="tk-faq" aria-labelledby="faq-title">
+        <div className="tk-shell">
+          <SectionMeta index="11" label="QUESTIONS BEFORE START" />
+          <Reveal className="tk-faq__heading">
+            <h2 id="faq-title">맡기기 전에 궁금한 것부터<br />먼저 답해두겠습니다.</h2>
+            <p>계약보다 운영 방식이 맞는지 확인하는 일이 먼저입니다.</p>
+          </Reveal>
+          <div className="tk-faq__list">
+            {content.faq.items.slice(0, 7).map((item, index) => (
+              <details key={item.q} className="tk-faq__item">
+                <summary><span>0{index + 1}</span><strong>{item.q}</strong><i aria-hidden="true">+</i></summary>
+                <p>{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="resources" className="tk-resources" aria-labelledby="resources-title">
+        <div className="tk-shell">
+          <SectionMeta index="12" label="INSIGHTS & PROPOSAL" />
+          <Reveal className="tk-resources__heading">
+            <h2 id="resources-title">판단에 필요한 자료를<br />한곳에 모았습니다.</h2>
+            <p>현장 운영에서 확인한 기준과 공식 제안서를 함께 공개합니다.</p>
+          </Reveal>
+          <div className="tk-resources__grid">
+            <div className="tk-insight-list">
+              {latestInsights.map((post, index) => (
+                <Link href={`/insights/${post.slug}`} key={post.slug} className="tk-insight-row">
+                  <span>0{index + 1}</span>
+                  <div><time dateTime={post.publishedAt}>{post.publishedAt.replaceAll("-", ".")}</time><h3>{post.title}</h3></div>
+                  <Arrow />
+                </Link>
+              ))}
+              <Link href="/insights" className="tk-text-link">인사이트 전체 보기 <Arrow /></Link>
+            </div>
+            <a href="/proposal.html" className="tk-proposal-link">
+              <span>OFFICIAL PROPOSAL · HTML</span>
+              <h3>턴키하우스 공식 제안서</h3>
+              <p>운영 범위와 서비스 구조를 별도 문서에서 확인하실 수 있습니다.</p>
+              <strong>제안서 열기 <Arrow /></strong>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" className="tk-contact">
+        <div className="tk-shell">
+          <SectionMeta index="13" label="LET’S TALK" dark />
+          <Reveal className="tk-contact__main">
+            <p>채널 운영 상담 · 1영업일 내 연락</p>
+            <h2>채널 링크 하나면<br />어디서 막혀 있는지부터 보겠습니다.</h2>
+            <div className="tk-contact__actions">
+              <a href={content.contact.kakaoChatUrl} target="_blank" rel="noreferrer" className="tk-contact__primary">
+                카카오톡으로 채널 보내기 <Arrow />
+              </a>
+              <a href={content.contact.googleFormShareUrl} target="_blank" rel="noreferrer" className="tk-text-link tk-text-link--light">
+                상담 폼 작성하기 <Arrow />
+              </a>
+            </div>
+          </Reveal>
+
+          <footer className="tk-footer">
+            <div className="tk-footer__brand">
+              <Image src="/images/turnkeyhaus-logo-main.png" alt="턴키하우스 by TKDG" width={180} height={79} />
+            </div>
+            <div className="tk-footer__company">
+              <strong>{content.footer.companyName}</strong>
+              {content.footer.lines.map((line) => <p key={line.label}><span>{line.label}</span>{line.value}</p>)}
+            </div>
+            <div className="tk-footer__links">
+              <Link href="/company">COMPANY <Arrow /></Link>
+              <Link href="/youtube-channel-management">SERVICES <Arrow /></Link>
+              <a href="/proposal.html">PROPOSAL <Arrow /></a>
+              <Link href="/insights">INSIGHTS <Arrow /></Link>
+              <a href="mailto:contact@tkdglabs.com">EMAIL <Arrow /></a>
+              <a href={content.contact.phoneHref}>CALL <Arrow /></a>
+              <a href="https://www.tkdglabs.com" target="_blank" rel="noreferrer">TKDG LABS <Arrow /></a>
+            </div>
+            <p className="tk-footer__copy">© {new Date().getFullYear()} TKDG Labs Co., Ltd.</p>
+          </footer>
+        </div>
+      </section>
+
+      <aside className={`tk-contact-dock ${showContactDock ? "is-visible" : ""}`} aria-label="빠른 상담" aria-hidden={!showContactDock}>
+        <a href={content.contact.kakaoChatUrl} target="_blank" rel="noreferrer"><span>KAKAO</span><strong>카카오톡 상담</strong><Arrow /></a>
+        <a href={content.contact.phoneHref}><span>CALL</span><strong>{content.contact.phoneDisplay}</strong><Arrow /></a>
+      </aside>
     </main>
   );
 }

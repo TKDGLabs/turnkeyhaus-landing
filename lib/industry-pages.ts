@@ -56,7 +56,7 @@ export const industryPages: IndustryPageData[] = [
     ],
     offerTitle: "처음부터 장기계약하지 않아도 됩니다",
     offers: [
-      "24시간 3포인트 무료 진단",
+      "채널 구조 1차 검토",
       "49만원 채널 진단 리포트",
       "3개월 검증 운영: 월 1회 촬영, 롱폼 2~4편, 쇼츠 4~8편"
     ],
@@ -94,7 +94,7 @@ export const industryPages: IndustryPageData[] = [
     ],
     offerTitle: "처음부터 장기계약하지 않아도 됩니다",
     offers: [
-      "24시간 3포인트 무료 진단",
+      "채널 구조 1차 검토",
       "49만원 채널 진단 리포트",
       "3개월 검증 운영: 롱폼 2~4편, 쇼츠 4~8편, 월간 리포트"
     ],
@@ -132,7 +132,7 @@ export const industryPages: IndustryPageData[] = [
     ],
     offerTitle: "단발 홍보영상보다 월간 운영 구조를 먼저 봅니다",
     offers: [
-      "24시간 3포인트 무료 진단",
+      "채널 구조 1차 검토",
       "사업/정책/서비스별 콘텐츠 캘린더 제안",
       "월간 운영 또는 내부 영상 시스템 구축 연동"
     ],
@@ -170,7 +170,7 @@ export const industryPages: IndustryPageData[] = [
     ],
     offerTitle: "작은 부티크 운영팀처럼 고정 담당자가 봅니다",
     offers: [
-      "24시간 3포인트 무료 진단",
+      "채널 구조 1차 검토",
       "월간 운영 플랜 추천",
       "인하우스 영상 시스템 구축 컨설팅"
     ],
@@ -284,7 +284,7 @@ export const industryPages: IndustryPageData[] = [
     ],
     offerTitle: "처음부터 장기계약하지 않아도 됩니다",
     offers: [
-      "24시간 3포인트 무료 진단",
+      "채널 구조 1차 검토",
       "49만원 채널 진단 리포트",
       "3개월 검증 운영: 시즌 주제 설계 + 제작 + 월간 리포트"
     ],

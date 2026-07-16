@@ -6,7 +6,7 @@ import { getIndustryPage } from "@/lib/industry-pages";
 const page = getIndustryPage("tax-youtube");
 
 export const metadata: Metadata = {
-  title: page?.title ?? "세무·노무 유튜브 운영대행 | Turnkeyhaus",
+  title: "세무·노무·회계 유튜브 운영대행",
   description: page?.description,
   keywords: page?.keywords,
   alternates: {

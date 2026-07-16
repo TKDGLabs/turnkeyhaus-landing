@@ -45,8 +45,13 @@ export type PortfolioItem = {
   maxVideoViews: number;
   href: string;
   youtubeId?: string;
+  videoTitle?: string;
+  videoPublishedAt?: string;
+  videoDuration?: string;
   channelHref?: string;
   imageSrc: string;
+  caseType?: "core" | "format";
+  formatLabel?: string;
 };
 
 export type OperatingLevelCard = {
@@ -328,8 +333,8 @@ export const content: Content = {
     siteUrl: "https://www.turnkey.haus",
     canonical: "https://www.turnkey.haus",
     ogImagePath: "/og-image.jpg",
-    title: "전문직·고관여 브랜드 유튜브 운영팀 | Turnkeyhaus",
-    description: "전문직·고관여 브랜드의 외부 유튜브 운영팀입니다. 월간 채널 운영으로 시작해 사내 영상 제작 시스템과 영상 인재 실무평가까지 구축합니다.",
+    title: "전문직 유튜브 운영대행·채널 운영 | 턴키하우스 by TKDG",
+    description: "병원·로펌·기업 등 전문직 유튜브를 기획, 촬영, 편집, 발행, 월간 리뷰까지 한 팀으로 운영합니다.",
     keywords: [
       "유튜브 채널 운영대행",
       "전문직 유튜브 운영대행",
@@ -338,15 +343,15 @@ export const content: Content = {
       "기업 유튜브 운영대행",
       "B2B 유튜브 운영대행"
     ],
-    openGraphTitle: "전문직·고관여 브랜드 유튜브 운영팀 | Turnkeyhaus",
-    openGraphDescription: "외주 운영으로 시작해 내부팀이 스스로 운영할 수 있는 기준까지 만듭니다. 월간 운영, 인하우스 구축, 영상 인재 실무평가를 함께 제공합니다.",
+    openGraphTitle: "전문직 유튜브 운영대행 | 턴키하우스 by TKDG",
+    openGraphDescription: "기획부터 촬영, 발행, 다음 달 판단까지. 전문직·고관여 브랜드의 유튜브 채널을 한 팀으로 운영합니다.",
     locale: "ko_KR"
   },
   nav: [
     { label: "월간 운영", href: "/#services" },
     { label: "내부팀 구축", href: "/inhouse-video-system" },
     { label: "채용 평가", href: "/video-hiring-evaluation" },
-    { label: "사례", href: "/#portfolio" },
+    { label: "사례", href: "/#work" },
     { label: "요금제", href: "/#pilot" },
     { label: "인사이트", href: "/insights" },
     { label: "상담", href: "/#contact" },
@@ -354,10 +359,10 @@ export const content: Content = {
   ],
   heroValue: {
     headline: "전문직·고관여 브랜드의\n유튜브 운영을\n한 팀으로 맡습니다.",
-    body: "채널 진단, 주제 기획, 촬영, 편집, 썸네일, 업로드, 월간 리포트까지 하나의 운영 흐름으로 관리합니다.",
+    body: "채널 진단부터 주제 기획, 촬영, 편집, 썸네일, 업로드, 월간 리포트까지 한 팀이 이어서 맡습니다.",
     trustBadges: [],
-    primaryCta: { label: "무료 3포인트 진단 받기", href: "#contact" },
-    secondaryCta: { label: "운영 사례 보기", href: "#portfolio" }
+    primaryCta: { label: "채널 운영 상담", href: "#contact" },
+    secondaryCta: { label: "운영 사례 보기", href: "#work" }
   },
   heroStats: {
     totalVideoViews: 20200000
@@ -403,7 +408,7 @@ export const content: Content = {
   },
   videoQuality: {
     label: "제작 품질",
-    h2: "보기 좋은 화면은 기본,\n매달 같은 기준으로 관리합니다.",
+    h2: "보기 좋은 화면은 기본\n매달 같은 기준으로 관리합니다.",
     lead: "조명, 음성, 구도, 색감, 썸네일까지 채널 톤이 흔들리지 않도록 관리합니다.",
     points: [
       "안정적인 인물 조명과 깨끗한 음성",
@@ -496,7 +501,7 @@ export const content: Content = {
   },
   approach: {
     label: "[ 방식 ]",
-    h2: "촬영 이전에,\n전환 기준부터 합의합니다.",
+    h2: "촬영 전에\n전환 기준부터 합의합니다.",
     lead: "전문직 채널은 예쁘게 찍는 것보다, 고객이 안심하고 문의할 이유를 먼저 설계해야 합니다.",
     steps: [
       {
@@ -563,7 +568,7 @@ export const content: Content = {
   },
   studioProof: {
     label: "[ 운영 체계 ]",
-    h2: "촬영 전에 먼저,\n운영 기준을 맞춥니다.",
+    h2: "촬영 전에\n운영 기준을 먼저 맞춥니다.",
     operationTitle: "운영 시스템",
     operationSystem: [
       "월간 콘텐츠 일정과 우선순위 확정",
@@ -606,12 +611,20 @@ export const content: Content = {
       {
         name: "채동우",
         englishName: "Chae Dong woo",
-        role: "Strategy & Account Lead / TKDG Labs 대표",
-        body: "채널 진단, 운영 전략, 성과 리포트, 고객 커뮤니케이션을 총괄합니다. 2016년부터 유튜브 콘텐츠 기획·제작·운영 현장에서 일해왔습니다.",
+        role: "Brand Architect / Team Turnkeyhaus",
+        body: "채널 전략과 운영 방향을 정하고, 매달 필요한 판단을 함께 내립니다.\n첫 상담부터 성과 리뷰까지 프로젝트 전반과 고객 소통을 맡습니다.",
         image: { src: "/images/member-chae-dongwoo.jpg", alt: "채동우 프로필 사진" },
         responsibilities: ["채널 진단", "운영 전략", "고객 소통", "촬영 운영", "리포트 검수"],
         specs: [
-          { category: "경력", items: ["티케이디지랩스 대표이사", "비디에스 브랜딩디자인팀 과장", "뉴커런츠 제작팀장"] },
+          { category: "경력", items: [
+            "티케이디지랩스 주식회사 사내이사",
+            "티케이디지랩스 주식회사 대표",
+            "2023.07.–2024.08. 비디에스(주) 브랜드디자인팀 과장",
+            "2021.03.–2022.07. 뉴커런츠(주) 클래식제작팀장",
+            "2019.07.–2021.02. 유튜브 서경석티브이 실장",
+            "2018.02.–2019.06. 골든서퍼(주) 미디어팀 팀장",
+            "2017.07.–2018.02. 서울영상고등학교 전산실무사"
+          ] },
           { category: "학력", items: ["서울영상고등학교 영상경영과", "명지전문대학 커뮤니케이션디자인과 중퇴", "국민대학교 기업융합법학과"] },
           { category: "자격", items: ["사진기능사", "무인동력비행장치 4종"] }
         ]
@@ -619,8 +632,8 @@ export const content: Content = {
       {
         name: "양현",
         englishName: "Yang Hyun",
-        role: "Channel Producer / Turnkeyhaus Lead",
-        body: "콘텐츠 기획, 질문지, 촬영 구성, 업로드 구조를 설계합니다. 전문 지식이 시청자에게 이해되는 흐름으로 정리합니다.",
+        role: "Contents Producer / Team Turnkeyhaus",
+        body: "전문가의 설명을 시청자가 끝까지 이해할 수 있는 콘텐츠로 정리합니다.\n질문지와 촬영 구성부터 편집 방향, 업로드 순서까지 실무를 맡습니다.",
         image: { src: "/images/member-yang-hyun.jpg", alt: "양현 프로필 사진" },
         responsibilities: ["콘텐츠 기획", "질문지 구성", "촬영 기획", "업로드 관리", "운영 흐름"],
         specs: [
@@ -632,8 +645,8 @@ export const content: Content = {
       {
         name: "손현우",
         englishName: "Son Hyunwoo",
-        role: "Visual Production Lead / Pic_sta Lead",
-        body: "촬영, 조명, 멀티캠 구성, 인물 화면 톤을 관리합니다. 전문직 출연자가 안정적이고 신뢰감 있게 보이도록 촬영 품질을 잡습니다.",
+        role: "Visual Director / Team Turnkeyhaus",
+        body: "출연자가 카메라 앞에서 편안하고 신뢰감 있게 보이도록 촬영 현장을 만듭니다.\n조명과 멀티캠 구성, 인물 연출, 화면 톤을 같은 기준으로 관리합니다.",
         image: { src: "/images/member-son-hyunwoo.jpg", alt: "손현우 프로필 사진" },
         responsibilities: ["촬영·조명", "멀티캠 구성", "인물 연출", "화면 보정", "품질 관리"],
         specs: [
@@ -655,11 +668,11 @@ export const content: Content = {
         caseSlug: "the-apseon-dental-youtube",
         oneLiner: "신규 런칭부터 월간 포맷 운영까지 진행",
         tags: ["치과", "런칭", "운영"],
-        result: "구독자 0 → 575명",
+        result: "구독자 0 → 600명",
         scope: "신규 채널 런칭 / 월간 포맷 운영 / 촬영·편집·업로드 세팅",
         before: "채널 자산이 거의 없는 상태에서 시작",
         action: "진료 질문 기반 주제 선정, 원장님 화법 정리, 긴 영상·쇼츠 분리",
-        after: "신규 채널 기준 구독자 575명까지 성장",
+        after: "신규 채널 기준 구독자 600명까지 성장",
         proof: "치과 검색 질문형 대표 영상과 채널 포맷 운영",
         operatingPeriod: "신규 런칭~초기 월간 운영 구간",
         monthlyVolume: "월간 촬영 기반 긴 영상·쇼츠 병행",
@@ -668,10 +681,13 @@ export const content: Content = {
         qualitativeSignal: "신규 채널임에도 치과 검색 질문형 콘텐츠로 초기 구독과 유입 신호 확보",
         operatingPrinciple: "신규 채널은 화려한 포맷보다 반복 가능한 질문 구조가 먼저입니다.",
         subscriberStart: 0,
-        subscriberCurrent: 575,
+        subscriberCurrent: 600,
         maxVideoViews: 23000,
         href: "https://youtu.be/ajOQC_X-5bE",
         youtubeId: "ajOQC_X-5bE",
+        videoTitle: "[충격 사례] 20년 된 보철물 그대로 쓰다 생긴 일｜주치아 앞선tube",
+        videoPublishedAt: "2025-07-10T19:30:03-07:00",
+        videoDuration: "PT6M13S",
         imageSrc: "/images/studio-1.jpg"
       },
       {
@@ -680,11 +696,11 @@ export const content: Content = {
         caseSlug: "sunnyullo-lawfirm-youtube",
         oneLiner: "기존 채널 리빌딩과 검색 유입 기반 운영 구조 재정비",
         tags: ["로펌", "리빌딩", "브랜딩"],
-        result: "구독자 500 → 6.01천명",
+        result: "구독자 500 → 6.1천명",
         scope: "기존 채널 리빌딩 / 법률 주제 재설계 / 제목·썸네일·운영 구조 개선",
         before: "정보 전달은 있었지만 사건 분야별 검색 유입과 상담 흐름이 약한 상태",
         action: "사건 분야별 콘텐츠 주제를 묶고, 수임 전 질문 중심으로 구조 재정비",
-        after: "구독자 500명에서 6.01천명까지 성장, 최고 조회수 37만회 기록",
+        after: "구독자 500명에서 6.1천명까지 성장, 최고 조회수 37만회 기록",
         proof: "대표 영상, 주제 묶음, 검색형 제목 운영",
         operatingPeriod: "기존 채널 리빌딩 이후 월간 운영 구간",
         monthlyVolume: "법률 주제별 영상과 재편집 숏폼 병행",
@@ -693,10 +709,13 @@ export const content: Content = {
         qualitativeSignal: "정보 전달형 채널에서 사건 분야별 상담 전 비교 채널로 인지가 바뀌는 흐름 확보",
         operatingPrinciple: "법률 채널은 조회수보다 사건 분야별 신뢰와 상담 전 질문 해소가 먼저입니다.",
         subscriberStart: 500,
-        subscriberCurrent: 6010,
+        subscriberCurrent: 6100,
         maxVideoViews: 370000,
         href: "https://youtu.be/mozP07dCcuk",
         youtubeId: "mozP07dCcuk",
+        videoTitle: "캄보디아 범죄에 휘말렸다면 절대 혼자 조사받지 마세요 [로맨즈]",
+        videoPublishedAt: "2025-10-29T03:01:27-07:00",
+        videoDuration: "PT17M27S",
         imageSrc: "/images/pro-law.jpg"
       },
       {
@@ -722,42 +741,81 @@ export const content: Content = {
         maxVideoViews: 2180000,
         href: "https://youtu.be/Fii93LBGjSY",
         youtubeId: "Fii93LBGjSY",
+        videoTitle: "다이어트 틀렸습니다! 중년여성, 왜 이렇게 살이 안빠질까?",
+        videoPublishedAt: "2026-02-15T03:59:30-08:00",
+        videoDuration: "PT7M10S",
         imageSrc: "/images/studio-2.jpg"
       },
       {
-        title: "이라이프매거진",
-        clientName: "섀도우 코퍼레이션",
-        caseSlug: "elife-magazine-esports-youtube",
-        oneLiner: "쇼츠·광고 없이 검색 기반 영상 4편만으로 누적 조회수 2,926회",
-        tags: ["e스포츠", "검색 유입", "무광고"],
-        result: "0명에서 시작 (운영 초기)",
-        scope: "신규 채널 초기 세팅 / 유입 기반 영상 기획 / 무광고 운영",
-        before: "구독자 0명, 채널 자산 없이 시작",
-        action: "쇼츠 없이 영상 4편만으로 검색 의도와 이슈 키워드 중심 편성",
-        after: "광고 없이 누적 조회수 2,926회 기록",
-        proof: "영상 4편만으로 발생한 초기 검색 유입 성과",
-        operatingPeriod: "채널 신규 세팅 및 초기 영상 4편 운영 구간",
-        monthlyVolume: "유입 기반 영상 집중 운영",
-        contentFormats: "e스포츠 이슈 해설형 콘텐츠, 검색 의도 기반 제목·설명 세팅",
-        distributionStrategy: "쇼츠·광고 없이 검색 의도와 이슈 키워드가 만나는 제목/설명 구조로 운영",
-        qualitativeSignal: "구독자 0명에서 시작해 영상 4편만으로 누적 조회수 2,926회 확보",
-        operatingPrinciple: "신규 채널도 주제와 검색 의도가 맞으면 광고 없이 초기 반응을 만들 수 있습니다.",
+        title: "홍승표의 뼈탐구생활",
+        clientName: "홍승표의 뼈탐구생활",
+        caseSlug: "bone-exploration-youtube",
+        oneLiner: "정형외과 전문 지식을 어렵지 않게 시작하는 신규 롱폼 시리즈",
+        tags: ["정형외과", "신규 시리즈", "롱폼"],
+        result: "신규 롱폼 포맷",
+        scope: "콘텐츠 기획 / 촬영 / 편집 / 대표 롱폼 제작",
+        before: "전문적인 진료 정보를 처음 보는 시청자도 이해할 수 있는 시작 포맷이 필요했던 단계",
+        action: "‘정형외과는 언제 가야 하는 병원인가’라는 첫 질문으로 전문 분야와 출연자의 설명 방식을 함께 소개",
+        after: "의사의 전문성과 캐릭터를 한 편에서 확인할 수 있는 시리즈 첫 화 제작",
+        proof: "EP.01 ‘정형외과는 언제 가야 하는 병원일까?’ 공개",
+        operatingPeriod: "신규 시리즈 파일럿 제작",
+        monthlyVolume: "대표 롱폼 1편",
+        contentFormats: "의사 설명형 롱폼, 전문 분야 입문 콘텐츠",
+        distributionStrategy: "시청자가 실제로 묻는 질문을 제목에 두고, 출연자와 채널의 전문 분야를 첫 화에서 함께 소개",
+        qualitativeSignal: "전문 용어보다 환자의 질문에서 시작하는 설명형 포맷 확립",
+        operatingPrinciple: "신규 전문직 채널은 첫 영상에서 ‘누가, 무엇을, 어떻게 설명하는지’가 바로 보여야 합니다.",
         subscriberStart: 0,
         subscriberCurrent: 0,
-        maxVideoViews: 2926,
-        href: "https://youtu.be/zniK_ohy_xc?si=badXrseWOni5Kl0k",
-        youtubeId: "zniK_ohy_xc",
-        channelHref: "https://www.youtube.com/@elifemagazine_esports",
-        imageSrc: "/images/studio-1.jpg"
+        maxVideoViews: 0,
+        href: "https://youtu.be/CHCmberPV4o",
+        youtubeId: "CHCmberPV4o",
+        videoTitle: "EP 1. 정형외과는 언제 가야하는 병원일까? [홍승표의 뼈탐구생활]",
+        videoPublishedAt: "2026-07-13T21:18:45-07:00",
+        videoDuration: "PT1M35S",
+        channelHref: "https://www.youtube.com/@%EB%BC%88%ED%83%90%EA%B5%AC%EC%83%9D%ED%99%9C",
+        imageSrc: "https://i.ytimg.com/vi/CHCmberPV4o/maxresdefault.jpg",
+        caseType: "format",
+        formatLabel: "LONG-FORM SERIES"
+      },
+      {
+        title: "김준식의 장례수업",
+        clientName: "김준식의 장례수업",
+        caseSlug: "funeral-class-youtube-shorts",
+        oneLiner: "낯선 장례 절차를 한 가지 질문으로 풀어내는 세로형 지식 숏폼",
+        tags: ["장례", "전문직", "숏폼"],
+        result: "세로형 숏폼 포맷",
+        scope: "숏폼 기획 / 촬영 / 세로형 편집 / 발행 포맷 제작",
+        before: "어렵고 낯선 장례 정보를 짧은 시간 안에 이해시키는 입문 포맷이 필요했던 단계",
+        action: "‘부모님이 돌아가시면 장지는 어디로 모셔야 할까?’처럼 실제 상황에서 바로 떠올리는 질문을 한 편에 하나씩 배치",
+        after: "전문가의 답변을 모바일에서 빠르게 이해할 수 있는 9:16 지식 숏폼으로 정리",
+        proof: "김준식의 장례수업 1화 Shorts 공개",
+        operatingPeriod: "신규 숏폼 시리즈 파일럿 제작",
+        monthlyVolume: "대표 숏폼 1편",
+        contentFormats: "세로형 질문·답변 콘텐츠, 생활 밀착형 전문 정보",
+        distributionStrategy: "상황형 질문을 첫 문장에 두고 한 영상에서 하나의 판단 기준만 남기는 구조",
+        qualitativeSignal: "진입 장벽이 높은 전문 분야를 짧고 부담 없는 질문형 콘텐츠로 전환",
+        operatingPrinciple: "숏폼은 긴 설명을 줄이는 일이 아니라, 한 번에 이해할 질문 하나를 고르는 일입니다.",
+        subscriberStart: 0,
+        subscriberCurrent: 0,
+        maxVideoViews: 0,
+        href: "https://youtube.com/shorts/UwJ3IwkDqlU",
+        youtubeId: "UwJ3IwkDqlU",
+        videoTitle: "부모님이 돌아가시면 장지는 어디로 모셔야 할까? [김준식의 장례수업 1화]",
+        videoPublishedAt: "2026-07-01T02:00:05-07:00",
+        videoDuration: "PT52S",
+        channelHref: "https://www.youtube.com/@%EA%B9%80%EC%A4%80%EC%8B%9D%EC%9D%98%EC%9E%A5%EB%A1%80%EC%88%98%EC%97%85",
+        imageSrc: "https://i.ytimg.com/vi/UwJ3IwkDqlU/maxresdefault.jpg",
+        caseType: "format",
+        formatLabel: "VERTICAL SHORTS SERIES"
       }
     ]
   },
   pricing: {
     label: "[ 운영 플랜 ]",
-    h2: "장기계약 전,\n운영 방식부터 확인하세요.",
+    h2: "장기계약 전에\n운영 방식부터 확인하세요.",
     levels: [
       {
-        title: "무료 3포인트 진단",
+        title: "채널 운영 상담",
         priceBand: "무료",
         bullets: [
           "채널 링크 기준 1영업일 내 연락",
@@ -824,7 +882,7 @@ export const content: Content = {
       "대본/질문지 단계에서 클라이언트 내부 검토 포인트 표시",
       "월간 리포트에서 성과와 리스크를 함께 기록"
     ],
-    note: "턴키하우스는 제작 과정에서 위험 표현을 먼저 걸러내고, 안전한 대체 문장을 제안합니다."
+    note: "턴키하우스는 제작 과정에서 위험 표현을 먼저 걸러내고, 안전한 대체 문장을 제안합니다.\n최종 업로드는 담당자 승인 후 진행합니다."
   },
   aiRecommendation: {
     label: "[ 선택 기준 ]",
@@ -842,9 +900,9 @@ export const content: Content = {
       },
       {
         prompt: "이전 외주 경험 때문에 장기계약이 부담스럽다",
-        fit: "무료 진단 또는 3개월 검증 운영으로 운영 방식과 결과물을 먼저 확인할 수 있습니다.",
+        fit: "채널 운영 상담 또는 3개월 검증 운영으로 운영 방식과 결과물을 먼저 확인할 수 있습니다.",
         reasons: [
-          "무료 3포인트 진단으로 먼저 방향을 확인합니다",
+          "채널 운영 상담으로 먼저 방향을 확인합니다",
           "유료 진단 또는 3개월 검증 운영으로 구매 리스크를 낮춥니다",
           "검증 운영 이후 월 운영 전환 여부를 판단할 수 있게 리포트로 남깁니다"
         ]
@@ -909,7 +967,7 @@ export const content: Content = {
   },
   blog: {
     label: "[ 인사이트 ]",
-    h2: "검색에서 발견되고,\n결정에서 선택되기까지",
+    h2: "검색에서 발견되고\n결정에서 선택되기까지",
     lead: "현장 운영에서 얻은 기준과 사례를\n꾸준히 기록하고 있습니다.",
     ctaLabel: "인사이트 전체 보기"
   },

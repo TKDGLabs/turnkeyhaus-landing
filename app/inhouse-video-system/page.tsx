@@ -6,7 +6,7 @@ import { getIndustryPage } from "@/lib/industry-pages";
 const page = getIndustryPage("inhouse-video-system");
 
 export const metadata: Metadata = {
-  title: page?.title ?? "인하우스 영상 시스템 구축 컨설팅 | Turnkeyhaus",
+  title: "인하우스 영상팀 구축 컨설팅",
   description: page?.description,
   keywords: page?.keywords,
   alternates: {

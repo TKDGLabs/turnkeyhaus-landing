@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { content } from "@/content";
 import type { IndustryPageData } from "@/lib/industry-pages";
@@ -75,25 +74,11 @@ export default function IndustryLanding({ page }: { page: IndustryPageData }) {
   ];
 
   return (
-    <main className="bg-white text-[#0B0F0E]">
+    <main id="main-content" className="bg-white pt-[82px] text-[#0B0F0E]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <header className="border-b border-black/10 bg-white">
-        <div className={`${shell} flex items-center justify-between py-4`}>
-          <Link href="/" className={`inline-flex items-center ${focusRing}`}>
-            <Image src="/logo.png" alt="Turnkeyhaus" width={176} height={48} className="h-11 w-auto object-contain" />
-          </Link>
-          <Link
-            href="/#contact"
-            className={`inline-flex h-10 items-center border border-[#21c1a2] bg-[#21c1a2] px-4 text-sm font-semibold text-[#07211d] transition-colors hover:bg-[#1db197] ${focusRing}`}
-          >
-            24시간 진단 요청
-          </Link>
-        </div>
-      </header>
-
       <section className="border-b border-black/12">
         <div className={`${shell} py-16 md:py-24`}>
           <p className="text-xs font-semibold tracking-[0.14em] text-black/48">[ {page.eyebrow} ]</p>
@@ -108,7 +93,7 @@ export default function IndustryLanding({ page }: { page: IndustryPageData }) {
               href="/#contact"
               className={`inline-flex items-center border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-[#07211d] transition-colors hover:bg-[#1db197] ${focusRing}`}
             >
-              24시간 3포인트 진단 받기
+              채널 운영 상담
             </Link>
             <Link
               href="/#pilot"
@@ -165,7 +150,7 @@ export default function IndustryLanding({ page }: { page: IndustryPageData }) {
                 href="/#contact"
                 className={`inline-flex items-center border border-[#21c1a2] bg-[#21c1a2] px-5 py-3 text-sm font-semibold text-[#07211d] transition-colors hover:bg-[#1db197] ${focusRing}`}
               >
-                채널 진단 요청
+                채널 구조 검토 요청
               </Link>
               <a
                 href={content.contact.kakaoChatUrl}

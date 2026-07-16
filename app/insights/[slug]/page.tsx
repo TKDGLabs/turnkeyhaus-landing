@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { content } from "@/content";
 import { getInsightBySlug, insights } from "@/content/insights";
+import { ORGANIZATION_ID, breadcrumbJsonLd, serializeJsonLd } from "@/lib/seo";
 
 type InsightParams = {
   params: {
@@ -34,7 +34,7 @@ export function generateMetadata({ params }: InsightParams): Metadata {
   if (!post) return {};
 
   return {
-    title: `${post.title} | TKDG Labs`,
+    title: { absolute: post.title },
     description: post.description,
     keywords: post.keywords,
     alternates: { canonical: `https://www.turnkey.haus/insights/${post.slug}` },
@@ -63,56 +63,42 @@ export default function InsightDetailPage({ params }: InsightParams) {
 
   const articleStructuredData = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.description,
-    inLanguage: "ko-KR",
-    datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
-    mainEntityOfPage: `${content.seo.siteUrl}/insights/${post.slug}`,
-    author: {
-      "@type": "Organization",
-      name: content.brand.name
-    },
-    publisher: {
-      "@type": "Organization",
-      name: content.brand.name,
-      logo: {
-        "@type": "ImageObject",
-        url: `${content.seo.siteUrl}/logo.png`
-      }
-    },
-    keywords: post.keywords.join(", ")
+    "@graph": [
+      {
+        "@type": "Article",
+        "@id": `${content.seo.siteUrl}/insights/${post.slug}#article`,
+        headline: post.title,
+        description: post.description,
+        image: `${content.seo.siteUrl}${content.seo.ogImagePath}`,
+        inLanguage: "ko-KR",
+        datePublished: post.publishedAt,
+        dateModified: post.publishedAt,
+        mainEntityOfPage: `${content.seo.siteUrl}/insights/${post.slug}`,
+        author: { "@id": ORGANIZATION_ID },
+        publisher: { "@id": ORGANIZATION_ID },
+        keywords: post.keywords.join(", ")
+      },
+      breadcrumbJsonLd([
+        { name: "홈", path: "/" },
+        { name: "인사이트", path: "/insights" },
+        { name: post.title, path: `/insights/${post.slug}` }
+      ])
+    ]
   };
 
+  const keywordText = post.keywords.join(" ");
+  const industryLink = keywordText.match(/병원|의료|치과/)
+    ? { href: "/medical-youtube", label: "병원·의원 유튜브 운영 방식" }
+    : keywordText.match(/로펌|변호사|법률/)
+      ? { href: "/lawfirm-youtube", label: "변호사·로펌 유튜브 운영 방식" }
+      : { href: "/youtube-channel-management", label: "전문직 유튜브 운영 범위" };
+
   return (
-    <main className="min-h-screen bg-white text-[#0B0F0E]">
+    <main id="main-content" className="min-h-screen bg-white pt-[82px] text-[#0B0F0E]">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleStructuredData) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleStructuredData) }}
       />
-      <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-5 py-5">
-          <Link href="/" className="flex h-11 shrink-0 items-center">
-            <Image
-              src="/logo.png"
-              alt={content.brand.logoAlt}
-              width={164}
-              height={44}
-              className="h-11 w-auto object-contain"
-              priority
-            />
-          </Link>
-
-          <Link
-            href="/insights"
-            className="inline-flex h-10 items-center rounded-xl border border-black/15 px-4 text-sm font-semibold text-black/75 hover:bg-black/[0.03]"
-          >
-            인사이트 목록
-          </Link>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-3xl px-6 py-12">
         <article>
           <header className="mb-10">
@@ -160,15 +146,22 @@ export default function InsightDetailPage({ params }: InsightParams) {
             })}
           </div>
 
-          <footer className="mt-12 rounded-2xl border border-black/10 bg-black/[0.02] p-6">
-            <div className="text-sm text-black/60">브랜딩 콘텐츠·채널 운영 상담</div>
-            <div className="mt-2 text-lg font-semibold">채널 구조/대본/전환 설계까지 함께 잡습니다.</div>
-            <a
-              href="/#contact"
-              className="mt-4 inline-flex rounded-xl bg-black px-5 py-3 text-sm font-semibold text-white"
-            >
-              상담 요청하기
-            </a>
+          <aside className="mt-12 border-y border-black/15 py-6" aria-label="작성자 정보">
+            <p className="text-[12px] font-semibold tracking-[0.1em] text-black/45">작성·검수</p>
+            <div className="mt-3 flex flex-wrap items-baseline justify-between gap-3">
+              <div><strong className="text-[18px]">턴키하우스 by TKDG 운영팀</strong><p className="mt-1 text-[14px] leading-relaxed text-black/60">티케이디지랩스 주식회사 · 전문직 유튜브 운영 현장 기록</p></div>
+              <Link href="/company" className="text-[13px] font-semibold underline underline-offset-4">운영팀 경력 확인</Link>
+            </div>
+          </aside>
+
+          <footer className="mt-10 border border-black/12 bg-[#f4f3ef] p-6 md:p-8">
+            <div className="text-sm text-black/55">이 글과 연결된 운영 자료</div>
+            <div className="mt-2 text-xl font-semibold">현장에서 쓰는 기준을 서비스와 사례로 이어서 확인하세요.</div>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href={industryLink.href} className="inline-flex border border-black/20 bg-white px-5 py-3 text-sm font-semibold">{industryLink.label}</Link>
+              <Link href="/#work" className="inline-flex border border-black/20 bg-white px-5 py-3 text-sm font-semibold">운영 사례 보기</Link>
+              <a href="/#contact" className="inline-flex bg-black px-5 py-3 text-sm font-semibold text-white">채널 운영 상담</a>
+            </div>
           </footer>
         </article>
       </section>
